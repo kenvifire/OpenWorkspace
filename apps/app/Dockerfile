@@ -61,11 +61,13 @@ COPY --from=builder /app/apps/app/public ./public
 
 # Leverage Next.js standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/apps/app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/app/.next/static ./apps/app/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/app/public ./apps/app/public
 
 USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
+WORKDIR /app/apps/app
 
 CMD ["node", "server.js"]
