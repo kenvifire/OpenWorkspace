@@ -58,8 +58,9 @@ RUN pnpm install --frozen-lockfile --filter api... --prod
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 
 # Copy Prisma schema and the generated client from the builder
+# In pnpm workspaces the generated .prisma client lives at the workspace root node_modules
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
-COPY --from=builder /app/apps/api/node_modules/.prisma ./apps/api/node_modules/.prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Copy nest-cli.json needed by the NestJS runtime path resolver
 COPY --from=builder /app/apps/api/tsconfig.json ./apps/api/tsconfig.json
