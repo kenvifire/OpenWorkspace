@@ -1,0 +1,8 @@
+asyncpg==0.30.0
+cuid2==2.0.1
+httpx==0.28.1
+python-dotenv==1.1.0
+redis[asyncio]==5.2.1
+uvloop==0.21.0; sys_platform != "win32"
+cryptography==44.0.2
+e2b>=1.0.0
