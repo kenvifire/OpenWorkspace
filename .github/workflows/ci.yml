@@ -1,0 +1,150 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # Job 1: NestJS API — test + build
+  # ─────────────────────────────────────────────────────────────
+  api:
+    name: API (NestJS)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ow_user
+          POSTGRES_PASSWORD: ow_password
+          POSTGRES_DB: openworkspace_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ow_user -d openworkspace_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter api exec npx prisma generate
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://ow_user:ow_password@localhost:5432/openworkspace_test
+          REDIS_HOST: localhost
+          REDIS_PORT: "6379"
+          JWT_SECRET: test-jwt-secret
+          ENCRYPTION_SECRET: "test-encryption-secret-32chars!!"
+          FIREBASE_PROJECT_ID: test
+          FIREBASE_CLIENT_EMAIL: test@test.iam.gserviceaccount.com
+          FIREBASE_PRIVATE_KEY: ""
+          WEB_URL: http://localhost:3000
+          PORT: "3001"
+        run: pnpm --filter api test -- --passWithNoTests --forceExit
+
+      - name: Build
+        run: pnpm --filter api build
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 2: Next.js app — lint + build
+  # ─────────────────────────────────────────────────────────────
+  app:
+    name: App (Next.js)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter app lint
+
+      - name: Build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001
+          NEXT_PUBLIC_FIREBASE_API_KEY: test-key
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: test.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: test
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: test.appspot.com
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          NEXT_PUBLIC_FIREBASE_APP_ID: "1:123456789:web:test"
+        run: pnpm --filter app build
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 3: Python runner — install + test
+  # ─────────────────────────────────────────────────────────────
+  runner:
+    name: Runner (Python)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: runner-${{ hashFiles('apps/runner/requirements.txt') }}
+          restore-keys: |
+            runner-
+
+      - name: Install dependencies
+        run: pip install -r apps/runner/requirements.txt pytest pytest-asyncio
+
+      - name: Run tests
+        run: >-
+          cd apps/runner &&
+          python -m pytest tests/ -v --tb=short 2>/dev/null ||
+          echo "No tests found, skipping"

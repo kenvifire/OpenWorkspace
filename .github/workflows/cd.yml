@@ -1,0 +1,135 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+# Prevent concurrent deployments on the same branch
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # Job 1: Build and push API Docker image
+  # ─────────────────────────────────────────────────────────────
+  docker-api:
+    name: Docker — API
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+            ghcr.io/${{ github.repository }}/api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # TODO: Add deployment step here, e.g.:
+      # - name: Deploy API
+      #   run: kubectl set image deployment/api api=ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+      # or:
+      #   run: fly deploy --app openworkspace-api --image ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 2: Build and push runner Docker image
+  # ─────────────────────────────────────────────────────────────
+  docker-runner:
+    name: Docker — Runner
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push runner image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/runner
+          file: apps/runner/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/runner:${{ github.sha }}
+            ghcr.io/${{ github.repository }}/runner:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # TODO: Add deployment step here, e.g.:
+      # - name: Deploy Runner
+      #   run: kubectl set image deployment/runner runner=ghcr.io/${{ github.repository }}/runner:${{ github.sha }}
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 3: Build and push app Docker image
+  # ─────────────────────────────────────────────────────────────
+  docker-app:
+    name: Docker — App
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push app image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/app/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/app:${{ github.sha }}
+            ghcr.io/${{ github.repository }}/app:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # TODO: Add deployment step here, e.g.:
+      # - name: Deploy App
+      #   run: kubectl set image deployment/app app=ghcr.io/${{ github.repository }}/app:${{ github.sha }}
+      # or:
+      #   run: fly deploy --app openworkspace-app --image ghcr.io/${{ github.repository }}/app:${{ github.sha }}
