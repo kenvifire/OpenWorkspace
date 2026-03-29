@@ -34,6 +34,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase image name
+        run: echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}/api" >> $GITHUB_ENV
+
       - name: Build and push API image
         uses: docker/build-push-action@v6
         with:
@@ -41,8 +44,8 @@ jobs:
           file: apps/api/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/api:${{ github.sha }}
-            ghcr.io/${{ github.repository }}/api:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -76,6 +79,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase image name
+        run: echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}/runner" >> $GITHUB_ENV
+
       - name: Build and push runner image
         uses: docker/build-push-action@v6
         with:
@@ -83,8 +89,8 @@ jobs:
           file: apps/runner/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/runner:${{ github.sha }}
-            ghcr.io/${{ github.repository }}/runner:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -116,6 +122,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase image name
+        run: echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}/app" >> $GITHUB_ENV
+
       - name: Build and push app image
         uses: docker/build-push-action@v6
         with:
@@ -123,8 +132,8 @@ jobs:
           file: apps/app/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/app:${{ github.sha }}
-            ghcr.io/${{ github.repository }}/app:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
