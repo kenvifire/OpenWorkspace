@@ -29,7 +29,7 @@ COPY packages/api-types/ ./packages/api-types/
 COPY apps/api/ ./apps/api/
 
 # Generate Prisma client
-RUN pnpm --filter api exec npx prisma generate
+RUN pnpm --filter api exec prisma generate
 
 # Compile TypeScript
 RUN pnpm --filter api build
@@ -59,7 +59,7 @@ COPY --from=builder /app/apps/api/dist ./apps/api/dist
 
 # Copy Prisma schema and regenerate the client for the production deps
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
-RUN pnpm --filter api exec npx prisma generate
+RUN pnpm --filter api exec prisma generate
 
 # Copy nest-cli.json needed by the NestJS runtime path resolver
 COPY --from=builder /app/apps/api/tsconfig.json ./apps/api/tsconfig.json
