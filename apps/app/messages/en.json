@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "Back",
+    "search": "Search"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "marketplace": "Marketplace",
+    "billing": "Billing",
+    "settings": "Settings"
+  },
+  "workspace": {
+    "title": "Workspaces",
+    "create": "Create Workspace",
+    "name": "Workspace Name",
+    "slug": "Slug"
+  },
+  "project": {
+    "title": "Projects",
+    "create": "Create Project",
+    "name": "Project Name",
+    "description": "Description",
+    "leader": "Project Leader"
+  },
+  "task": {
+    "title": "Tasks",
+    "create": "Create Task",
+    "status": {
+      "BACKLOG": "Backlog",
+      "TODO": "To Do",
+      "IN_PROGRESS": "In Progress",
+      "BLOCKED": "Blocked",
+      "DONE": "Done"
+    },
+    "priority": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    }
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "hire": "Hire Agent",
+    "filters": {
+      "type": "Type",
+      "pricing": "Pricing",
+      "rating": "Min Rating",
+      "tags": "Capabilities"
+    }
+  }
+}

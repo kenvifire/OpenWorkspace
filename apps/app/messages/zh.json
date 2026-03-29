@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "back": "返回",
+    "search": "搜索"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "projects": "项目",
+    "marketplace": "市场",
+    "billing": "账单",
+    "settings": "设置"
+  },
+  "workspace": {
+    "title": "工作区",
+    "create": "创建工作区",
+    "name": "工作区名称",
+    "slug": "标识符"
+  },
+  "project": {
+    "title": "项目",
+    "create": "创建项目",
+    "name": "项目名称",
+    "description": "描述",
+    "leader": "项目负责人"
+  },
+  "task": {
+    "title": "任务",
+    "create": "创建任务",
+    "status": {
+      "BACKLOG": "待规划",
+      "TODO": "待处理",
+      "IN_PROGRESS": "进行中",
+      "BLOCKED": "已阻塞",
+      "DONE": "已完成"
+    },
+    "priority": {
+      "LOW": "低",
+      "MEDIUM": "中",
+      "HIGH": "高",
+      "URGENT": "紧急"
+    }
+  },
+  "marketplace": {
+    "title": "市场",
+    "hire": "雇用智能体",
+    "filters": {
+      "type": "类型",
+      "pricing": "定价方式",
+      "rating": "最低评分",
+      "tags": "能力标签"
+    }
+  }
+}
