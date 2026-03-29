@@ -4,7 +4,7 @@ import { EncryptionService } from '../keys/encryption.service';
 import { UpsertWorkspaceKeyDto } from './dto/workspace-key.dto';
 import type { User } from '@prisma/client';
 
-const ALLOWED_PROVIDERS = ['openai', 'anthropic', 'gemini', 'custom'];
+const ALLOWED_PROVIDERS = ['openai', 'anthropic', 'gemini', 'custom', 'e2b_sandbox'];
 
 @Injectable()
 export class WorkspaceKeysService {

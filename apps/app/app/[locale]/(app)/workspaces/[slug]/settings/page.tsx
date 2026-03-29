@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Trash2, Eye, EyeOff, KeyRound, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Eye, EyeOff, KeyRound, ShieldCheck, Box } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const PROVIDERS = [
@@ -31,6 +31,10 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
   const [apiKey, setApiKey] = useState('');
   const [label, setLabel] = useState('');
   const [showKey, setShowKey] = useState(false);
+
+  // E2B sandbox key
+  const [sandboxKey, setSandboxKey] = useState('');
+  const [showSandboxKey, setShowSandboxKey] = useState(false);
 
   const { data: workspace } = useQuery({
     queryKey: ['workspace', slug],
@@ -56,6 +60,19 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
 
   const deleteKey = useMutation({
     mutationFn: (p: string) => workspaceKeysApi.delete(workspace!.id, p),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['workspace-provider-keys', workspace?.id] }),
+  });
+
+  const e2bKey = providerKeys.find((k) => k.provider === 'e2b_sandbox');
+  const saveSandboxKey = useMutation({
+    mutationFn: () => workspaceKeysApi.upsert(workspace!.id, { provider: 'e2b_sandbox' as any, apiKey: sandboxKey }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['workspace-provider-keys', workspace?.id] });
+      setSandboxKey('');
+    },
+  });
+  const deleteSandboxKey = useMutation({
+    mutationFn: () => workspaceKeysApi.delete(workspace!.id, 'e2b_sandbox'),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['workspace-provider-keys', workspace?.id] }),
   });
 
@@ -205,6 +222,81 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
             })}
           </div>
         )}
+      </motion.div>
+
+      {/* Sandbox section */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+        className="max-w-2xl mt-10"
+      >
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100">
+            <Box size={16} className="text-cyan-600" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-zinc-900">Sandbox</h2>
+            <p className="text-xs text-zinc-400">API keys for agent sandbox providers (used for real code execution)</p>
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-white px-5 py-4 shadow-sm ring-1 ring-zinc-200/80 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-zinc-900">E2B</p>
+              <p className="text-xs text-zinc-400 mt-0.5">
+                Isolated Ubuntu sandboxes for agents — run shell commands, write files, build & push code.{' '}
+                <a href="https://e2b.dev" target="_blank" rel="noreferrer" className="text-cyan-600 hover:underline">
+                  Get API key →
+                </a>
+              </p>
+            </div>
+            {e2bKey ? (
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">Configured</span>
+                <button
+                  onClick={() => deleteSandboxKey.mutate()}
+                  disabled={deleteSandboxKey.isPending}
+                  className="rounded-lg p-1.5 text-zinc-300 hover:bg-red-50 hover:text-red-400 transition-colors"
+                  title="Remove key"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            ) : (
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold text-zinc-500">Not set</span>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                type={showSandboxKey ? 'text' : 'password'}
+                placeholder="e2b_..."
+                value={sandboxKey}
+                onChange={(e) => setSandboxKey(e.target.value)}
+                className="pr-10 font-mono text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => setShowSandboxKey((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+              >
+                {showSandboxKey ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+            <Button
+              disabled={!sandboxKey.trim() || saveSandboxKey.isPending}
+              onClick={() => saveSandboxKey.mutate()}
+            >
+              {saveSandboxKey.isPending ? 'Saving…' : e2bKey ? 'Update' : 'Save'}
+            </Button>
+          </div>
+          {saveSandboxKey.isError && (
+            <p className="text-xs text-red-500">{(saveSandboxKey.error as any)?.response?.data?.message ?? 'Failed to save key'}</p>
+          )}
+        </div>
       </motion.div>
     </div>
   );

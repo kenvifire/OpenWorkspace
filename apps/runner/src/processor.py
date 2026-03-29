@@ -132,6 +132,13 @@ async def _process_job(job: dict) -> None:
     if not agent:
         raise ValueError(f"Agent {agent_id} not found")
 
+    # Load project sandbox config
+    project_row = await pool.fetchrow(
+        'SELECT "sandboxProvider", "workspaceId" FROM "Project" WHERE id = $1',
+        project_id,
+    )
+    sandbox_provider: str | None = project_row["sandboxProvider"] if project_row else None
+
     max_iterations: int = agent["maxIterations"] or 20
     enabled_tools_raw = agent["enabledTools"] or []
 
@@ -223,32 +230,36 @@ async def _process_job(job: dict) -> None:
 
     # ── Sandbox setup ─────────────────────────────────────────────────────────
     sandbox = None
-    if E2B_API_KEY and _E2B_AVAILABLE:
-        try:
-            sandbox = await _AsyncSandbox.create(api_key=E2B_API_KEY, timeout=600)
-            log.info("Run %s: E2B sandbox %s created.", run_log_id, sandbox.sandbox_id)
-            # Add sandbox tools and update system prompt
-            tools = tools + SANDBOX_TOOLS
-            system_prompt += (
-                "\n\n---\n## Sandbox Environment\n"
-                "You have access to a secure Ubuntu sandbox where you can execute shell commands, "
-                "write and read files, run build tools (cmake, make, cargo, npm, pip, git, etc.), "
-                "and commit/push code to GitHub.\n\n"
-                "**Coding workflow:**\n"
-                "1. Use `get_resource_key` to retrieve any tokens/credentials you need.\n"
-                "2. Use `run_shell` to clone the repository: "
-                "`git clone https://x-access-token:{token}@github.com/owner/repo /home/user/repo`\n"
-                "3. Write or edit files with `write_file` or `run_shell`.\n"
-                "4. Build and test with `run_shell`.\n"
-                "5. Commit and push: `git -C /home/user/repo add -A && git commit -m '...' && git push`\n"
-                "6. Call `complete_task` with a summary of what was done.\n\n"
-                "The sandbox is ephemeral — data does not persist after this run. "
-                "Always push to a remote repo before completing the task.\n"
-                "Working directory defaults to `/home/user`."
-            )
-        except Exception as e:
-            log.warning("Run %s: Failed to create E2B sandbox: %s", run_log_id, e)
-            sandbox = None
+    if sandbox_provider == "e2b" and _E2B_AVAILABLE:
+        # Resolve API key: workspace-stored key → env var fallback
+        e2b_key = await _resolve_api_key(None, "e2b_sandbox", workspace_id, pool) or E2B_API_KEY
+        if e2b_key:
+            try:
+                sandbox = await _AsyncSandbox.create(api_key=e2b_key, timeout=600)
+                log.info("Run %s: E2B sandbox %s created.", run_log_id, sandbox.sandbox_id)
+                tools = tools + SANDBOX_TOOLS
+                system_prompt += (
+                    "\n\n---\n## Sandbox Environment\n"
+                    "You have access to a secure Ubuntu sandbox where you can execute shell commands, "
+                    "write and read files, run build tools (cmake, make, cargo, npm, pip, git, etc.), "
+                    "and commit/push code to GitHub.\n\n"
+                    "**Coding workflow:**\n"
+                    "1. Use `get_resource_key` to retrieve any tokens/credentials you need.\n"
+                    "2. Use `run_shell` to clone the repository: "
+                    "`git clone https://x-access-token:{token}@github.com/owner/repo /home/user/repo`\n"
+                    "3. Write or edit files with `write_file` or `run_shell`.\n"
+                    "4. Build and test with `run_shell`.\n"
+                    "5. Commit and push: `git -C /home/user/repo add -A && git commit -m '...' && git push`\n"
+                    "6. Call `complete_task` with a summary of what was done.\n\n"
+                    "The sandbox is ephemeral — data does not persist after this run. "
+                    "Always push to a remote repo before completing the task.\n"
+                    "Working directory defaults to `/home/user`."
+                )
+            except Exception as e:
+                log.warning("Run %s: Failed to create E2B sandbox: %s", run_log_id, e)
+                sandbox = None
+        else:
+            log.warning("Run %s: sandbox_provider=e2b but no API key found.", run_log_id)
 
     ctx = ToolContext(
         task_id=task_id,

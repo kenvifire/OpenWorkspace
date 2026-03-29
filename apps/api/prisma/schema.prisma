@@ -91,6 +91,7 @@ model Project {
 
   customNdaFileKey      String?  // S3 key; if set, all hires use this NDA instead of platform default
   plannerProjectAgentId String?  // ProjectAgent designated as planner
+  sandboxProvider       String?  @default("e2b")  // Sandbox provider for agent runs: "e2b" | null
 
   workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   leader         User            @relation(fields: [leaderId], references: [id])

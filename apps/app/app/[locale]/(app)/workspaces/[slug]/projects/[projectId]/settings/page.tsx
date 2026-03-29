@@ -20,7 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   ArrowLeft, Bot, User, KeyRound, ShieldCheck, ShieldAlert,
   Trash2, Plus, Eye, EyeOff, Copy, Check, Star, Sparkles, Play, CheckCheck, X,
-  Brain, RotateCcw, ChevronDown, ChevronRight, Coins, BookOpen, ScrollText, Recycle, Settings2,
+  Brain, RotateCcw, ChevronDown, ChevronRight, Coins, BookOpen, ScrollText, Recycle, Settings2, Box,
 } from 'lucide-react';
 
 // ─── Run status colours ──────────────────────────────────────────────────────
@@ -814,6 +814,11 @@ export default function ProjectSettingsPage({
   const removeAgent = useMutation({
     mutationFn: (projectAgentId: string) => projectsApi.removeAgent(projectId, projectAgentId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['project-agents', projectId] }),
+  });
+
+  const updateSandboxProvider = useMutation({
+    mutationFn: (provider: string | null) => projectsApi.update(projectId, { sandboxProvider: provider } as any),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['project', projectId] }),
   });
 
   const acceptAgreement = useMutation({
@@ -1705,6 +1710,54 @@ export default function ProjectSettingsPage({
             ))}
           </div>
         )}
+      </section>
+
+      {/* ── Sandbox ───────────────────────────────────────────────────────── */}
+      <section className="mb-10">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-zinc-900">Sandbox</h2>
+          <p className="text-sm text-zinc-400">
+            Choose the sandbox provider for agent runs in this project.
+            Agents use the sandbox to execute code, run builds, and push to Git.
+          </p>
+        </div>
+        <Card>
+          <CardContent className="pt-4 space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-50 shrink-0">
+                <Box size={16} className="text-cyan-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-zinc-900">Provider</p>
+                <p className="text-xs text-zinc-400">
+                  Configure the E2B API key in{' '}
+                  <Link href={`/${locale}/workspaces/${slug}/settings`} className="text-violet-600 hover:underline">
+                    workspace settings
+                  </Link>
+                </p>
+              </div>
+              <select
+                className="rounded-md border border-zinc-200 px-3 py-2 text-sm bg-white"
+                value={project?.sandboxProvider ?? 'none'}
+                onChange={(e) => updateSandboxProvider.mutate(e.target.value === 'none' ? null : e.target.value)}
+                disabled={updateSandboxProvider.isPending}
+              >
+                <option value="e2b">E2B (default)</option>
+                <option value="none">None — disable sandbox</option>
+              </select>
+            </div>
+            {project?.sandboxProvider === 'e2b' && (
+              <p className="text-xs text-zinc-400 bg-cyan-50 rounded-lg px-3 py-2">
+                Agents will run in isolated E2B Ubuntu sandboxes with access to shell, git, build tools, and file I/O.
+              </p>
+            )}
+            {!project?.sandboxProvider && (
+              <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+                Sandbox disabled — agents can only use HTTP requests and task tools. No code execution.
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </section>
 
       {selectedAgent && (
