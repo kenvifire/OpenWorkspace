@@ -63,7 +63,7 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
     onSuccess: () => qc.invalidateQueries({ queryKey: ['workspace-provider-keys', workspace?.id] }),
   });
 
-  const e2bKey = providerKeys.find((k) => k.provider === 'e2b_sandbox');
+  const e2bKey = providerKeys.find((k) => (k.provider as string) === 'e2b_sandbox');
   const saveSandboxKey = useMutation({
     mutationFn: () => workspaceKeysApi.upsert(workspace!.id, { provider: 'e2b_sandbox' as any, apiKey: sandboxKey }),
     onSuccess: () => {
