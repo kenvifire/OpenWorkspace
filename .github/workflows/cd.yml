@@ -49,12 +49,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # TODO: Add deployment step here, e.g.:
-      # - name: Deploy API
-      #   run: kubectl set image deployment/api api=ghcr.io/${{ github.repository }}/api:${{ github.sha }}
-      # or:
-      #   run: fly deploy --app openworkspace-api --image ghcr.io/${{ github.repository }}/api:${{ github.sha }}
-
   # ─────────────────────────────────────────────────────────────
   # Job 2: Build and push runner Docker image
   # ─────────────────────────────────────────────────────────────
@@ -94,10 +88,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # TODO: Add deployment step here, e.g.:
-      # - name: Deploy Runner
-      #   run: kubectl set image deployment/runner runner=ghcr.io/${{ github.repository }}/runner:${{ github.sha }}
-
   # ─────────────────────────────────────────────────────────────
   # Job 3: Build and push app Docker image
   # ─────────────────────────────────────────────────────────────
@@ -136,9 +126,33 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+            NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+            NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+            NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+            NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+            NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      # TODO: Add deployment step here, e.g.:
-      # - name: Deploy App
-      #   run: kubectl set image deployment/app app=ghcr.io/${{ github.repository }}/app:${{ github.sha }}
-      # or:
-      #   run: fly deploy --app openworkspace-app --image ghcr.io/${{ github.repository }}/app:${{ github.sha }}
+  # ─────────────────────────────────────────────────────────────
+  # Job 4: Deploy to HK server
+  # ─────────────────────────────────────────────────────────────
+  deploy-hk:
+    name: Deploy — HK
+    runs-on: ubuntu-latest
+    needs: [docker-api, docker-app, docker-runner]
+    environment: production
+
+    steps:
+      - name: Deploy to HK server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: proxyhk.itluobo.com
+          username: ubuntu
+          key: ${{ secrets.HK_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/openworkspace
+            docker compose -f deploy/docker-compose.yml pull
+            docker compose -f deploy/docker-compose.yml up -d --remove-orphans
+            docker image prune -f
