@@ -143,16 +143,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: [docker-api, docker-app, docker-runner]
     environment: production
+    permissions:
+      packages: read
 
     steps:
       - name: Deploy to HK server
         uses: appleboy/ssh-action@v1
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           host: proxyhk.itluobo.com
           username: ubuntu
           key: ${{ secrets.HK_SSH_PRIVATE_KEY }}
+          envs: GHCR_TOKEN
           script: |
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u kenvifire --password-stdin
             cd /home/ubuntu/openworkspace
-            docker compose -f deploy/docker-compose.yml pull
-            docker compose -f deploy/docker-compose.yml up -d --remove-orphans
+            docker compose pull
+            docker compose up -d --remove-orphans
             docker image prune -f
