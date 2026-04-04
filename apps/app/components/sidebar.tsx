@@ -72,7 +72,7 @@ export function Sidebar() {
     { label: t('dashboard'), href: `/${locale}/dashboard`, icon: <LayoutDashboard size={15} /> },
     { label: t('marketplace'), href: `/${locale}/marketplace`, icon: <Store size={15} /> },
     { label: t('billing'), href: `/${locale}/billing`, icon: <CreditCard size={15} /> },
-    { label: t('settings'), href: `/${locale}/providers`, icon: <Settings size={15} /> },
+    { label: t('settings'), href: `/${locale}/settings`, icon: <Settings size={15} /> },
   ];
 
   const handleSignOut = async () => {
