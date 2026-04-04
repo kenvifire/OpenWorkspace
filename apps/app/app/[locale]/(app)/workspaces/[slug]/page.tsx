@@ -9,8 +9,7 @@ import type { WorkspaceMemberRole } from '@openworkspace/api-types';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Plus, FolderKanban, Users, Trash2, UserPlus, Settings, ArrowRight, Bot } from 'lucide-react';
+import { Plus, FolderKanban, Users, Trash2, UserPlus, Settings, ArrowRight, Bot, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function WorkspacePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -51,10 +50,10 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
   if (isLoading) {
     return (
       <div className="p-8 space-y-4">
-        <div className="h-10 w-48 animate-pulse rounded-xl bg-zinc-200" />
+        <div className="h-10 w-48 animate-pulse rounded-xl bg-[oklch(0.12_0.014_265)]" />
         <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2 h-64 animate-pulse rounded-2xl bg-zinc-200" />
-          <div className="h-64 animate-pulse rounded-2xl bg-zinc-200" />
+          <div className="col-span-2 h-64 animate-pulse rounded-2xl bg-[oklch(0.12_0.014_265)]" />
+          <div className="h-64 animate-pulse rounded-2xl bg-[oklch(0.12_0.014_265)]" />
         </div>
       </div>
     );
@@ -63,6 +62,13 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
 
   return (
     <div className="min-h-full p-8">
+      {/* Breadcrumb */}
+      <div className="mb-6 flex items-center gap-1.5 text-xs text-[oklch(0.55_0.02_265)]">
+        <Link href={`/${locale}/dashboard`} className="hover:text-zinc-300 transition-colors">Dashboard</Link>
+        <ChevronRight size={12} />
+        <span className="text-zinc-300">{workspace.name}</span>
+      </div>
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
@@ -71,19 +77,19 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
         className="mb-8 flex items-center justify-between"
       >
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-lg font-bold text-white shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-lg font-bold text-white shadow-[0_0_20px_oklch(0.68_0.18_285/0.4)]">
             {workspace.name[0].toUpperCase()}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">{workspace.name}</h1>
-            <p className="text-sm text-zinc-400">/{workspace.slug}</p>
+            <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>{workspace.name}</h1>
+            <p className="text-sm text-[oklch(0.55_0.02_265)]">/{workspace.slug}</p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Link href={`/${locale}/workspaces/${slug}/settings`} className={buttonVariants({ variant: 'outline' })}>
+          <Link href={`/${locale}/workspaces/${slug}/settings`} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
             <Settings size={13} className="mr-1.5" /> Settings
           </Link>
-          <Link href={`/${locale}/workspaces/${slug}/projects/new`} className={buttonVariants()}>
+          <Link href={`/${locale}/workspaces/${slug}/projects/new`} className={buttonVariants({ size: 'sm', className: 'shadow-[0_0_16px_oklch(0.68_0.18_285/0.35)] hover:shadow-[0_0_24px_oklch(0.68_0.18_285/0.5)] transition-shadow' })}>
             <Plus size={14} className="mr-1.5" /> New Project
           </Link>
         </div>
@@ -98,19 +104,19 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
           className="lg:col-span-2"
         >
           <div className="mb-4 flex items-center gap-2">
-            <FolderKanban size={14} className="text-zinc-400" />
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Projects</h2>
-            <span className="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px] font-medium text-zinc-500">{projects.length}</span>
+            <FolderKanban size={14} className="text-[oklch(0.55_0.02_265)]" />
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.55_0.02_265)]">Projects</h2>
+            <span className="rounded-full bg-[oklch(0.22_0.02_265)] px-1.5 py-0.5 text-[11px] font-medium text-[oklch(0.55_0.02_265)]">{projects.length}</span>
           </div>
 
           {projectsLoading ? (
             <div className="space-y-3">
-              {[...Array(3)].map((_, i) => <div key={i} className="h-20 animate-pulse rounded-2xl bg-zinc-200" />)}
+              {[...Array(3)].map((_, i) => <div key={i} className="h-20 animate-pulse rounded-2xl bg-[oklch(0.12_0.014_265)]" />)}
             </div>
           ) : projects.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-white py-16 text-center">
-              <FolderKanban size={28} className="mb-3 text-zinc-300" />
-              <p className="text-sm font-medium text-zinc-500">No projects yet</p>
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] py-16 text-center">
+              <FolderKanban size={28} className="mb-3 text-[oklch(0.22_0.02_265)]" />
+              <p className="text-sm font-medium text-[oklch(0.55_0.02_265)]">No projects yet</p>
               <Link href={`/${locale}/workspaces/${slug}/projects/new`} className={buttonVariants({ variant: 'outline', size: 'sm', className: 'mt-3' })}>
                 Create first project
               </Link>
@@ -126,17 +132,17 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
                   whileHover={{ y: -2, transition: { duration: 0.15 } }}
                 >
                   <Link href={`/${locale}/workspaces/${slug}/projects/${p.id}/${(p._count?.tasks ?? 0) === 0 ? 'settings' : 'board'}`}>
-                    <div className="group flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-zinc-200/80 hover:shadow-md transition-shadow">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white">
+                    <div className="group flex items-center gap-4 rounded-2xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] p-4 shadow-lg shadow-black/30 hover:border-[oklch(0.32_0.04_265)] hover:shadow-[0_8px_32px_black/50] transition-all">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-[0_0_16px_oklch(0.6_0.18_230/0.3)]">
                         <FolderKanban size={16} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-zinc-900">{p.name}</p>
+                        <p className="font-semibold text-zinc-100">{p.name}</p>
                         {p.description && (
-                          <p className="mt-0.5 text-sm text-zinc-500 line-clamp-1">{p.description}</p>
+                          <p className="mt-0.5 text-sm text-[oklch(0.55_0.02_265)] line-clamp-1">{p.description}</p>
                         )}
                       </div>
-                      <div className="flex shrink-0 items-center gap-4 text-xs text-zinc-400">
+                      <div className="flex shrink-0 items-center gap-4 text-xs text-[oklch(0.55_0.02_265)]">
                         <span className="flex items-center gap-1">
                           <FolderKanban size={11} />
                           {p._count?.tasks ?? 0} tasks
@@ -145,7 +151,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
                           <Bot size={11} />
                           {p._count?.projectAgents ?? 0} agents
                         </span>
-                        <ArrowRight size={14} className="text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+                        <ArrowRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
                       </div>
                     </div>
                   </Link>
@@ -163,13 +169,13 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
         >
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Users size={14} className="text-zinc-400" />
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Members</h2>
-              <span className="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px] font-medium text-zinc-500">{workspace.members?.length ?? 0}</span>
+              <Users size={14} className="text-[oklch(0.55_0.02_265)]" />
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.55_0.02_265)]">Members</h2>
+              <span className="rounded-full bg-[oklch(0.22_0.02_265)] px-1.5 py-0.5 text-[11px] font-medium text-[oklch(0.55_0.02_265)]">{workspace.members?.length ?? 0}</span>
             </div>
             <button
               onClick={() => setShowInvite((v) => !v)}
-              className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700 transition-colors"
+              className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[oklch(0.55_0.02_265)] hover:bg-[oklch(0.22_0.02_265)] hover:text-zinc-300 transition-colors"
             >
               <UserPlus size={12} /> Invite
             </button>
@@ -179,7 +185,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-zinc-200/80 space-y-2"
+              className="mb-3 rounded-2xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] p-4 shadow-lg shadow-black/30 space-y-2"
             >
               <Input
                 placeholder="colleague@example.com"
@@ -201,31 +207,31 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
                 </Button>
               </div>
               {inviteMember.isError && (
-                <p className="text-xs text-red-500">{(inviteMember.error as any)?.response?.data?.message ?? 'Failed to invite'}</p>
+                <p className="text-xs text-red-400">{(inviteMember.error as any)?.response?.data?.message ?? 'Failed to invite'}</p>
               )}
             </motion.div>
           )}
 
-          <div className="rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200/80 divide-y divide-zinc-100">
-            {workspace.members?.map((m, i) => (
+          <div className="rounded-2xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] shadow-lg shadow-black/30 divide-y divide-[oklch(0.22_0.02_265)]">
+            {workspace.members?.map((m) => (
               <div key={m.id} className="flex items-center gap-3 px-4 py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-500 text-xs font-semibold text-white">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-zinc-600 to-zinc-700 text-xs font-semibold text-white border border-[oklch(0.22_0.02_265)]">
                   {m.user?.name?.[0]?.toUpperCase() ?? '?'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-800 truncate">{m.user?.name}</p>
-                  <p className="text-xs text-zinc-400 truncate">{m.user?.email}</p>
+                  <p className="text-sm font-medium text-zinc-200 truncate">{m.user?.name}</p>
+                  <p className="text-xs text-[oklch(0.55_0.02_265)] truncate">{m.user?.email}</p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                    (m.role as string) === 'OWNER' ? 'bg-violet-100 text-violet-700' :
-                    (m.role as string) === 'ADMIN' ? 'bg-sky-100 text-sky-700' :
-                    'bg-zinc-100 text-zinc-600'
+                    (m.role as string) === 'OWNER' ? 'bg-violet-500/20 text-violet-300' :
+                    (m.role as string) === 'ADMIN' ? 'bg-sky-500/20 text-sky-300' :
+                    'bg-[oklch(0.22_0.02_265)] text-[oklch(0.55_0.02_265)]'
                   }`}>{m.role}</span>
                   {m.role !== 'OWNER' && (
                     <button
                       onClick={() => removeMember.mutate(m.userId)}
-                      className="ml-1 rounded p-0.5 text-zinc-300 hover:text-red-400 transition-colors"
+                      className="ml-1 rounded p-0.5 text-[oklch(0.22_0.02_265)] hover:text-red-400 transition-colors"
                     >
                       <Trash2 size={12} />
                     </button>

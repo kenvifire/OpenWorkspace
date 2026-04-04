@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { marketplaceApi } from '@/lib/api';
 import type { MarketplaceSearchParams, Agent } from '@openworkspace/api-types';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Search, Star, Bot, User, ArrowRight, Sparkles } from 'lucide-react';
@@ -48,20 +47,24 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-full p-8">
-      {/* Header */}
+      {/* Hero Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="mb-8"
+        className="mb-10"
       >
-        <div className="flex items-center gap-2 mb-1">
-          <h1 className="text-2xl font-bold text-zinc-900">Marketplace</h1>
-          <span className="flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-semibold text-violet-600">
-            <Sparkles size={10} /> Live
+        <div className="flex items-center gap-2 mb-3">
+          <span className="flex items-center gap-1.5 rounded-full bg-violet-500/20 border border-violet-500/30 px-3 py-1 text-[11px] font-semibold text-violet-300">
+            <Sparkles size={10} /> Live Marketplace
           </span>
         </div>
-        <p className="text-sm text-zinc-500">Browse AI and human agents to hire for your projects</p>
+        <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>
+          <span className="bg-gradient-to-r from-white via-zinc-200 to-[oklch(0.75_0.15_210)] bg-clip-text text-transparent">
+            Find the right agent
+          </span>
+        </h1>
+        <p className="text-[oklch(0.55_0.02_265)] text-base">Browse AI and human agents to hire for your projects</p>
       </motion.div>
 
       {/* Filters */}
@@ -69,27 +72,37 @@ export default function MarketplacePage() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.05 }}
-        className="mb-6 flex flex-wrap gap-3"
+        className="mb-7 flex flex-wrap gap-3 items-center"
       >
         <div className="relative flex-1 min-w-52">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[oklch(0.55_0.02_265)]" />
           <Input
             placeholder="Search agents…"
-            className="pl-9 bg-white"
+            className="pl-9 bg-[oklch(0.12_0.014_265)] border-[oklch(0.22_0.02_265)] text-zinc-200 placeholder:text-[oklch(0.55_0.02_265)]"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           />
         </div>
-        <Select value={type} onValueChange={(v) => { setType(v ?? 'ALL'); setPage(1); }}>
-          <SelectTrigger className="w-36 bg-white"><SelectValue placeholder="Type" /></SelectTrigger>
-          <SelectContent alignItemWithTrigger={false}>
-            <SelectItem value="ALL">All types</SelectItem>
-            <SelectItem value="AI">AI agents</SelectItem>
-            <SelectItem value="HUMAN">Human agents</SelectItem>
-          </SelectContent>
-        </Select>
+
+        {/* Pill-style type filters */}
+        <div className="flex items-center gap-1.5 rounded-xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] p-1">
+          {['ALL', 'AI', 'HUMAN'].map((t) => (
+            <button
+              key={t}
+              onClick={() => { setType(t); setPage(1); }}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                type === t
+                  ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                  : 'text-[oklch(0.55_0.02_265)] hover:text-zinc-300 hover:bg-white/5'
+              }`}
+            >
+              {t === 'ALL' ? 'All Types' : t === 'AI' ? 'AI Agents' : 'Human Agents'}
+            </button>
+          ))}
+        </div>
+
         <Select value={pricing} onValueChange={(v) => { setPricing(v ?? 'ALL'); setPage(1); }}>
-          <SelectTrigger className="w-40 bg-white"><SelectValue placeholder="Pricing" /></SelectTrigger>
+          <SelectTrigger className="w-40 bg-[oklch(0.12_0.014_265)] border-[oklch(0.22_0.02_265)] text-zinc-200"><SelectValue placeholder="Pricing" /></SelectTrigger>
           <SelectContent alignItemWithTrigger={false}>
             <SelectItem value="ALL">All pricing</SelectItem>
             <SelectItem value="PER_JOB">Per job</SelectItem>
@@ -102,13 +115,13 @@ export default function MarketplacePage() {
       {isLoading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-52 animate-pulse rounded-2xl bg-zinc-200" />
+            <div key={i} className="h-52 animate-pulse rounded-2xl bg-[oklch(0.12_0.014_265)]" />
           ))}
         </div>
       ) : agents.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-white py-24 text-center">
-          <Bot size={32} className="mb-3 text-zinc-300" />
-          <p className="font-medium text-zinc-500">No agents match your filters</p>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] py-24 text-center">
+          <Bot size={32} className="mb-3 text-[oklch(0.22_0.02_265)]" />
+          <p className="font-medium text-[oklch(0.55_0.02_265)]">No agents match your filters</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -121,7 +134,7 @@ export default function MarketplacePage() {
               whileHover={{ y: -3, transition: { duration: 0.15 } }}
             >
               <Link href={`/${locale}/marketplace/${agent.id}`}>
-                <div className="group relative overflow-hidden rounded-2xl bg-white p-5 shadow-sm ring-1 ring-zinc-200/80 hover:shadow-md transition-shadow h-full flex flex-col">
+                <div className="group relative overflow-hidden rounded-2xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] p-5 shadow-lg shadow-black/30 hover:border-[oklch(0.32_0.04_265)] hover:shadow-[0_8px_32px_black/50] transition-all h-full flex flex-col">
                   {/* bg accent */}
                   <div className={`absolute right-0 top-0 h-24 w-24 -translate-y-8 translate-x-8 rounded-full bg-gradient-to-br ${AGENT_GRADIENTS[i % AGENT_GRADIENTS.length]} opacity-10 blur-2xl group-hover:opacity-20 transition-opacity`} />
 
@@ -131,39 +144,49 @@ export default function MarketplacePage() {
                         {agent.type === 'AI' ? <Bot size={18} /> : <User size={18} />}
                       </div>
                       <div>
-                        <p className="font-semibold text-zinc-900 leading-tight">{agent.name}</p>
-                        <p className="text-xs text-zinc-400">{agent.provider?.displayName}</p>
+                        <p className="font-semibold text-zinc-100 leading-tight">{agent.name}</p>
+                        <p className="text-xs text-[oklch(0.55_0.02_265)]">{agent.provider?.displayName}</p>
                       </div>
                     </div>
-                    {agent.aggregateRating != null && (
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Star size={11} className="text-amber-400 fill-amber-400" />
-                        <span className="text-xs font-semibold text-zinc-700">{agent.aggregateRating.toFixed(1)}</span>
-                      </div>
-                    )}
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      {agent.aggregateRating != null && (
+                        <div className="flex items-center gap-1">
+                          <Star size={11} className="text-amber-400 fill-amber-400" />
+                          <span className="text-xs font-semibold text-zinc-300">{agent.aggregateRating.toFixed(1)}</span>
+                        </div>
+                      )}
+                      {/* Agent type badge */}
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                        agent.type === 'AI'
+                          ? 'bg-[oklch(0.75_0.15_210/0.15)] text-[oklch(0.75_0.15_210)] border border-[oklch(0.75_0.15_210/0.25)]'
+                          : 'bg-amber-500/15 text-amber-300 border border-amber-500/25'
+                      }`}>
+                        {agent.type === 'AI' ? '✦ AI' : '● HUMAN'}
+                      </span>
+                    </div>
                   </div>
 
-                  <p className="text-sm text-zinc-500 line-clamp-2 flex-1 mb-3">{agent.description}</p>
+                  <p className="text-sm text-[oklch(0.55_0.02_265)] line-clamp-2 flex-1 mb-3">{agent.description}</p>
 
                   <div className="flex flex-wrap gap-1 mb-4">
                     {agent.capabilityTags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-500">{tag}</span>
+                      <span key={tag} className="rounded-full bg-[oklch(0.22_0.02_265)] px-2 py-0.5 text-[11px] font-medium text-[oklch(0.55_0.02_265)]">{tag}</span>
                     ))}
                     {agent.capabilityTags.length > 3 && (
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-400">+{agent.capabilityTags.length - 3}</span>
+                      <span className="rounded-full bg-[oklch(0.22_0.02_265)] px-2 py-0.5 text-[11px] font-medium text-[oklch(0.45_0.015_265)]">+{agent.capabilityTags.length - 3}</span>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-zinc-100 pt-3">
-                    <span className="text-sm font-semibold text-zinc-900">
+                  <div className="flex items-center justify-between border-t border-[oklch(0.22_0.02_265)] pt-3">
+                    <span className="text-sm font-semibold text-zinc-200">
                       {agent.pricingModel === 'PER_JOB'
                         ? `$${((agent.pricePerJob ?? 0) / 100).toFixed(2)}`
                         : `$${((agent.pricePerToken ?? 0) / 100000).toFixed(4)}`}
-                      <span className="ml-1 text-xs font-normal text-zinc-400">
+                      <span className="ml-1 text-xs font-normal text-[oklch(0.55_0.02_265)]">
                         {agent.pricingModel === 'PER_JOB' ? '/ job' : '/ token'}
                       </span>
                     </span>
-                    <span className="flex items-center gap-1 text-xs text-zinc-400 group-hover:text-violet-600 transition-colors">
+                    <span className="flex items-center gap-1 text-xs text-[oklch(0.55_0.02_265)] group-hover:text-violet-300 transition-colors">
                       View <ArrowRight size={12} />
                     </span>
                   </div>
@@ -176,10 +199,34 @@ export default function MarketplacePage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="mt-8 flex justify-center items-center gap-3">
-          <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="bg-white">Previous</Button>
-          <span className="text-sm text-zinc-500">Page {page} of {totalPages}</span>
-          <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage((p) => p + 1)} className="bg-white">Next</Button>
+        <div className="mt-8 flex justify-center items-center gap-2">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="rounded-lg border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] px-3 py-1.5 text-sm text-[oklch(0.55_0.02_265)] hover:text-zinc-200 hover:border-[oklch(0.32_0.04_265)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            ←
+          </button>
+          {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${
+                p === page
+                  ? 'border-violet-500/50 bg-violet-500/20 text-violet-300'
+                  : 'border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] text-[oklch(0.55_0.02_265)] hover:text-zinc-200 hover:border-[oklch(0.32_0.04_265)]'
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+            className="rounded-lg border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] px-3 py-1.5 text-sm text-[oklch(0.55_0.02_265)] hover:text-zinc-200 hover:border-[oklch(0.32_0.04_265)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            →
+          </button>
         </div>
       )}
     </div>
