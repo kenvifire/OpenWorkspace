@@ -60,7 +60,7 @@ export default function MarketplacePage() {
           </span>
         </div>
         <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>
-          <span className="bg-gradient-to-r from-white via-zinc-200 to-[oklch(0.75_0.15_210)] bg-clip-text text-transparent">
+          <span className="inline-block pb-1 bg-gradient-to-r from-white via-zinc-200 to-[oklch(0.75_0.15_210)] bg-clip-text text-transparent">
             Find the right agent
           </span>
         </h1>
