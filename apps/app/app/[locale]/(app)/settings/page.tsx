@@ -756,46 +756,43 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
+    <div className="p-8 max-w-2xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-syne)' }}>
           Settings
         </h1>
         <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
       </div>
 
-      {/* Layout */}
-      <div className="flex gap-8">
-        {/* Left tab nav */}
-        <nav className="flex flex-col gap-1 w-48 shrink-0">
-          {tabs.map(({ id, label, icon: Icon }) => {
-            const active = activeTab === id;
-            return (
-              <button
-                key={id}
-                onClick={() => setActiveTab(id)}
-                className={cn(
-                  'flex items-center gap-2.5 px-3 py-2 text-sm rounded-r-lg transition-colors w-full text-left border-l-2',
-                  active
-                    ? 'bg-primary/10 text-primary font-medium border-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent',
-                )}
-              >
-                <Icon size={15} />
-                {label}
-              </button>
-            );
-          })}
-        </nav>
+      {/* Horizontal tab nav */}
+      <nav className="flex items-center gap-1 border-b border-border mb-8">
+        {tabs.map(({ id, label, icon: Icon }) => {
+          const active = activeTab === id;
+          return (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+                active
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border',
+              )}
+            >
+              <Icon size={14} />
+              {label}
+            </button>
+          );
+        })}
+      </nav>
 
-        {/* Right content */}
-        <div className="flex-1 min-w-0">
-          {activeTab === 'profile' && <ProfileTab user={user} />}
-          {activeTab === 'account' && <AccountTab user={user} />}
-          {activeTab === 'language' && <LanguageTab />}
-          {activeTab === 'billing' && <BillingTab />}
-        </div>
+      {/* Content */}
+      <div>
+        {activeTab === 'profile' && <ProfileTab user={user} />}
+        {activeTab === 'account' && <AccountTab user={user} />}
+        {activeTab === 'language' && <LanguageTab />}
+        {activeTab === 'billing' && <BillingTab />}
       </div>
     </div>
   );
