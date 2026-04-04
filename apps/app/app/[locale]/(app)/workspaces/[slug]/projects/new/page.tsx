@@ -256,7 +256,7 @@ function AgentsStep({
 
   const { data, isLoading } = useQuery({
     queryKey: ['marketplace-search', debouncedQuery],
-    queryFn: () => marketplaceApi.search({ query: debouncedQuery, page: 1, limit: 20 }),
+    queryFn: () => marketplaceApi.search({ q: debouncedQuery, page: 1, limit: 20 }),
     placeholderData: (prev) => prev,
   });
 
