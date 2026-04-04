@@ -58,10 +58,10 @@ export default function NewWorkspacePage() {
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
             />
-            <p className="text-xs text-zinc-500">Unique URL identifier — lowercase letters, numbers, and hyphens only.</p>
+            <p className="text-xs text-muted-foreground">Unique URL identifier — lowercase letters, numbers, and hyphens only.</p>
           </div>
           {error && (
-            <p className="text-sm text-red-500">
+            <p className="text-sm text-red-400">
               {(() => {
                 const msg = (error as any)?.response?.data?.message;
                 if (typeof msg === 'string') return msg;

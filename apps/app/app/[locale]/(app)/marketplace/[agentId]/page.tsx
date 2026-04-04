@@ -65,8 +65,8 @@ export default function AgentDetailPage({ params }: { params: Promise<{ agentId:
   if (isLoading) {
     return (
       <div className="p-8 space-y-4">
-        <div className="h-8 w-32 animate-pulse rounded-lg bg-zinc-200" />
-        <div className="h-64 animate-pulse rounded-2xl bg-zinc-200" />
+        <div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />
+        <div className="h-64 animate-pulse rounded-2xl bg-muted" />
       </div>
     );
   }
@@ -76,7 +76,7 @@ export default function AgentDetailPage({ params }: { params: Promise<{ agentId:
     <div className="min-h-full p-8">
       <Link
         href={`/${locale}/marketplace`}
-        className="mb-6 flex w-fit items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700 transition-colors"
+        className="mb-6 flex w-fit items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-muted-foreground/70 hover:bg-muted hover:text-foreground/80 transition-colors"
       >
         <ArrowLeft size={14} /> Back to Marketplace
       </Link>
@@ -89,9 +89,9 @@ export default function AgentDetailPage({ params }: { params: Promise<{ agentId:
           className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5"
         >
           <p className="mb-2 text-sm font-semibold text-amber-800">Save this project key — it will not be shown again</p>
-          <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-white p-3">
+          <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-card p-3">
             <code className="flex-1 break-all font-mono text-sm text-amber-900">{hired.rawProjectKey}</code>
-            <button onClick={() => copy(hired.rawProjectKey)} className="shrink-0 rounded-lg p-1.5 text-amber-600 hover:bg-amber-100 transition-colors">
+            <button onClick={() => copy(hired.rawProjectKey)} className="shrink-0 rounded-lg p-1.5 text-amber-600 hover:bg-amber-900/40 transition-colors">
               {copied ? <Check size={16} /> : <Copy size={16} />}
             </button>
           </div>
@@ -121,54 +121,54 @@ export default function AgentDetailPage({ params }: { params: Promise<{ agentId:
               {agent.type === 'AI' ? <Bot size={30} /> : <User size={30} />}
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-zinc-900">{agent.name}</h1>
-              <p className="text-sm text-zinc-400">by {agent.provider.displayName}</p>
+              <h1 className="text-2xl font-bold text-foreground">{agent.name}</h1>
+              <p className="text-sm text-muted-foreground/70">by {agent.provider.displayName}</p>
               <div className="mt-2 flex items-center gap-3 flex-wrap">
                 {agent.aggregateRating != null && (
                   <div className="flex items-center gap-1">
                     {[1,2,3,4,5].map((s) => (
                       <Star key={s} size={14} className={s <= Math.round(agent.aggregateRating!) ? 'fill-amber-400 text-amber-400' : 'text-zinc-200'} />
                     ))}
-                    <span className="ml-1 text-sm font-semibold text-zinc-700">{agent.aggregateRating.toFixed(1)}</span>
-                    <span className="text-sm text-zinc-400">({agent.reviewCount})</span>
+                    <span className="ml-1 text-sm font-semibold text-foreground/80">{agent.aggregateRating.toFixed(1)}</span>
+                    <span className="text-sm text-muted-foreground/70">({agent.reviewCount})</span>
                   </div>
                 )}
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${agent.type === 'AI' ? 'bg-sky-100 text-sky-700' : 'bg-violet-100 text-violet-700'}`}>
+                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${agent.type === 'AI' ? 'bg-sky-900/40 text-sky-300' : 'bg-violet-900/40 text-violet-300'}`}>
                   {agent.type === 'AI' ? 'AI Agent' : 'Human'}
                 </span>
               </div>
             </div>
           </div>
 
-          <p className="text-zinc-600 leading-relaxed">{agent.description}</p>
+          <p className="text-muted-foreground leading-relaxed">{agent.description}</p>
 
           {/* Tags */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">Capabilities</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">Capabilities</p>
             <div className="flex flex-wrap gap-2">
               {agent.capabilityTags.map((tag: string) => (
-                <span key={tag} className="rounded-full bg-zinc-100 px-3 py-1 text-sm font-medium text-zinc-600">{tag}</span>
+                <span key={tag} className="rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground">{tag}</span>
               ))}
             </div>
           </div>
 
-          <div className="border-t border-zinc-200" />
+          <div className="border-t border-border" />
 
           {/* Reviews */}
           <div>
-            <h2 className="mb-4 font-semibold text-zinc-900">Reviews</h2>
+            <h2 className="mb-4 font-semibold text-foreground">Reviews</h2>
             {reviewData?.data?.length === 0 ? (
-              <p className="text-sm text-zinc-400">No reviews yet</p>
+              <p className="text-sm text-muted-foreground/70">No reviews yet</p>
             ) : (
               <div className="space-y-3">
                 {reviewData?.data?.map((r) => (
-                  <div key={r.id} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-zinc-200/80">
+                  <div key={r.id} className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-border">
                     <div className="mb-2 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-200 text-xs font-semibold text-zinc-600">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
                           {r.reviewer?.name?.[0]}
                         </div>
-                        <span className="text-sm font-medium text-zinc-800">{r.reviewer?.name}</span>
+                        <span className="text-sm font-medium text-foreground">{r.reviewer?.name}</span>
                       </div>
                       <div className="flex items-center gap-0.5">
                         {[1,2,3,4,5].map((s) => (
@@ -176,9 +176,9 @@ export default function AgentDetailPage({ params }: { params: Promise<{ agentId:
                         ))}
                       </div>
                     </div>
-                    {r.comment && <p className="text-sm text-zinc-600">{r.comment}</p>}
+                    {r.comment && <p className="text-sm text-muted-foreground">{r.comment}</p>}
                     {r.providerResponse && (
-                      <div className="mt-3 rounded-xl bg-zinc-50 p-3 text-sm text-zinc-600">
+                      <div className="mt-3 rounded-xl bg-background p-3 text-sm text-muted-foreground">
                         <span className="font-medium">Provider response: </span>{r.providerResponse}
                       </div>
                     )}
@@ -195,24 +195,24 @@ export default function AgentDetailPage({ params }: { params: Promise<{ agentId:
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <div className="sticky top-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-zinc-200/80 space-y-4">
+          <div className="sticky top-6 rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border space-y-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Pricing</p>
-              <p className="mt-1 text-3xl font-bold text-zinc-900">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">Pricing</p>
+              <p className="mt-1 text-3xl font-bold text-foreground">
                 {agent.pricingModel === 'PER_JOB'
                   ? `$${((agent.pricePerJob ?? 0) / 100).toFixed(2)}`
                   : `$${((agent.pricePerToken ?? 0) / 100000).toFixed(4)}`}
               </p>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-muted-foreground/70">
                 {agent.pricingModel === 'PER_JOB' ? 'per job' : 'per token'}
               </p>
             </div>
 
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-muted-foreground/70">
               {agent._count?.projectAgents ?? 0} active project engagements
             </p>
 
-            <div className="border-t border-zinc-100" />
+            <div className="border-t border-border/50" />
 
             {!hiring ? (
               <Button className="w-full" onClick={() => setHiring(true)}>Hire for a project</Button>
@@ -249,7 +249,7 @@ export default function AgentDetailPage({ params }: { params: Promise<{ agentId:
                 </div>
 
                 {hireAgent.isError && (
-                  <div className="flex items-start gap-1.5 rounded-xl bg-red-50 p-3 text-xs text-red-600">
+                  <div className="flex items-start gap-1.5 rounded-xl bg-red-50 p-3 text-xs text-red-400">
                     <AlertCircle size={13} className="mt-0.5 shrink-0" />
                     {(hireAgent.error as any)?.response?.data?.message ?? 'Failed to hire agent'}
                   </div>
@@ -264,7 +264,7 @@ export default function AgentDetailPage({ params }: { params: Promise<{ agentId:
               </div>
             )}
 
-            <p className="text-center text-xs text-zinc-400">
+            <p className="text-center text-xs text-muted-foreground/70">
               A project agreement will be created. The project key activates after signing.
             </p>
           </div>

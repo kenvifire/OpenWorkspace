@@ -20,9 +20,9 @@ import { useLocale } from 'next-intl';
 
 const LLM_PROVIDERS = [
   { value: 'anthropic', label: 'Anthropic', color: 'bg-orange-100 text-orange-700' },
-  { value: 'openai', label: 'OpenAI', color: 'bg-green-100 text-green-700' },
-  { value: 'gemini', label: 'Google Gemini', color: 'bg-blue-100 text-blue-700' },
-  { value: 'custom', label: 'Custom', color: 'bg-zinc-100 text-zinc-600' },
+  { value: 'openai', label: 'OpenAI', color: 'bg-green-900/40 text-green-400' },
+  { value: 'gemini', label: 'Google Gemini', color: 'bg-blue-900/40 text-blue-300' },
+  { value: 'custom', label: 'Custom', color: 'bg-muted text-muted-foreground' },
 ];
 
 const DEFAULT_MODELS: Record<string, string> = {
@@ -142,11 +142,11 @@ function AgentForm({
           maxLength={8000}
           className="resize-none font-mono text-sm"
         />
-        <p className="text-xs text-zinc-400">{systemPrompt.length}/8000</p>
+        <p className="text-xs text-muted-foreground/70">{systemPrompt.length}/8000</p>
       </div>
 
       <div className="space-y-1.5">
-        <Label>API Key {initial && <span className="text-zinc-400">(leave blank to keep current)</span>}</Label>
+        <Label>API Key {initial && <span className="text-muted-foreground/70">(leave blank to keep current)</span>}</Label>
         <div className="relative">
           <Input
             type={showApiKey ? 'text' : 'password'}
@@ -158,7 +158,7 @@ function AgentForm({
           <button
             type="button"
             onClick={() => setShowApiKey((v) => !v)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
           >
             {showApiKey ? <EyeOff size={14} /> : <Eye size={14} />}
           </button>
@@ -181,7 +181,7 @@ function AgentForm({
       </div>
 
       {error && (
-        <p className="text-sm text-red-500">{(error as any)?.response?.data?.message ?? 'Something went wrong'}</p>
+        <p className="text-sm text-red-400">{(error as any)?.response?.data?.message ?? 'Something went wrong'}</p>
       )}
 
       <div className="flex justify-end gap-2 pt-2">
@@ -231,7 +231,7 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
   if (rawKey) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-zinc-600">Agent added. The project key is shown once — store it securely.</p>
+        <p className="text-sm text-muted-foreground">Agent added. The project key is shown once — store it securely.</p>
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <code className="flex-1 break-all font-mono text-xs text-amber-900">{rawKey}</code>
           <Button size="sm" variant="outline" onClick={copy}>{copied ? 'Copied!' : 'Copy'}</Button>
@@ -279,7 +279,7 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
           </Select>
         </div>
       )}
-      {hire.error && <p className="text-sm text-red-500">{(hire.error as any)?.response?.data?.message ?? 'Failed to add agent'}</p>}
+      {hire.error && <p className="text-sm text-red-400">{(hire.error as any)?.response?.data?.message ?? 'Failed to add agent'}</p>}
       <div className="flex justify-end gap-2">
         <Button variant="outline" onClick={onClose}>Cancel</Button>
         <Button onClick={() => hire.mutate()} disabled={!projectId || hire.isPending}>
@@ -294,8 +294,8 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
 
 const PROVIDER_COLORS: Record<string, string> = {
   anthropic: 'bg-orange-100 text-orange-700',
-  openai: 'bg-green-100 text-green-700',
-  gemini: 'bg-blue-100 text-blue-700',
+  openai: 'bg-green-900/40 text-green-400',
+  gemini: 'bg-blue-900/40 text-blue-300',
 };
 
 function AgentVersionsPanel({ agent }: { agent: Agent }) {
@@ -327,13 +327,13 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
   });
 
   return (
-    <div className="mt-3 rounded-xl border border-zinc-100 bg-zinc-50 p-4 space-y-3">
+    <div className="mt-3 rounded-xl border border-border/50 bg-background p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <GitBranch size={13} className="text-zinc-400" />
-          <span className="text-xs font-semibold text-zinc-500">{versions.length}/3 versions</span>
+          <GitBranch size={13} className="text-muted-foreground/70" />
+          <span className="text-xs font-semibold text-muted-foreground">{versions.length}/3 versions</span>
           {activeVersionId === null && versions.length > 0 && (
-            <span className="text-[10px] text-zinc-400">(using draft)</span>
+            <span className="text-[10px] text-muted-foreground/70">(using draft)</span>
           )}
         </div>
         {versions.length < 3 && (
@@ -343,7 +343,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
               placeholder="Label (optional)"
               value={publishLabel}
               onChange={(e) => setPublishLabel(e.target.value)}
-              className="h-7 w-32 rounded-md border border-zinc-200 bg-white px-2.5 text-xs outline-none focus:border-zinc-400"
+              className="h-7 w-32 rounded-md border border-border bg-card px-2.5 text-xs outline-none focus:border-zinc-400"
             />
             <Button size="sm" className="h-7 text-xs" disabled={publishVersion.isPending} onClick={() => publishVersion.mutate()}>
               {publishVersion.isPending ? '…' : 'Publish'}
@@ -353,11 +353,11 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
       </div>
 
       {publishVersion.isError && (
-        <p className="text-xs text-red-500">{(publishVersion.error as any)?.response?.data?.message ?? 'Failed to publish'}</p>
+        <p className="text-xs text-red-400">{(publishVersion.error as any)?.response?.data?.message ?? 'Failed to publish'}</p>
       )}
 
       {versions.length === 0 ? (
-        <p className="text-xs text-zinc-400">No versions yet. Publish to snapshot the current config.</p>
+        <p className="text-xs text-muted-foreground/70">No versions yet. Publish to snapshot the current config.</p>
       ) : (
         <div className="space-y-1.5">
           {versions.map((v) => {
@@ -365,24 +365,24 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
             return (
               <div
                 key={v.id}
-                className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 ${isActive ? 'border-sky-200 bg-sky-50' : 'border-zinc-100 bg-white'}`}
+                className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 ${isActive ? 'border-sky-200 bg-sky-50' : 'border-border/50 bg-card'}`}
               >
-                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-bold ${isActive ? 'bg-sky-600 text-white' : 'bg-zinc-200 text-zinc-600'}`}>
+                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-bold ${isActive ? 'bg-sky-600 text-white' : 'bg-muted text-muted-foreground'}`}>
                   v{v.versionNumber}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-zinc-700 truncate">{v.label ?? `Version ${v.versionNumber}`}</p>
-                  <p className="text-[10px] text-zinc-400">{new Date(v.publishedAt).toLocaleDateString()}</p>
+                  <p className="text-xs font-medium text-foreground/80 truncate">{v.label ?? `Version ${v.versionNumber}`}</p>
+                  <p className="text-[10px] text-muted-foreground/70">{new Date(v.publishedAt).toLocaleDateString()}</p>
                 </div>
                 {isActive && (
-                  <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700">Active</span>
+                  <span className="rounded-full bg-sky-900/40 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300">Active</span>
                 )}
                 <div className="flex items-center gap-1 shrink-0">
                   {isActive ? (
                     <button
                       onClick={() => activateVersion.mutate(null)}
                       disabled={activateVersion.isPending}
-                      className="flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-0.5 text-[10px] text-zinc-500 hover:text-zinc-800 transition-colors"
+                      className="flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <RotateCcw size={9} /> Draft
                     </button>
@@ -398,7 +398,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
                   <button
                     onClick={() => deleteVersion.mutate(v.id)}
                     disabled={deleteVersion.isPending}
-                    className="rounded p-0.5 text-zinc-300 hover:text-red-400 transition-colors"
+                    className="rounded p-0.5 text-muted-foreground/50 hover:text-red-400 transition-colors"
                   >
                     <Trash2 size={11} />
                   </button>
@@ -468,15 +468,15 @@ function AgentCapabilitiesPanel({ agent }: { agent: Agent }) {
   });
 
   return (
-    <div className="mt-3 rounded-xl border border-zinc-100 bg-zinc-50 p-4 space-y-3">
+    <div className="mt-3 rounded-xl border border-border/50 bg-background p-4 space-y-3">
       {/* Tabs */}
-      <div className="flex gap-3 border-b border-zinc-200">
+      <div className="flex gap-3 border-b border-border">
         {(['skills', 'mcps'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`pb-2 text-xs font-semibold uppercase tracking-wide border-b-2 transition-colors ${
-              tab === t ? 'border-zinc-800 text-zinc-800' : 'border-transparent text-zinc-400 hover:text-zinc-600'
+              tab === t ? 'border-zinc-800 text-foreground' : 'border-transparent text-muted-foreground/70 hover:text-muted-foreground'
             }`}
           >
             {t === 'skills' ? (
@@ -491,19 +491,19 @@ function AgentCapabilitiesPanel({ agent }: { agent: Agent }) {
       {/* Skills tab */}
       {tab === 'skills' && (
         allSkills.length === 0 ? (
-          <p className="text-xs text-zinc-400">No skills yet. Create one in the Skills page.</p>
+          <p className="text-xs text-muted-foreground/70">No skills yet. Create one in the Skills page.</p>
         ) : (
           <div className="space-y-1.5">
             {allSkills.map((skill) => {
               const assigned = assignedSkillIds.has(skill.id);
               return (
-                <div key={skill.id} className="flex items-center justify-between rounded-lg border border-zinc-100 bg-white px-3 py-2">
+                <div key={skill.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-white ${skill.type === 'WEBHOOK' ? 'bg-emerald-500' : 'bg-amber-500'}`}>
+                    <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-white ${skill.type === 'WEBHOOK' ? 'bg-emerald-950/500' : 'bg-amber-500'}`}>
                       {skill.type === 'WEBHOOK' ? <Globe size={11} /> : <Zap size={11} />}
                     </div>
-                    <span className="text-sm font-medium text-zinc-800 truncate">{skill.name}</span>
-                    <span className="shrink-0 text-xs text-zinc-400 truncate hidden sm:block">{skill.description}</span>
+                    <span className="text-sm font-medium text-foreground truncate">{skill.name}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground/70 truncate hidden sm:block">{skill.description}</span>
                   </div>
                   <Button
                     size="sm"
@@ -524,22 +524,22 @@ function AgentCapabilitiesPanel({ agent }: { agent: Agent }) {
       {/* MCPs tab */}
       {tab === 'mcps' && (
         allMcps.length === 0 ? (
-          <p className="text-xs text-zinc-400">No MCPs yet. Create one in the MCP page.</p>
+          <p className="text-xs text-muted-foreground/70">No MCPs yet. Create one in the MCP page.</p>
         ) : (
           <div className="space-y-1.5">
             {allMcps.map((mcp) => {
               const assigned = assignedMcpIds.has(mcp.id);
               return (
-                <div key={mcp.id} className="flex items-center justify-between rounded-lg border border-zinc-100 bg-white px-3 py-2">
+                <div key={mcp.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-violet-500 text-white">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-violet-900/200 text-white">
                       <Globe size={11} />
                     </div>
-                    <span className="text-sm font-medium text-zinc-800 truncate">{mcp.name}</span>
+                    <span className="text-sm font-medium text-foreground truncate">{mcp.name}</span>
                     <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-                      mcp.transport === 'SSE' ? 'bg-blue-100 text-blue-700' :
-                      mcp.transport === 'HTTP' ? 'bg-green-100 text-green-700' :
-                      'bg-zinc-100 text-zinc-600'
+                      mcp.transport === 'SSE' ? 'bg-blue-900/40 text-blue-300' :
+                      mcp.transport === 'HTTP' ? 'bg-green-900/40 text-green-400' :
+                      'bg-muted text-muted-foreground'
                     }`}>{mcp.transport}</span>
                   </div>
                   <Button
@@ -576,7 +576,7 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
   const activeHires = (agent as any)._count?.projectAgents ?? 0;
   const versions: AgentVersion[] = (agent as any).versions ?? [];
   const activeVersionId: string | null = (agent as any).activeVersionId ?? null;
-  const providerColor = PROVIDER_COLORS[agent.llmProvider ?? ''] ?? 'bg-zinc-100 text-zinc-600';
+  const providerColor = PROVIDER_COLORS[agent.llmProvider ?? ''] ?? 'bg-muted text-muted-foreground';
 
   if (editing) {
     return (
@@ -604,7 +604,7 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
-      className="group relative overflow-hidden rounded-2xl bg-white p-5 shadow-sm ring-1 ring-zinc-200/80 hover:shadow-md transition-shadow"
+      className="group relative overflow-hidden rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border hover:shadow-md transition-shadow"
     >
       {/* gradient bg accent */}
       <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-sky-400/10 blur-2xl group-hover:bg-sky-400/20 transition-opacity" />
@@ -616,23 +616,23 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-semibold text-zinc-900">{agent.name}</h3>
+            <h3 className="font-semibold text-foreground">{agent.name}</h3>
             {agent.llmProvider && (
               <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${providerColor}`}>
                 {agent.llmProvider}
               </span>
             )}
             {activeVersionId && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-sky-900/40 px-2 py-0.5 text-[11px] font-medium text-sky-300">
                 <GitBranch size={9} />
                 {versions.find((v) => v.id === activeVersionId)?.label ?? `v${versions.find((v) => v.id === activeVersionId)?.versionNumber}`}
               </span>
             )}
           </div>
           {agent.description && (
-            <p className="mt-0.5 text-sm text-zinc-500 line-clamp-1">{agent.description}</p>
+            <p className="mt-0.5 text-sm text-muted-foreground line-clamp-1">{agent.description}</p>
           )}
-          <div className="mt-2 flex items-center gap-3 text-xs text-zinc-400">
+          <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground/70">
             {agent.modelName && (
               <span className="flex items-center gap-1">
                 <Cpu size={11} />
@@ -645,7 +645,7 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
             </span>
             <button
               onClick={() => setVersionsOpen((o) => !o)}
-              className="flex items-center gap-1 text-zinc-400 hover:text-zinc-600 transition-colors"
+              className="flex items-center gap-1 text-muted-foreground/70 hover:text-muted-foreground transition-colors"
             >
               <GitBranch size={11} />
               {versions.length} version{versions.length !== 1 ? 's' : ''}
@@ -669,7 +669,7 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50"
+            className="h-8 w-8 text-red-400 hover:text-red-400 hover:bg-red-50"
             onClick={() => { if (confirm(`Delete "${agent.name}"?`)) deleteMutation.mutate(); }}
             disabled={deleteMutation.isPending}
           >
@@ -679,8 +679,8 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
       </div>
 
       {agent.systemPrompt && (
-        <div className="mt-3 rounded-lg bg-zinc-50 px-3 py-2">
-          <p className="text-xs text-zinc-400 font-mono line-clamp-2">{agent.systemPrompt}</p>
+        <div className="mt-3 rounded-lg bg-background px-3 py-2">
+          <p className="text-xs text-muted-foreground/70 font-mono line-clamp-2">{agent.systemPrompt}</p>
         </div>
       )}
 
@@ -751,7 +751,7 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
   const providerDirty = provider !== (config.provider ?? '') || model !== (config.model ?? '') || !!apiKey;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white p-5 shadow-sm ring-1 ring-zinc-200/80">
+    <div className="relative overflow-hidden rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border">
       <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-violet-400/10 blur-2xl" />
 
       <div className="flex items-start gap-4">
@@ -761,11 +761,11 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-zinc-900">Planning Agent</h3>
-            <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-700">Built-in</span>
+            <h3 className="font-semibold text-foreground">Planning Agent</h3>
+            <span className="rounded-full bg-violet-900/40 px-2 py-0.5 text-[11px] font-medium text-violet-300">Built-in</span>
           </div>
-          <p className="mt-0.5 text-sm text-zinc-500">Default AI planner for your projects. Set a user-level prompt that applies across all projects.</p>
-          <div className="mt-2 flex items-center gap-4 text-xs text-zinc-400">
+          <p className="mt-0.5 text-sm text-muted-foreground">Default AI planner for your projects. Set a user-level prompt that applies across all projects.</p>
+          <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground/70">
             <span className="flex items-center gap-1">
               <Layers size={11} />
               3 prompt layers: base → user → project
@@ -775,7 +775,7 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
 
         <button
           onClick={() => setPromptOpen((o) => !o)}
-          className="shrink-0 rounded-lg p-1.5 text-zinc-300 hover:bg-zinc-100 hover:text-zinc-600 transition-colors"
+          className="shrink-0 rounded-lg p-1.5 text-muted-foreground/50 hover:bg-muted hover:text-muted-foreground transition-colors"
         >
           <motion.span animate={{ rotate: promptOpen ? 180 : 0 }} transition={{ duration: 0.15 }} className="block">
             <ChevronDown size={15} />
@@ -796,11 +796,11 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
             <div className="mt-4 space-y-4">
 
               {/* ── Model Provider Config ── */}
-              <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-4 space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">Model Provider</p>
+              <div className="rounded-xl border border-border/50 bg-background p-4 space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/70">Model Provider</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-zinc-700">Provider</label>
+                    <label className="text-xs font-medium text-foreground/80">Provider</label>
                     <Select value={provider} onValueChange={(v) => handleProviderChange(v ?? '')}>
                       <SelectTrigger className="h-8 text-sm w-full"><SelectValue placeholder="Select provider" /></SelectTrigger>
                       <SelectContent alignItemWithTrigger={false}>
@@ -811,7 +811,7 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-zinc-700">Model</label>
+                    <label className="text-xs font-medium text-foreground/80">Model</label>
                     <Input
                       value={model}
                       onChange={(e) => setModel(e.target.value)}
@@ -821,14 +821,14 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-700">
+                  <label className="text-xs font-medium text-foreground/80">
                     API Key
                     {config.hasApiKey && (
-                      <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700">
+                      <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-900/40 px-1.5 py-0.5 text-[10px] font-medium text-green-400">
                         <KeyRound size={9} /> Saved
                       </span>
                     )}
-                    <span className="ml-1.5 font-normal text-zinc-400">— leave blank to use workspace key</span>
+                    <span className="ml-1.5 font-normal text-muted-foreground/70">— leave blank to use workspace key</span>
                   </label>
                   <div className="relative">
                     <Input
@@ -841,7 +841,7 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
                     <button
                       type="button"
                       onClick={() => setShowApiKey((v) => !v)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
                     >
                       {showApiKey ? <EyeOff size={13} /> : <Eye size={13} />}
                     </button>
@@ -861,27 +861,27 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
               {/* ── Prompt Config ── */}
               <div className="space-y-3">
                 {/* Prompt hierarchy legend */}
-                <div className="flex items-center gap-2 text-[11px] text-zinc-400">
-                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono">Base</span>
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground/70">
+                  <span className="rounded bg-muted px-1.5 py-0.5 font-mono">Base</span>
                   <span>+</span>
-                  <span className="rounded bg-violet-100 px-1.5 py-0.5 font-mono text-violet-600">User (this)</span>
+                  <span className="rounded bg-violet-900/40 px-1.5 py-0.5 font-mono text-violet-400">User (this)</span>
                   <span>+</span>
-                  <span className="rounded bg-sky-100 px-1.5 py-0.5 font-mono text-sky-600">Project (per-project settings)</span>
+                  <span className="rounded bg-sky-900/40 px-1.5 py-0.5 font-mono text-sky-600">Project (per-project settings)</span>
                 </div>
 
                 {/* Base prompt */}
-                <details className="rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2">
-                  <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-zinc-400 select-none">
+                <details className="rounded-lg border border-border/50 bg-background px-3 py-2">
+                  <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 select-none">
                     Base prompt (readonly)
                   </summary>
-                  <pre className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-zinc-400 leading-relaxed">{config.basePrompt}</pre>
+                  <pre className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-muted-foreground/70 leading-relaxed">{config.basePrompt}</pre>
                 </details>
 
                 {/* User-level default prompt */}
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-zinc-700">
+                  <label className="text-xs font-medium text-foreground/80">
                     User-level default prompt
-                    <span className="ml-1.5 font-normal text-zinc-400">— appended after base, before project prompt</span>
+                    <span className="ml-1.5 font-normal text-muted-foreground/70">— appended after base, before project prompt</span>
                   </label>
                   <Textarea
                     value={draftPrompt}
@@ -892,13 +892,13 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
                     maxLength={8000}
                   />
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-zinc-400">{draftPrompt.length}/8000</span>
+                    <span className="text-xs text-muted-foreground/70">{draftPrompt.length}/8000</span>
                     <Button size="sm" disabled={!isDirty || updateConfig.isPending} onClick={savePrompt}>
                       {updateConfig.isPending ? 'Saving…' : 'Save prompt'}
                     </Button>
                   </div>
                   {updateConfig.isError && (
-                    <p className="text-xs text-red-500">{(updateConfig.error as any)?.response?.data?.message ?? 'Failed to save'}</p>
+                    <p className="text-xs text-red-400">{(updateConfig.error as any)?.response?.data?.message ?? 'Failed to save'}</p>
                   )}
                 </div>
               </div>
@@ -934,8 +934,8 @@ export default function MyAgentsPage() {
         className="mb-8 flex items-end justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">Agents</h1>
-          <p className="mt-1 text-sm text-zinc-500">Personal AI agents you can deploy to any project.</p>
+          <h1 className="text-2xl font-bold text-foreground">Agents</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Personal AI agents you can deploy to any project.</p>
         </div>
         {!creating && (
           <Button onClick={() => setCreating(true)}>
@@ -958,29 +958,29 @@ export default function MyAgentsPage() {
 
       {/* Planning Agent */}
       <div className="mb-8">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Planning Agent</p>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">Planning Agent</p>
         {planningLoading ? (
-          <div className="h-20 animate-pulse rounded-2xl bg-zinc-200" />
+          <div className="h-20 animate-pulse rounded-2xl bg-muted" />
         ) : planningConfig ? (
           <PlanningAgentCard config={planningConfig} />
         ) : null}
       </div>
 
       {/* Personal Agents */}
-      <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Personal Agents</p>
+      <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">Personal Agents</p>
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-2xl bg-zinc-200" />
+            <div key={i} className="h-24 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
       ) : agents.length === 0 && !creating ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-white py-24 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card py-24 text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600">
             <Bot size={26} className="text-white" />
           </div>
-          <p className="font-semibold text-zinc-700">No agents yet</p>
-          <p className="mt-1 text-sm text-zinc-400">Create your first personal AI agent to get started.</p>
+          <p className="font-semibold text-foreground/80">No agents yet</p>
+          <p className="mt-1 text-sm text-muted-foreground/70">Create your first personal AI agent to get started.</p>
           <Button className="mt-6" onClick={() => setCreating(true)}>
             <Plus size={14} className="mr-1.5" />
             New agent

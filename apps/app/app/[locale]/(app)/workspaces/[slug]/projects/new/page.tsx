@@ -137,7 +137,7 @@ function DetailsStep({
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="proj-name">
-          Project name <span className="text-red-500">*</span>
+          Project name <span className="text-red-400">*</span>
         </Label>
         <Input
           id="proj-name"
@@ -496,7 +496,7 @@ function ResourceKeysStep({
               </button>
             </div>
           </div>
-          {addError && <p className="text-xs text-red-500">{addError}</p>}
+          {addError && <p className="text-xs text-red-400">{addError}</p>}
           <Button variant="outline" size="sm" className="w-full" onClick={addKey}>
             <Plus className="w-3.5 h-3.5 mr-1" /> Add key
           </Button>

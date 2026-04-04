@@ -51,10 +51,10 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50">
-      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-1 text-2xl font-bold text-zinc-900">OpenWorkspace</h1>
-        <p className="mb-6 text-sm text-zinc-500">
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-sm">
+        <h1 className="mb-1 text-2xl font-bold text-foreground">OpenWorkspace</h1>
+        <p className="mb-6 text-sm text-muted-foreground">
           {mode === 'signin' ? 'Sign in to your account' : 'Create an account'}
         </p>
 
@@ -76,7 +76,7 @@ export default function SignInPage() {
 
         <div className="my-5 flex items-center gap-3">
           <Separator className="flex-1" />
-          <span className="text-xs text-zinc-400">or</span>
+          <span className="text-xs text-muted-foreground/70">or</span>
           <Separator className="flex-1" />
         </div>
 
@@ -97,17 +97,17 @@ export default function SignInPage() {
             required
             autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
           />
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="text-xs text-red-400">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {mode === 'signin' ? 'Sign in' : 'Create account'}
           </Button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-zinc-500">
+        <p className="mt-4 text-center text-sm text-muted-foreground">
           {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
           <button
             type="button"
-            className="font-medium text-zinc-900 underline underline-offset-2"
+            className="font-medium text-foreground underline underline-offset-2"
             onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(''); }}
           >
             {mode === 'signin' ? 'Sign up' : 'Sign in'}

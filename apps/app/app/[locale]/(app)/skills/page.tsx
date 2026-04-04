@@ -467,7 +467,7 @@ function SkillForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label className="text-zinc-300 text-xs font-medium uppercase tracking-wide">Name</Label>
+          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Name</Label>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -475,11 +475,11 @@ function SkillForm({
             required
             minLength={2}
             maxLength={80}
-            className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-zinc-600 focus:border-violet-500/50 font-mono"
+            className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50 font-mono"
           />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-zinc-300 text-xs font-medium uppercase tracking-wide">Type</Label>
+          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Type</Label>
           <Select value={type} onValueChange={(v) => setType((v ?? 'PROMPT') as 'PROMPT' | 'WEBHOOK')}>
             <SelectTrigger className="w-full bg-[#0f0f1a] border-[#1e1e3a] text-white focus:border-violet-500/50"><SelectValue /></SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
@@ -491,7 +491,7 @@ function SkillForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-zinc-300 text-xs font-medium uppercase tracking-wide">Description</Label>
+        <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Description</Label>
         <Input
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -499,40 +499,40 @@ function SkillForm({
           required
           minLength={5}
           maxLength={500}
-          className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-zinc-600 focus:border-violet-500/50"
+          className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
         />
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-zinc-300 text-xs font-medium uppercase tracking-wide">Instructions</Label>
+        <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Instructions</Label>
         <Textarea
           value={instructions}
           onChange={(e) => setInstructions(e.target.value)}
           placeholder={type === 'PROMPT' ? 'When the user asks about X, you should…' : 'Call this webhook with…'}
           rows={6}
           maxLength={8000}
-          className="resize-none font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-zinc-600 focus:border-violet-500/50"
+          className="resize-none font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
           required
         />
-        <p className="text-xs text-zinc-600 font-mono">{instructions.length}/8000</p>
+        <p className="text-xs text-muted-foreground font-mono">{instructions.length}/8000</p>
       </div>
 
       {type === 'WEBHOOK' && (
-        <div className="space-y-3 rounded-xl border border-[#1e1e3a] bg-white/[0.03] p-4">
+        <div className="space-y-3 rounded-xl border border-[#1e1e3a] bg-card/[0.03] p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-violet-400">Webhook Config</p>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="sm:col-span-2 space-y-1.5">
-              <Label className="text-zinc-300 text-xs font-medium uppercase tracking-wide">URL</Label>
+              <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">URL</Label>
               <Input
                 value={webhookUrl}
                 onChange={(e) => setWebhookUrl(e.target.value)}
                 placeholder="https://api.example.com/endpoint"
                 type="url"
-                className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-zinc-600 focus:border-violet-500/50 font-mono text-sm"
+                className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50 font-mono text-sm"
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-zinc-300 text-xs font-medium uppercase tracking-wide">Method</Label>
+              <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Method</Label>
               <Select value={webhookMethod} onValueChange={(v) => setWebhookMethod(v ?? 'POST')}>
                 <SelectTrigger className="bg-[#0f0f1a] border-[#1e1e3a] text-white focus:border-violet-500/50"><SelectValue /></SelectTrigger>
                 <SelectContent alignItemWithTrigger={false}>
@@ -544,12 +544,12 @@ function SkillForm({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-zinc-300 text-xs font-medium uppercase tracking-wide">Headers <span className="text-zinc-600 normal-case">(JSON)</span></Label>
+            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Headers <span className="text-muted-foreground normal-case">(JSON)</span></Label>
             <Input
               value={webhookHeaders}
               onChange={(e) => setWebhookHeaders(e.target.value)}
               placeholder='{"Authorization": "Bearer sk-..."}'
-              className="font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-zinc-600 focus:border-violet-500/50"
+              className="font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
             />
           </div>
         </div>
@@ -561,14 +561,14 @@ function SkillForm({
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 rounded-lg text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 transition-all duration-200"
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-card/5 hover:bg-card/10 border border-white/10 text-muted-foreground/50 transition-all duration-200"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isPending}
-          className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? 'Saving…' : initial ? 'Save changes' : 'Create skill'}
         </button>
@@ -600,19 +600,19 @@ function AssignAgentsPanel({ skill }: { skill: Skill }) {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['skill-agents', skill.id] }); qc.invalidateQueries({ queryKey: ['my-skills'] }); },
   });
 
-  if (agents.length === 0) return <p className="text-sm text-zinc-500">No personal agents yet.</p>;
+  if (agents.length === 0) return <p className="text-sm text-muted-foreground">No personal agents yet.</p>;
 
   return (
     <div className="space-y-2">
       {agentSkills.map(({ agent, assigned }: { agent: Agent; assigned: boolean }) => (
-        <div key={agent.id} className="flex items-center justify-between rounded-xl border border-[#1e1e3a] bg-white/[0.03] px-3 py-2">
+        <div key={agent.id} className="flex items-center justify-between rounded-xl border border-[#1e1e3a] bg-card/[0.03] px-3 py-2">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500">
               <Bot size={11} className="text-white" />
             </div>
             <span className="text-sm font-medium text-zinc-200">{agent.name}</span>
             {agent.modelName && (
-              <span className="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-mono bg-violet-500/10 text-violet-400 border border-violet-500/20">
+              <span className="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-mono bg-violet-900/200/10 text-violet-400 border border-violet-500/20">
                 {agent.modelName}
               </span>
             )}
@@ -622,7 +622,7 @@ function AssignAgentsPanel({ skill }: { skill: Skill }) {
             disabled={assign.isPending || remove.isPending}
             className={`h-7 px-3 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1 disabled:opacity-50 ${
               assigned
-                ? 'bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 text-zinc-400 hover:text-red-400'
+                ? 'bg-card/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 text-muted-foreground/70 hover:text-red-400'
                 : 'bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-300'
             }`}
           >
@@ -664,7 +664,7 @@ function SkillCard({ skill }: { skill: Skill }) {
       transition={{ duration: 0.15 }}
       className="group relative overflow-hidden rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] hover:border-violet-500/30 p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
     >
-      <div className="absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-violet-500/5 blur-2xl group-hover:bg-violet-500/10 transition-opacity" />
+      <div className="absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-violet-900/200/5 blur-2xl group-hover:bg-violet-900/200/10 transition-opacity" />
       <div className="flex items-start gap-4">
         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl shadow-sm text-white ${isWebhook ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-violet-500 to-purple-600'}`}>
           {isWebhook ? <Globe size={18} /> : <Zap size={18} />}
@@ -672,13 +672,13 @@ function SkillCard({ skill }: { skill: Skill }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-white">{skill.name}</h3>
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${isWebhook ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-violet-500/10 text-violet-400 border-violet-500/20'}`}>
+            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${isWebhook ? 'bg-emerald-950/500/10 text-emerald-400 border-emerald-500/20' : 'bg-violet-900/200/10 text-violet-400 border-violet-500/20'}`}>
               {isWebhook ? <Globe size={10} className="mr-1" /> : <MessageSquare size={10} className="mr-1" />}
               {skill.type}
             </span>
           </div>
-          <p className="mt-0.5 text-sm text-zinc-400 line-clamp-1">{skill.description}</p>
-          <p className="mt-1.5 text-xs text-zinc-600">Assigned to <span className="font-medium text-zinc-400">{agentCount}</span> agent{agentCount !== 1 ? 's' : ''}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground/70 line-clamp-1">{skill.description}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">Assigned to <span className="font-medium text-muted-foreground/70">{agentCount}</span> agent{agentCount !== 1 ? 's' : ''}</p>
         </div>
         <div className="flex shrink-0 items-center gap-1">
           <button
@@ -686,34 +686,34 @@ function SkillCard({ skill }: { skill: Skill }) {
             className={`h-8 px-3 rounded-lg text-xs font-medium transition-all duration-200 border ${
               showAgents
                 ? 'bg-violet-600/20 text-violet-300 border-violet-500/30'
-                : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-400 hover:text-zinc-300'
+                : 'bg-card/5 hover:bg-card/10 border-white/10 text-muted-foreground/70 hover:text-muted-foreground/50'
             }`}
           >
             {showAgents ? 'Hide agents' : 'Assign agents'}
           </button>
           <button
             onClick={() => setEditing(true)}
-            className="h-8 w-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-all duration-200"
+            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-muted-foreground/50 hover:bg-card/5 transition-all duration-200"
           >
             <Pencil size={13} />
           </button>
           <button
             onClick={() => { if (confirm(`Delete "${skill.name}"?`)) deleteMutation.mutate(); }}
             disabled={deleteMutation.isPending}
-            className="h-8 w-8 rounded-lg flex items-center justify-center text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-50"
+            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-50"
           >
             <Trash2 size={13} />
           </button>
         </div>
       </div>
       {skill.instructions && (
-        <div className="mt-3 rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2">
-          <p className="text-xs text-zinc-500 font-mono line-clamp-2">{skill.instructions}</p>
+        <div className="mt-3 rounded-lg bg-card/[0.03] border border-white/[0.06] px-3 py-2">
+          <p className="text-xs text-muted-foreground font-mono line-clamp-2">{skill.instructions}</p>
         </div>
       )}
       {showAgents && (
         <div className="mt-4 border-t border-[#1e1e3a] pt-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Agents</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Agents</p>
           <AssignAgentsPanel skill={skill} />
         </div>
       )}
@@ -742,20 +742,20 @@ function HubSkillCard({ item, installed, onInstall, installing }: {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-white">{item.name}</h3>
-            <span className="rounded-full bg-white/[0.04] border border-white/[0.08] px-2 py-0.5 text-[11px] font-medium text-zinc-500">{item.category}</span>
-            <span className="rounded-full bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 text-[11px] font-medium text-violet-400">{item.preset.type ?? 'PROMPT'}</span>
+            <span className="rounded-full bg-card/[0.04] border border-white/[0.08] px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{item.category}</span>
+            <span className="rounded-full bg-violet-900/200/10 border border-violet-500/20 px-2 py-0.5 text-[11px] font-medium text-violet-400">{item.preset.type ?? 'PROMPT'}</span>
           </div>
-          <p className="mt-0.5 text-sm text-zinc-400">{item.description}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground/70">{item.description}</p>
         </div>
         <button
           disabled={installed || installing}
           onClick={onInstall}
           className={`shrink-0 h-8 px-3 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1 border disabled:cursor-not-allowed ${
             installed
-              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 cursor-default'
+              ? 'bg-emerald-950/500/10 text-emerald-400 border-emerald-500/20 cursor-default'
               : installing
-                ? 'bg-white/5 text-zinc-500 border-white/10 opacity-60'
-                : 'bg-violet-600 hover:bg-violet-500 text-white border-transparent'
+                ? 'bg-card/5 text-muted-foreground border-white/10 opacity-60'
+                : 'bg-violet-600 hover:bg-violet-900/200 text-white border-transparent'
           }`}
         >
           {installed ? <><Check size={11} />Installed</> : installing ? 'Installing…' : <><Download size={11} />Install</>}
@@ -809,12 +809,12 @@ export default function SkillsPage() {
       >
         <div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">Skills</h1>
-          <p className="mt-1 text-sm text-zinc-500">Reusable capabilities you can assign to your agents.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Reusable capabilities you can assign to your agents.</p>
         </div>
         {pageTab === 'mine' && !creating && (
           <button
             onClick={openBlank}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
           >
             <Plus size={14} />New skill
           </button>
@@ -830,7 +830,7 @@ export default function SkillsPage() {
             className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
               pageTab === t
                 ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30'
-                : 'text-zinc-500 hover:text-zinc-300'
+                : 'text-muted-foreground hover:text-muted-foreground/50'
             }`}
           >
             {t === 'mine' ? (
@@ -860,25 +860,25 @@ export default function SkillsPage() {
 
           {isLoading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => <div key={i} className="h-24 animate-pulse bg-white/5 rounded-2xl" />)}
+              {[1, 2, 3].map((i) => <div key={i} className="h-24 animate-pulse bg-card/5 rounded-2xl" />)}
             </div>
           ) : skills.length === 0 && !creating ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#1e1e3a] bg-white/[0.02] py-24 text-center">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#1e1e3a] bg-card/[0.02] py-24 text-center">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600">
                 <Zap size={26} className="text-white" />
               </div>
-              <p className="font-semibold text-zinc-300">No skills yet</p>
-              <p className="mt-1 text-sm text-zinc-500">Create your own or install one from the Skill Hub.</p>
+              <p className="font-semibold text-muted-foreground/50">No skills yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">Create your own or install one from the Skill Hub.</p>
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={openBlank}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
                 >
                   <Plus size={14} />New skill
                 </button>
                 <button
                   onClick={() => setPageTab('hub')}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 transition-all duration-200"
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-card/5 hover:bg-card/10 border border-white/10 text-muted-foreground/50 transition-all duration-200"
                 >
                   Browse hub
                 </button>
@@ -902,12 +902,12 @@ export default function SkillsPage() {
           {/* Search + category filter */}
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={hubSearch}
                 onChange={(e) => setHubSearch(e.target.value)}
                 placeholder="Search skills…"
-                className="pl-9 bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-zinc-600 focus:border-violet-500/50"
+                className="pl-9 bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
               />
             </div>
             <div className="flex gap-1.5 flex-wrap">
@@ -917,8 +917,8 @@ export default function SkillsPage() {
                   onClick={() => setHubCategory(cat)}
                   className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 border ${
                     hubCategory === cat
-                      ? 'bg-violet-500/20 text-violet-300 border-violet-500/30'
-                      : 'bg-white/[0.03] text-zinc-500 border-white/[0.06] hover:border-white/20 hover:text-zinc-300'
+                      ? 'bg-violet-900/200/20 text-violet-300 border-violet-500/30'
+                      : 'bg-card/[0.03] text-muted-foreground border-white/[0.06] hover:border-white/20 hover:text-muted-foreground/50'
                   }`}
                 >
                   {cat}
@@ -928,7 +928,7 @@ export default function SkillsPage() {
           </div>
 
           {filteredHub.length === 0 ? (
-            <p className="py-12 text-center text-sm text-zinc-500">No skills match your search.</p>
+            <p className="py-12 text-center text-sm text-muted-foreground">No skills match your search.</p>
           ) : (
             <div className="space-y-3">
               {filteredHub.map((item, i) => (

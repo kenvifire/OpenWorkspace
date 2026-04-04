@@ -18,7 +18,7 @@ function PaymentBanner() {
     <motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-sm text-emerald-800"
+      className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-800 bg-emerald-950/50 px-4 py-3.5 text-sm text-emerald-400"
     >
       <CheckCircle2 size={16} className="shrink-0 text-emerald-500" />
       Payment successful — thank you! Your balance has been updated.
@@ -27,9 +27,9 @@ function PaymentBanner() {
     <motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-6 flex items-center gap-3 rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 text-sm text-zinc-600"
+      className="mb-6 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-sm text-muted-foreground"
     >
-      <XCircle size={16} className="shrink-0 text-zinc-400" />
+      <XCircle size={16} className="shrink-0 text-muted-foreground/70" />
       Payment cancelled. No charge was made.
     </motion.div>
   );
@@ -71,11 +71,11 @@ export default function BillingPage() {
         className="mb-8 flex items-end justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">Billing</h1>
-          <p className="mt-1 text-sm text-zinc-500">Current billing cycle usage and payments</p>
+          <h1 className="text-2xl font-bold text-foreground">Billing</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Current billing cycle usage and payments</p>
         </div>
         <Select value={selectedWorkspaceId} onValueChange={(v) => setSelectedWorkspaceId(v ?? '')}>
-          <SelectTrigger className="w-48 bg-white">
+          <SelectTrigger className="w-48 bg-card">
             <SelectValue placeholder="Select workspace" />
           </SelectTrigger>
           <SelectContent alignItemWithTrigger={false}>
@@ -88,13 +88,13 @@ export default function BillingPage() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <div className="h-36 animate-pulse rounded-2xl bg-zinc-200" />
-          <div className="h-64 animate-pulse rounded-2xl bg-zinc-200" />
+          <div className="h-36 animate-pulse rounded-2xl bg-muted" />
+          <div className="h-64 animate-pulse rounded-2xl bg-muted" />
         </div>
       ) : !summary ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-white py-24 text-center">
-          <CreditCard size={32} className="mb-3 text-zinc-300" />
-          <p className="text-sm text-zinc-400">Select a workspace to view billing</p>
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card py-24 text-center">
+          <CreditCard size={32} className="mb-3 text-muted-foreground/50" />
+          <p className="text-sm text-muted-foreground/70">Select a workspace to view billing</p>
         </div>
       ) : (
         <motion.div
@@ -107,20 +107,20 @@ export default function BillingPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Total */}
             <div className="sm:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-700 p-6 text-white shadow-sm">
-              <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-white/5 blur-2xl" />
-              <p className="text-sm font-medium text-zinc-400">Current cycle total</p>
+              <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-card/5 blur-2xl" />
+              <p className="text-sm font-medium text-muted-foreground/70">Current cycle total</p>
               <p className="mt-2 text-5xl font-bold tracking-tight">{summary.totalFormatted}</p>
-              <p className="mt-2 text-xs text-zinc-400">
+              <p className="mt-2 text-xs text-muted-foreground/70">
                 {new Date(summary.periodStart).toLocaleDateString()} – {new Date(summary.periodEnd).toLocaleDateString()}
               </p>
             </div>
             {/* Pay card */}
-            <div className="flex flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-zinc-200/80">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100">
-                <DollarSign size={18} className="text-violet-600" />
+            <div className="flex flex-col rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-900/40">
+                <DollarSign size={18} className="text-violet-400" />
               </div>
-              <p className="text-sm font-medium text-zinc-700">Pay this cycle</p>
-              <p className="mt-0.5 text-xs text-zinc-400">Securely via Stripe</p>
+              <p className="text-sm font-medium text-foreground/80">Pay this cycle</p>
+              <p className="mt-0.5 text-xs text-muted-foreground/70">Securely via Stripe</p>
               <Button
                 onClick={handleCheckout}
                 disabled={summary.totalCents === 0}
@@ -132,14 +132,14 @@ export default function BillingPage() {
           </div>
 
           {/* Breakdown */}
-          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200/80">
+          <div className="rounded-2xl bg-card p-6 shadow-sm ring-1 ring-border">
             <div className="mb-5 flex items-center gap-2">
-              <TrendingUp size={16} className="text-zinc-400" />
-              <h2 className="font-semibold text-zinc-900">Breakdown by project</h2>
+              <TrendingUp size={16} className="text-muted-foreground/70" />
+              <h2 className="font-semibold text-foreground">Breakdown by project</h2>
             </div>
 
             {summary.byProject.length === 0 ? (
-              <p className="text-sm text-zinc-400">No usage this cycle</p>
+              <p className="text-sm text-muted-foreground/70">No usage this cycle</p>
             ) : (
               <div className="space-y-5">
                 {summary.byProject.map((p: {
@@ -151,23 +151,23 @@ export default function BillingPage() {
                   <div key={p.projectId}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-violet-500" />
-                        <span className="font-semibold text-zinc-800">{p.projectName}</span>
+                        <div className="h-2 w-2 rounded-full bg-violet-900/200" />
+                        <span className="font-semibold text-foreground">{p.projectName}</span>
                       </div>
-                      <span className="font-bold text-zinc-900">{p.totalFormatted}</span>
+                      <span className="font-bold text-foreground">{p.totalFormatted}</span>
                     </div>
-                    <div className="ml-4 space-y-2 border-l-2 border-zinc-100 pl-4">
+                    <div className="ml-4 space-y-2 border-l-2 border-border/50 pl-4">
                       {p.byAgent.map((a) => (
                         <div key={a.agentId} className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
-                            <ChevronRight size={12} className="text-zinc-300" />
-                            <span className="text-zinc-600">{a.agentName}</span>
+                            <ChevronRight size={12} className="text-muted-foreground/50" />
+                            <span className="text-muted-foreground">{a.agentName}</span>
                           </div>
-                          <span className="font-medium text-zinc-700">{a.totalFormatted}</span>
+                          <span className="font-medium text-foreground/80">{a.totalFormatted}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="mt-4 border-t border-zinc-100" />
+                    <div className="mt-4 border-t border-border/50" />
                   </div>
                 ))}
               </div>

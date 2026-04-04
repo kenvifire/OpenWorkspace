@@ -25,11 +25,11 @@ import {
 
 // ─── Run status colours ──────────────────────────────────────────────────────
 const RUN_STATUS_COLOR: Record<string, string> = {
-  RUNNING: 'bg-blue-100 text-blue-700',
-  COMPLETED: 'bg-green-100 text-green-700',
-  STOPPED: 'bg-zinc-100 text-zinc-600',
-  FAILED: 'bg-red-100 text-red-600',
-  MAX_ITERATIONS: 'bg-yellow-100 text-yellow-700',
+  RUNNING: 'bg-blue-900/40 text-blue-300',
+  COMPLETED: 'bg-green-900/40 text-green-400',
+  STOPPED: 'bg-muted text-muted-foreground',
+  FAILED: 'bg-red-900/40 text-red-400',
+  MAX_ITERATIONS: 'bg-yellow-900/40 text-yellow-300',
 };
 
 // ─── Single run entry (collapsible) ─────────────────────────────────────────
@@ -38,40 +38,40 @@ function RunEntry({ run }: { run: AgentRunLog & { task?: { id: string; title: st
   const totalTokens = (run.totalInputTokens ?? 0) + (run.totalOutputTokens ?? 0);
 
   return (
-    <div className="rounded-lg border border-zinc-100 bg-white">
+    <div className="rounded-lg border border-border/50 bg-card">
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
       >
-        {open ? <ChevronDown size={13} className="shrink-0 text-zinc-400" /> : <ChevronRight size={13} className="shrink-0 text-zinc-400" />}
-        <span className={`shrink-0 rounded text-[10px] font-semibold px-1.5 py-0.5 ${RUN_STATUS_COLOR[run.status] ?? 'bg-zinc-100 text-zinc-500'}`}>
+        {open ? <ChevronDown size={13} className="shrink-0 text-muted-foreground/70" /> : <ChevronRight size={13} className="shrink-0 text-muted-foreground/70" />}
+        <span className={`shrink-0 rounded text-[10px] font-semibold px-1.5 py-0.5 ${RUN_STATUS_COLOR[run.status] ?? 'bg-muted text-muted-foreground'}`}>
           {run.status}
         </span>
         {run.task && (
-          <span className="flex-1 truncate text-xs text-zinc-700 font-medium">{run.task.title}</span>
+          <span className="flex-1 truncate text-xs text-foreground/80 font-medium">{run.task.title}</span>
         )}
-        <span className="shrink-0 text-xs text-zinc-400">{run.iterations} iter</span>
+        <span className="shrink-0 text-xs text-muted-foreground/70">{run.iterations} iter</span>
         {totalTokens > 0 && (
-          <span className="shrink-0 flex items-center gap-1 text-[10px] text-zinc-400">
+          <span className="shrink-0 flex items-center gap-1 text-[10px] text-muted-foreground/70">
             <Coins size={9} />{totalTokens.toLocaleString()} tok
           </span>
         )}
-        <span className="shrink-0 text-[10px] text-zinc-300">{new Date(run.startedAt).toLocaleString()}</span>
+        <span className="shrink-0 text-[10px] text-muted-foreground/50">{new Date(run.startedAt).toLocaleString()}</span>
       </button>
 
       {open && (
         <div className="border-t border-zinc-50 px-3 pb-3 pt-2 space-y-1.5 max-h-80 overflow-y-auto">
           {(run.log as AgentRunStep[]).length === 0 && (
-            <p className="text-xs text-zinc-300">No steps logged</p>
+            <p className="text-xs text-muted-foreground/50">No steps logged</p>
           )}
           {(run.log as AgentRunStep[]).map((step, i) => (
             <div key={i} className="flex items-start gap-2 text-[11px]">
-              <span className="shrink-0 rounded px-1 py-0.5 font-mono font-medium bg-zinc-50 text-zinc-500">
+              <span className="shrink-0 rounded px-1 py-0.5 font-mono font-medium bg-background text-muted-foreground">
                 #{step.iteration}
               </span>
               <div className="flex-1 overflow-x-auto space-y-0.5">
                 {(step.input_tokens != null || step.context_messages != null) && (
-                  <div className="flex items-center gap-2 text-[9px] text-zinc-400">
+                  <div className="flex items-center gap-2 text-[9px] text-muted-foreground/70">
                     {step.input_tokens != null && (
                       <span className="flex items-center gap-0.5">
                         <Coins size={8} />{step.input_tokens.toLocaleString()} in / {(step.output_tokens ?? 0).toLocaleString()} out
@@ -85,10 +85,10 @@ function RunEntry({ run }: { run: AgentRunLog & { task?: { id: string; title: st
                   </div>
                 )}
                 {step.error && (
-                  <pre className="whitespace-pre-wrap text-red-600 font-mono text-[10px] bg-red-50 rounded px-1.5 py-1">{step.error}</pre>
+                  <pre className="whitespace-pre-wrap text-red-400 font-mono text-[10px] bg-red-50 rounded px-1.5 py-1">{step.error}</pre>
                 )}
                 {step.llm_content && (
-                  <p className="text-zinc-600 text-[10px]">{step.llm_content}</p>
+                  <p className="text-muted-foreground text-[10px]">{step.llm_content}</p>
                 )}
                 {step.tool_calls?.map((tc, j) => (
                   <div key={j} className="rounded bg-purple-50 px-1.5 py-1 text-purple-700">
@@ -98,7 +98,7 @@ function RunEntry({ run }: { run: AgentRunLog & { task?: { id: string; title: st
                   </div>
                 ))}
               </div>
-              <span className="shrink-0 text-zinc-300">{new Date(step.timestamp).toLocaleTimeString()}</span>
+              <span className="shrink-0 text-muted-foreground/50">{new Date(step.timestamp).toLocaleTimeString()}</span>
             </div>
           ))}
         </div>
@@ -138,47 +138,47 @@ function AgentLogDrawer({
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative ml-auto z-10 flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl">
+      <div className="relative ml-auto z-10 flex h-full w-full max-w-2xl flex-col bg-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center gap-3 border-b border-zinc-100 px-6 py-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
+        <div className="flex items-center gap-3 border-b border-border/50 px-6 py-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
             {agent.agent?.type === 'AI' ? <Bot size={17} /> : <User size={17} />}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-zinc-900 truncate">{agent.agent?.name}</p>
-            <p className="text-xs text-zinc-400">{agent.role}{agent.agent?.provider?.displayName ? ` · ${agent.agent.provider.displayName}` : ''}</p>
+            <p className="font-semibold text-foreground truncate">{agent.agent?.name}</p>
+            <p className="text-xs text-muted-foreground/70">{agent.role}{agent.agent?.provider?.displayName ? ` · ${agent.agent.provider.displayName}` : ''}</p>
           </div>
           {runningRun && (
-            <span className="flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700">
+            <span className="flex items-center gap-1.5 rounded-full bg-blue-900/40 px-2.5 py-1 text-xs font-medium text-blue-300">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
               Running
             </span>
           )}
-          <button onClick={onClose} className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700">
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground/70 hover:bg-muted hover:text-foreground/80">
             <X size={16} />
           </button>
         </div>
 
         {/* Stats bar */}
         {totalRuns > 0 && (
-          <div className="flex items-center gap-6 border-b border-zinc-100 px-6 py-3 text-sm">
+          <div className="flex items-center gap-6 border-b border-border/50 px-6 py-3 text-sm">
             <div className="text-center">
-              <p className="text-lg font-bold text-zinc-900">{totalRuns}</p>
-              <p className="text-[11px] text-zinc-400">Total runs</p>
+              <p className="text-lg font-bold text-foreground">{totalRuns}</p>
+              <p className="text-[11px] text-muted-foreground/70">Total runs</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-zinc-900">{totalTokens.toLocaleString()}</p>
-              <p className="text-[11px] text-zinc-400">Tokens used</p>
+              <p className="text-lg font-bold text-foreground">{totalTokens.toLocaleString()}</p>
+              <p className="text-[11px] text-muted-foreground/70">Tokens used</p>
             </div>
             <div className="text-center">
-              <p className={`text-lg font-bold ${failedRuns > 0 ? 'text-red-600' : 'text-zinc-900'}`}>{failedRuns}</p>
-              <p className="text-[11px] text-zinc-400">Failed</p>
+              <p className={`text-lg font-bold ${failedRuns > 0 ? 'text-red-400' : 'text-foreground'}`}>{failedRuns}</p>
+              <p className="text-[11px] text-muted-foreground/70">Failed</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-zinc-900">
+              <p className="text-lg font-bold text-foreground">
                 {runs.reduce((s, r) => s + r.iterations, 0)}
               </p>
-              <p className="text-[11px] text-zinc-400">Total iterations</p>
+              <p className="text-[11px] text-muted-foreground/70">Total iterations</p>
             </div>
           </div>
         )}
@@ -188,14 +188,14 @@ function AgentLogDrawer({
           {isLoading ? (
             <div className="space-y-2">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-12 animate-pulse rounded-lg bg-zinc-100" />
+                <div key={i} className="h-12 animate-pulse rounded-lg bg-muted" />
               ))}
             </div>
           ) : runs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <ScrollText size={28} className="mb-3 text-zinc-300" />
-              <p className="text-sm font-medium text-zinc-500">No runs yet</p>
-              <p className="mt-1 text-xs text-zinc-400">Assign this agent to a task and set it to TODO to trigger a run.</p>
+              <ScrollText size={28} className="mb-3 text-muted-foreground/50" />
+              <p className="text-sm font-medium text-muted-foreground">No runs yet</p>
+              <p className="mt-1 text-xs text-muted-foreground/70">Assign this agent to a task and set it to TODO to trigger a run.</p>
             </div>
           ) : (
             runs.map((run) => <RunEntry key={run.id} run={run} />)
@@ -228,36 +228,36 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative ml-auto z-10 flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl">
+      <div className="relative ml-auto z-10 flex h-full w-full max-w-2xl flex-col bg-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center gap-3 border-b border-zinc-100 px-6 py-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
+        <div className="flex items-center gap-3 border-b border-border/50 px-6 py-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-900/40 text-violet-400">
             <Brain size={17} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-zinc-900">Planning Agent</p>
-            <p className="text-xs text-zinc-400">Planner run history</p>
+            <p className="font-semibold text-foreground">Planning Agent</p>
+            <p className="text-xs text-muted-foreground/70">Planner run history</p>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700">
+          <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground/70 hover:bg-muted hover:text-foreground/80">
             <X size={16} />
           </button>
         </div>
 
         {/* Stats bar */}
         {runs.length > 0 && (
-          <div className="flex items-center gap-6 border-b border-zinc-100 px-6 py-3">
+          <div className="flex items-center gap-6 border-b border-border/50 px-6 py-3">
             <div className="text-center">
-              <p className="text-lg font-bold text-zinc-900">{runs.length}</p>
-              <p className="text-[11px] text-zinc-400">Total runs</p>
+              <p className="text-lg font-bold text-foreground">{runs.length}</p>
+              <p className="text-[11px] text-muted-foreground/70">Total runs</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-zinc-900">{totalTokens.toLocaleString()}</p>
-              <p className="text-[11px] text-zinc-400">Tokens used</p>
+              <p className="text-lg font-bold text-foreground">{totalTokens.toLocaleString()}</p>
+              <p className="text-[11px] text-muted-foreground/70">Tokens used</p>
             </div>
             {failedCount > 0 && (
               <div className="text-center">
-                <p className="text-lg font-bold text-red-500">{failedCount}</p>
-                <p className="text-[11px] text-zinc-400">Failed</p>
+                <p className="text-lg font-bold text-red-400">{failedCount}</p>
+                <p className="text-[11px] text-muted-foreground/70">Failed</p>
               </div>
             )}
           </div>
@@ -267,10 +267,10 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {isLoading ? (
             <div className="space-y-2">
-              {[...Array(3)].map((_, i) => <div key={i} className="h-14 animate-pulse rounded-lg bg-zinc-100" />)}
+              {[...Array(3)].map((_, i) => <div key={i} className="h-14 animate-pulse rounded-lg bg-muted" />)}
             </div>
           ) : runs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-40 text-sm text-zinc-400 gap-2">
+            <div className="flex flex-col items-center justify-center h-40 text-sm text-muted-foreground/70 gap-2">
               <ScrollText size={28} className="text-zinc-200" />
               No planner runs yet. Click "Run planner" to generate a plan.
             </div>
@@ -278,18 +278,18 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
             const isOpen = expandedId === run.id;
             const totalTok = run.totalInputTokens + run.totalOutputTokens;
             return (
-              <div key={run.id} className="rounded-lg border border-zinc-100 bg-white">
+              <div key={run.id} className="rounded-lg border border-border/50 bg-card">
                 <button
                   onClick={() => setExpandedId(isOpen ? null : run.id)}
                   className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
                 >
-                  {isOpen ? <ChevronDown size={13} className="shrink-0 text-zinc-400" /> : <ChevronRight size={13} className="shrink-0 text-zinc-400" />}
-                  <span className={`shrink-0 rounded text-[10px] font-semibold px-1.5 py-0.5 ${run.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                  {isOpen ? <ChevronDown size={13} className="shrink-0 text-muted-foreground/70" /> : <ChevronRight size={13} className="shrink-0 text-muted-foreground/70" />}
+                  <span className={`shrink-0 rounded text-[10px] font-semibold px-1.5 py-0.5 ${run.status === 'COMPLETED' ? 'bg-green-900/40 text-green-400' : 'bg-red-900/40 text-red-400'}`}>
                     {run.status}
                   </span>
-                  <span className="flex-1 text-xs text-zinc-500">{new Date(run.startedAt).toLocaleString()}</span>
+                  <span className="flex-1 text-xs text-muted-foreground">{new Date(run.startedAt).toLocaleString()}</span>
                   {totalTok > 0 && (
-                    <span className="flex items-center gap-1 text-[11px] text-zinc-400">
+                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground/70">
                       <Coins size={11} /> {totalTok.toLocaleString()}
                     </span>
                   )}
@@ -303,36 +303,36 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
                     )}
                     {run.descriptionSnapshot && (
                       <div>
-                        <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">Description used</p>
-                        <p className="text-xs text-zinc-600 whitespace-pre-wrap line-clamp-4">{run.descriptionSnapshot}</p>
+                        <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">Description used</p>
+                        <p className="text-xs text-muted-foreground whitespace-pre-wrap line-clamp-4">{run.descriptionSnapshot}</p>
                       </div>
                     )}
                     {run.planOutput && (
                       <div className="space-y-2">
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
                           Generated plan — {run.planOutput.roles?.length ?? 0} roles · {run.planOutput.tasks?.length ?? 0} tasks
                         </p>
                         <div className="space-y-1">
                           {run.planOutput.tasks?.slice(0, 8).map((t, i) => (
-                            <div key={i} className="flex items-center gap-2 rounded bg-zinc-50 px-2 py-1.5">
-                              <span className="text-xs font-medium text-zinc-800 flex-1 truncate">{t.title}</span>
-                              <span className="text-[10px] text-zinc-400">{t.role}</span>
+                            <div key={i} className="flex items-center gap-2 rounded bg-background px-2 py-1.5">
+                              <span className="text-xs font-medium text-foreground flex-1 truncate">{t.title}</span>
+                              <span className="text-[10px] text-muted-foreground/70">{t.role}</span>
                               {t.priority && (
                                 <span className={`text-[9px] font-semibold px-1 py-0.5 rounded ${
-                                  t.priority === 'HIGH' || t.priority === 'URGENT' ? 'bg-red-50 text-red-600' :
-                                  t.priority === 'MEDIUM' ? 'bg-yellow-50 text-yellow-600' : 'bg-zinc-100 text-zinc-500'
+                                  t.priority === 'HIGH' || t.priority === 'URGENT' ? 'bg-red-50 text-red-400' :
+                                  t.priority === 'MEDIUM' ? 'bg-yellow-50 text-yellow-600' : 'bg-muted text-muted-foreground'
                                 }`}>{t.priority}</span>
                               )}
                             </div>
                           ))}
                           {(run.planOutput.tasks?.length ?? 0) > 8 && (
-                            <p className="text-[11px] text-zinc-400 pl-2">+{run.planOutput.tasks!.length - 8} more tasks</p>
+                            <p className="text-[11px] text-muted-foreground/70 pl-2">+{run.planOutput.tasks!.length - 8} more tasks</p>
                           )}
                         </div>
                       </div>
                     )}
                     {(run.totalInputTokens > 0 || run.totalOutputTokens > 0) && (
-                      <div className="flex items-center gap-4 text-[11px] text-zinc-400">
+                      <div className="flex items-center gap-4 text-[11px] text-muted-foreground/70">
                         <span>{run.totalInputTokens.toLocaleString()} in</span>
                         <span>{run.totalOutputTokens.toLocaleString()} out</span>
                       </div>
@@ -386,7 +386,7 @@ function ProjectAgentCapabilities({ projectId, projectAgentId }: { projectId: st
   });
 
   return (
-    <div className="border-t border-zinc-100 pt-3 mt-1">
+    <div className="border-t border-border/50 pt-3 mt-1">
       {/* Tab bar */}
       <div className="flex gap-1 mb-3">
         {(['skills', 'mcps'] as const).map((t) => (
@@ -394,7 +394,7 @@ function ProjectAgentCapabilities({ projectId, projectAgentId }: { projectId: st
             key={t}
             onClick={() => setTab(t)}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-              tab === t ? 'bg-violet-100 text-violet-700' : 'text-zinc-500 hover:text-zinc-800'
+              tab === t ? 'bg-violet-900/40 text-violet-300' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {t === 'skills' ? `Skills (${assignedSkillIds.size})` : `MCPs (${assignedMcpIds.size})`}
@@ -405,22 +405,22 @@ function ProjectAgentCapabilities({ projectId, projectAgentId }: { projectId: st
       {tab === 'skills' && (
         <div className="space-y-1.5">
           {allSkills.length === 0 ? (
-            <p className="text-xs text-zinc-400">No skills created yet. Create skills in the Skills page.</p>
+            <p className="text-xs text-muted-foreground/70">No skills created yet. Create skills in the Skills page.</p>
           ) : allSkills.map((skill) => {
             const assigned = assignedSkillIds.has(skill.id);
             return (
-              <div key={skill.id} className="flex items-center gap-2 rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2">
+              <div key={skill.id} className="flex items-center gap-2 rounded-lg border border-border/50 bg-background px-3 py-2">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-zinc-800 truncate">{skill.name}</p>
-                  <p className="text-[10px] text-zinc-400">{skill.type}</p>
+                  <p className="text-xs font-medium text-foreground truncate">{skill.name}</p>
+                  <p className="text-[10px] text-muted-foreground/70">{skill.type}</p>
                 </div>
                 <button
                   onClick={() => assigned ? removeSkill.mutate(skill.id) : assignSkill.mutate(skill.id)}
                   disabled={assignSkill.isPending || removeSkill.isPending}
                   className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
                     assigned
-                      ? 'bg-violet-100 text-violet-700 hover:bg-red-50 hover:text-red-600'
-                      : 'bg-zinc-200 text-zinc-600 hover:bg-violet-100 hover:text-violet-700'
+                      ? 'bg-violet-900/40 text-violet-300 hover:bg-red-50 hover:text-red-400'
+                      : 'bg-muted text-muted-foreground hover:bg-violet-900/40 hover:text-violet-300'
                   }`}
                 >
                   {assigned ? 'Remove' : 'Assign'}
@@ -434,22 +434,22 @@ function ProjectAgentCapabilities({ projectId, projectAgentId }: { projectId: st
       {tab === 'mcps' && (
         <div className="space-y-1.5">
           {allMcps.length === 0 ? (
-            <p className="text-xs text-zinc-400">No MCPs created yet. Create MCPs in the MCPs page.</p>
+            <p className="text-xs text-muted-foreground/70">No MCPs created yet. Create MCPs in the MCPs page.</p>
           ) : allMcps.map((mcp) => {
             const assigned = assignedMcpIds.has(mcp.id);
             return (
-              <div key={mcp.id} className="flex items-center gap-2 rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2">
+              <div key={mcp.id} className="flex items-center gap-2 rounded-lg border border-border/50 bg-background px-3 py-2">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-zinc-800 truncate">{mcp.name}</p>
-                  <p className="text-[10px] text-zinc-400">{mcp.transport}</p>
+                  <p className="text-xs font-medium text-foreground truncate">{mcp.name}</p>
+                  <p className="text-[10px] text-muted-foreground/70">{mcp.transport}</p>
                 </div>
                 <button
                   onClick={() => assigned ? removeMcp.mutate(mcp.id) : assignMcp.mutate(mcp.id)}
                   disabled={assignMcp.isPending || removeMcp.isPending}
                   className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
                     assigned
-                      ? 'bg-violet-100 text-violet-700 hover:bg-red-50 hover:text-red-600'
-                      : 'bg-zinc-200 text-zinc-600 hover:bg-violet-100 hover:text-violet-700'
+                      ? 'bg-violet-900/40 text-violet-300 hover:bg-red-50 hover:text-red-400'
+                      : 'bg-muted text-muted-foreground hover:bg-violet-900/40 hover:text-violet-300'
                   }`}
                 >
                   {assigned ? 'Remove' : 'Assign'}
@@ -513,14 +513,14 @@ function AgentConfigEditor({ agent, onClose }: { agent: ProjectAgent; onClose: (
   });
 
   return (
-    <div className="border-t border-zinc-100 pt-4 mt-1 space-y-3">
+    <div className="border-t border-border/50 pt-4 mt-1 space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
           <Label className="text-xs">Provider</Label>
           <select
             value={provider}
             onChange={(e) => { setProvider(e.target.value); setModel(DEFAULT_MODELS[e.target.value] ?? ''); }}
-            className="w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400"
+            className="w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400"
           >
             {LLM_PROVIDERS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
@@ -558,7 +558,7 @@ function AgentConfigEditor({ agent, onClose }: { agent: ProjectAgent; onClose: (
       </div>
 
       <div className="space-y-1">
-        <Label className="text-xs">API Key Override <span className="text-zinc-400">(leave blank to keep current)</span></Label>
+        <Label className="text-xs">API Key Override <span className="text-muted-foreground/70">(leave blank to keep current)</span></Label>
         <div className="relative">
           <Input
             type={showKey ? 'text' : 'password'}
@@ -570,14 +570,14 @@ function AgentConfigEditor({ agent, onClose }: { agent: ProjectAgent; onClose: (
           <button
             type="button"
             onClick={() => setShowKey((v) => !v)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
           >
             {showKey ? <EyeOff size={13} /> : <Eye size={13} />}
           </button>
         </div>
       </div>
 
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-400">{error}</p>}
 
       <div className="flex gap-2 pt-1">
         <Button variant="outline" size="sm" className="flex-1" onClick={onClose}>Cancel</Button>
@@ -592,10 +592,10 @@ function AgentConfigEditor({ agent, onClose }: { agent: ProjectAgent; onClose: (
 // ─── Recycle Bin Drawer ───────────────────────────────────────────────────────
 
 const PRIORITY_COLOR: Record<string, string> = {
-  URGENT: 'bg-red-50 text-red-600',
+  URGENT: 'bg-red-50 text-red-400',
   HIGH: 'bg-orange-50 text-orange-600',
   MEDIUM: 'bg-yellow-50 text-yellow-600',
-  LOW: 'bg-zinc-100 text-zinc-500',
+  LOW: 'bg-muted text-muted-foreground',
 };
 
 function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: () => void }) {
@@ -632,16 +632,16 @@ function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative ml-auto z-10 flex h-full w-full max-w-md flex-col bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-4">
+      <div className="relative ml-auto z-10 flex h-full w-full max-w-md flex-col bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border/50 px-5 py-4">
           <div className="flex items-center gap-2">
-            <Recycle size={16} className="text-zinc-400" />
-            <h2 className="text-sm font-semibold text-zinc-900">Recycle Bin</h2>
+            <Recycle size={16} className="text-muted-foreground/70" />
+            <h2 className="text-sm font-semibold text-foreground">Recycle Bin</h2>
             {deleted.length > 0 && (
-              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-500">{deleted.length}</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{deleted.length}</span>
             )}
           </div>
-          <button onClick={onClose} className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700">
+          <button onClick={onClose} className="rounded-lg p-1 text-muted-foreground/70 hover:bg-muted hover:text-foreground/80">
             <X size={16} />
           </button>
         </div>
@@ -649,25 +649,25 @@ function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: 
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {isLoading && (
             <div className="space-y-2">
-              {[1, 2, 3].map((i) => <div key={i} className="h-14 rounded-lg bg-zinc-100 animate-pulse" />)}
+              {[1, 2, 3].map((i) => <div key={i} className="h-14 rounded-lg bg-muted animate-pulse" />)}
             </div>
           )}
           {!isLoading && deleted.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Recycle size={32} className="mb-3 text-zinc-200" />
-              <p className="text-sm text-zinc-400">Recycle bin is empty</p>
+              <p className="text-sm text-muted-foreground/70">Recycle bin is empty</p>
             </div>
           )}
           {deleted.map((task) => (
-            <div key={task.id} className="rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2.5">
+            <div key={task.id} className="rounded-lg border border-border/50 bg-background px-3 py-2.5">
               <div className="flex items-start gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-700 truncate">{task.title}</p>
+                  <p className="text-sm font-medium text-foreground/80 truncate">{task.title}</p>
                   <div className="mt-1 flex items-center gap-1.5">
-                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${PRIORITY_COLOR[task.priority] ?? 'bg-zinc-100 text-zinc-500'}`}>
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${PRIORITY_COLOR[task.priority] ?? 'bg-muted text-muted-foreground'}`}>
                       {task.priority}
                     </span>
-                    <span className="text-[10px] text-zinc-400">
+                    <span className="text-[10px] text-muted-foreground/70">
                       Deleted {new Date(task.deletedAt!).toLocaleDateString()}
                     </span>
                   </div>
@@ -676,7 +676,7 @@ function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: 
                   <button
                     onClick={() => restore.mutate(task.id)}
                     disabled={restore.isPending}
-                    className="rounded px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-50 disabled:opacity-50 transition-colors"
+                    className="rounded px-2 py-1 text-xs font-medium text-green-400 hover:bg-green-50 disabled:opacity-50 transition-colors"
                     title="Restore task"
                   >
                     Restore
@@ -686,16 +686,16 @@ function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: 
                       <button
                         onClick={() => permanentlyDelete.mutate(task.id)}
                         disabled={permanentlyDelete.isPending}
-                        className="text-xs font-semibold text-red-600 hover:text-red-800 disabled:opacity-50"
+                        className="text-xs font-semibold text-red-400 hover:text-red-800 disabled:opacity-50"
                       >
                         {permanentlyDelete.isPending ? '…' : 'Delete'}
                       </button>
-                      <button onClick={() => setConfirmId(null)} className="text-xs text-zinc-400 hover:text-zinc-600">Cancel</button>
+                      <button onClick={() => setConfirmId(null)} className="text-xs text-muted-foreground/70 hover:text-muted-foreground">Cancel</button>
                     </div>
                   ) : (
                     <button
                       onClick={() => setConfirmId(task.id)}
-                      className="rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                      className="rounded p-1 text-muted-foreground/70 hover:bg-red-50 hover:text-red-400 transition-colors"
                       title="Permanently delete"
                     >
                       <Trash2 size={13} />
@@ -927,18 +927,18 @@ export default function ProjectSettingsPage({
       <div className="mb-8">
         <Link
           href={`/${locale}/workspaces/${slug}/projects/${projectId}/board`}
-          className="mb-4 flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-700"
+          className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground/70 hover:text-foreground/80"
         >
           <ArrowLeft size={14} /> Back to board
         </Link>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">{project?.name ?? '…'}</h1>
-            <p className="mt-1 text-sm text-zinc-500">Project settings</p>
+            <h1 className="text-2xl font-bold text-foreground">{project?.name ?? '…'}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Project settings</p>
           </div>
           <button
             onClick={() => setShowRecycleBin(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-background hover:text-foreground/80 transition-colors"
             title="Recycle bin"
           >
             <Recycle size={14} />
@@ -951,8 +951,8 @@ export default function ProjectSettingsPage({
       <section className="mb-10">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900">Project Description</h2>
-            <p className="text-sm text-zinc-400">Describe the project goals. Saving will automatically re-run the planner and propose updated tasks.</p>
+            <h2 className="text-lg font-semibold text-foreground">Project Description</h2>
+            <p className="text-sm text-muted-foreground/70">Describe the project goals. Saving will automatically re-run the planner and propose updated tasks.</p>
           </div>
         </div>
         <div className="space-y-2">
@@ -964,9 +964,9 @@ export default function ProjectSettingsPage({
             onChange={(e) => { setDescription(e.target.value); setDescDirty(true); }}
           />
           <div className="flex items-center justify-between">
-            <div className="text-xs text-zinc-400">
+            <div className="text-xs text-muted-foreground/70">
               {updateDescription.isPending && (
-                <span className="flex items-center gap-1.5 text-violet-600">
+                <span className="flex items-center gap-1.5 text-violet-400">
                   <Sparkles size={11} className="animate-pulse" /> Running planner…
                 </span>
               )}
@@ -980,7 +980,7 @@ export default function ProjectSettingsPage({
             </Button>
           </div>
           {updateDescription.isError && (
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-red-400">
               {(updateDescription.error as any)?.response?.data?.message ?? 'Failed to save'}
             </p>
           )}
@@ -992,10 +992,10 @@ export default function ProjectSettingsPage({
       {/* ── Agents ───────────────────────────────────────────────────────── */}
       <section className="mb-10">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-zinc-900">Agents</h2>
+          <h2 className="text-lg font-semibold text-foreground">Agents</h2>
           <Link
             href={`/${locale}/marketplace`}
-            className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
           >
             <Plus size={14} /> Hire from marketplace
           </Link>
@@ -1006,7 +1006,7 @@ export default function ProjectSettingsPage({
             {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
           </div>
         ) : activeAgents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-zinc-300 py-10 text-center text-sm text-zinc-400">
+          <div className="rounded-xl border border-dashed border-zinc-300 py-10 text-center text-sm text-muted-foreground/70">
             No agents hired yet
           </div>
         ) : (
@@ -1019,17 +1019,17 @@ export default function ProjectSettingsPage({
                   <CardContent className="flex items-center gap-4 py-4">
                     <button
                       onClick={() => setSelectedAgent(pa)}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 shrink-0 hover:bg-zinc-200 transition-colors"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground shrink-0 hover:bg-muted transition-colors"
                       title="View run logs"
                     >
                       {pa.agent!.type === 'AI' ? <Bot size={18} /> : <User size={18} />}
                     </button>
                     <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setSelectedAgent(pa)}>
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-zinc-900 hover:text-violet-700 transition-colors">{pa.agent!.name}</p>
+                        <p className="font-medium text-foreground hover:text-violet-300 transition-colors">{pa.agent!.name}</p>
                         <Badge variant="secondary" className="text-[10px]">{pa.role}</Badge>
                       </div>
-                      <p className="text-xs text-zinc-400">{pa.agent!.provider?.displayName}</p>
+                      <p className="text-xs text-muted-foreground/70">{pa.agent!.provider?.displayName}</p>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -1039,7 +1039,7 @@ export default function ProjectSettingsPage({
                           <ShieldCheck size={13} /> Agreement accepted
                         </div>
                       ) : !isHuman ? (
-                        <div className="flex items-center gap-1 text-xs text-zinc-400">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground/70">
                           <ShieldAlert size={13} /> Awaiting provider
                         </div>
                       ) : signingId === pa.id ? (
@@ -1075,8 +1075,8 @@ export default function ProjectSettingsPage({
                         onClick={() => setCapabilitiesOpenId(capabilitiesOpenId === pa.id ? null : pa.id)}
                         className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border transition-colors ${
                           capabilitiesOpenId === pa.id
-                            ? 'border-violet-200 bg-violet-50 text-violet-700'
-                            : 'border-zinc-200 text-zinc-500 hover:border-violet-200 hover:text-violet-600'
+                            ? 'border-violet-200 bg-violet-900/20 text-violet-300'
+                            : 'border-border text-muted-foreground hover:border-violet-200 hover:text-violet-400'
                         }`}
                         title="Skills & MCPs"
                       >
@@ -1089,8 +1089,8 @@ export default function ProjectSettingsPage({
                           onClick={() => setConfigOpenId(configOpenId === pa.id ? null : pa.id)}
                           className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border transition-colors ${
                             configOpenId === pa.id
-                              ? 'border-blue-200 bg-blue-50 text-blue-700'
-                              : 'border-zinc-200 text-zinc-500 hover:border-blue-200 hover:text-blue-600'
+                              ? 'border-blue-200 bg-blue-50 text-blue-300'
+                              : 'border-border text-muted-foreground hover:border-blue-200 hover:text-blue-600'
                           }`}
                           title="Edit agent config"
                         >
@@ -1102,7 +1102,7 @@ export default function ProjectSettingsPage({
                       <button
                         onClick={() => removeAgent.mutate(pa.id)}
                         disabled={removeAgent.isPending}
-                        className="text-zinc-300 hover:text-red-400"
+                        className="text-muted-foreground/50 hover:text-red-400"
                         title="Remove agent"
                       >
                         <Trash2 size={15} />
@@ -1132,8 +1132,8 @@ export default function ProjectSettingsPage({
       {activeAgents.filter((a) => a.agreement).length > 0 && (
         <section className="mb-10">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-zinc-900">Leave a Review</h2>
-            <p className="text-sm text-zinc-400">Rate agents you have worked with on this project.</p>
+            <h2 className="text-lg font-semibold text-foreground">Leave a Review</h2>
+            <p className="text-sm text-muted-foreground/70">Rate agents you have worked with on this project.</p>
           </div>
           <div className="space-y-2">
             {activeAgents
@@ -1144,8 +1144,8 @@ export default function ProjectSettingsPage({
                     <Card>
                       <CardContent className="pt-4 space-y-3">
                         <div className="flex items-center gap-2">
-                          {pa.agent!.type === 'AI' ? <Bot size={15} className="text-zinc-400" /> : <User size={15} className="text-zinc-400" />}
-                          <p className="text-sm font-medium text-zinc-800">{pa.agent!.name}</p>
+                          {pa.agent!.type === 'AI' ? <Bot size={15} className="text-muted-foreground/70" /> : <User size={15} className="text-muted-foreground/70" />}
+                          <p className="text-sm font-medium text-foreground">{pa.agent!.name}</p>
                         </div>
                         {/* Star rating */}
                         <div className="flex items-center gap-1">
@@ -1158,7 +1158,7 @@ export default function ProjectSettingsPage({
                               />
                             </button>
                           ))}
-                          <span className="ml-2 text-sm text-zinc-500">{reviewRating} / 5</span>
+                          <span className="ml-2 text-sm text-muted-foreground">{reviewRating} / 5</span>
                         </div>
                         <Textarea
                           placeholder="Share your experience (optional)…"
@@ -1167,7 +1167,7 @@ export default function ProjectSettingsPage({
                           onChange={(e) => setReviewComment(e.target.value)}
                         />
                         {submitReview.isError && (
-                          <p className="text-xs text-red-500">
+                          <p className="text-xs text-red-400">
                             {(submitReview.error as any)?.response?.data?.message ?? 'Failed to submit review'}
                           </p>
                         )}
@@ -1184,15 +1184,15 @@ export default function ProjectSettingsPage({
                       </CardContent>
                     </Card>
                   ) : (
-                    <div className="flex items-center justify-between rounded-xl border border-zinc-100 bg-white px-4 py-3">
+                    <div className="flex items-center justify-between rounded-xl border border-border/50 bg-card px-4 py-3">
                       <div className="flex items-center gap-2">
-                        {pa.agent!.type === 'AI' ? <Bot size={15} className="text-zinc-400" /> : <User size={15} className="text-zinc-400" />}
-                        <p className="text-sm text-zinc-700">{pa.agent!.name}</p>
-                        <span className="text-xs text-zinc-400">{pa.agent!.provider?.displayName}</span>
+                        {pa.agent!.type === 'AI' ? <Bot size={15} className="text-muted-foreground/70" /> : <User size={15} className="text-muted-foreground/70" />}
+                        <p className="text-sm text-foreground/80">{pa.agent!.name}</p>
+                        <span className="text-xs text-muted-foreground/70">{pa.agent!.provider?.displayName}</span>
                       </div>
                       <button
                         onClick={() => { setReviewingAgentId(pa.agent!.id); setReviewRating(5); setReviewComment(''); }}
-                        className="flex items-center gap-1 text-xs text-zinc-400 hover:text-amber-500"
+                        className="flex items-center gap-1 text-xs text-muted-foreground/70 hover:text-amber-500"
                       >
                         <Star size={13} /> Write review
                       </button>
@@ -1209,8 +1209,8 @@ export default function ProjectSettingsPage({
       {/* ── Planner ───────────────────────────────────────────────────────── */}
       <section className="mb-10">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900">Planner Agent</h2>
-          <p className="text-sm text-zinc-400">
+          <h2 className="text-lg font-semibold text-foreground">Planner Agent</h2>
+          <p className="text-sm text-muted-foreground/70">
             Assign an AI agent to plan the project: it will generate roles and tasks from your project description.
           </p>
         </div>
@@ -1220,7 +1220,7 @@ export default function ProjectSettingsPage({
           <CardContent className="pt-4 space-y-3">
             <div className="flex items-center gap-3">
               <select
-                className="flex-1 rounded-md border border-zinc-200 px-3 py-2 text-sm bg-white"
+                className="flex-1 rounded-md border border-border px-3 py-2 text-sm bg-card"
                 value={plannerAgentId || project?.plannerProjectAgentId || ''}
                 onChange={(e) => setPlannerAgentId(e.target.value)}
               >
@@ -1245,12 +1245,12 @@ export default function ProjectSettingsPage({
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-green-600 flex items-center gap-1">
                     <CheckCheck size={12} /> Planner assigned
-                    {plannerPa && <span className="text-zinc-500 ml-1">— {plannerPa.agent?.name}</span>}
+                    {plannerPa && <span className="text-muted-foreground ml-1">— {plannerPa.agent?.name}</span>}
                   </p>
                   {plannerPa && (
                     <button
                       onClick={() => setSelectedAgent(plannerPa)}
-                      className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800"
+                      className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-800"
                     >
                       <ScrollText size={12} /> View logs
                     </button>
@@ -1274,35 +1274,35 @@ export default function ProjectSettingsPage({
         )}
 
         {runPlanner.isError && (
-          <p className="mt-2 text-xs text-red-500">
+          <p className="mt-2 text-xs text-red-400">
             {(runPlanner.error as any)?.response?.data?.message ?? 'Planner failed'}
           </p>
         )}
 
         {/* Plan draft review */}
         {planDraft && (
-          <div className="mt-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4 space-y-4">
+          <div className="mt-4 rounded-xl border border-border bg-background p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-zinc-800">Review proposed plan</p>
-              <button onClick={() => { setPlanDraft(null); setTaskAssignees({}); }} className="text-zinc-400 hover:text-zinc-700">
+              <p className="text-sm font-semibold text-foreground">Review proposed plan</p>
+              <button onClick={() => { setPlanDraft(null); setTaskAssignees({}); }} className="text-muted-foreground/70 hover:text-foreground/80">
                 <X size={16} />
               </button>
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase text-zinc-400 tracking-wide">Roles</p>
+              <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground/70 tracking-wide">Roles</p>
               <div className="space-y-1">
                 {planDraft.roles.map((r, i) => (
                   <div key={i} className="flex items-start gap-2 text-sm">
-                    <span className="font-medium text-zinc-800">{r.name}</span>
-                    {r.description && <span className="text-zinc-400">— {r.description}</span>}
+                    <span className="font-medium text-foreground">{r.name}</span>
+                    {r.description && <span className="text-muted-foreground/70">— {r.description}</span>}
                   </div>
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase text-zinc-400 tracking-wide">Tasks ({planDraft.tasks.length})</p>
+              <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground/70 tracking-wide">Tasks ({planDraft.tasks.length})</p>
               <div className="space-y-1.5">
                 {planDraft.tasks.map((t, i) => {
                   const autoAssigneeId = roleAgentMap.get(t.role.toLowerCase());
@@ -1312,19 +1312,19 @@ export default function ProjectSettingsPage({
                     ? ((assigneePa as any).agent?.name ?? assigneePa.customRole ?? assigneePa.role)
                     : null;
                   return (
-                    <div key={i} className={`rounded-lg bg-white border px-3 py-2 ${assigneeId ? 'border-zinc-100' : 'border-red-200 bg-red-50/30'}`}>
+                    <div key={i} className={`rounded-lg bg-card border px-3 py-2 ${assigneeId ? 'border-border/50' : 'border-red-200 bg-red-50/30'}`}>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium text-zinc-900">{t.title}</span>
-                        <span className="text-xs text-zinc-400">→ {t.role}</span>
+                        <span className="text-sm font-medium text-foreground">{t.title}</span>
+                        <span className="text-xs text-muted-foreground/70">→ {t.role}</span>
                         {t.priority && (
                           <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                            t.priority === 'HIGH' || t.priority === 'URGENT' ? 'bg-red-50 text-red-600' :
-                            t.priority === 'MEDIUM' ? 'bg-yellow-50 text-yellow-600' : 'bg-zinc-100 text-zinc-500'
+                            t.priority === 'HIGH' || t.priority === 'URGENT' ? 'bg-red-50 text-red-400' :
+                            t.priority === 'MEDIUM' ? 'bg-yellow-50 text-yellow-600' : 'bg-muted text-muted-foreground'
                           }`}>{t.priority}</span>
                         )}
                         <div className="ml-auto flex items-center gap-1.5">
                           {assigneeName && (
-                            <span className="text-[11px] px-1.5 py-0.5 rounded bg-green-50 text-green-700 font-medium flex items-center gap-1">
+                            <span className="text-[11px] px-1.5 py-0.5 rounded bg-green-50 text-green-400 font-medium flex items-center gap-1">
                               <Bot size={10} />
                               {assigneeName}
                             </span>
@@ -1332,7 +1332,7 @@ export default function ProjectSettingsPage({
                           <select
                             value={taskAssignees[i] ?? autoAssigneeId ?? ''}
                             onChange={(e) => setTaskAssignees((prev) => ({ ...prev, [i]: e.target.value }))}
-                            className={`text-xs border rounded px-1.5 py-0.5 bg-white focus:outline-none ${assigneeId ? 'border-zinc-200 text-zinc-500' : 'border-red-300 text-red-500'}`}
+                            className={`text-xs border rounded px-1.5 py-0.5 bg-card focus:outline-none ${assigneeId ? 'border-border text-muted-foreground' : 'border-red-300 text-red-400'}`}
                           >
                             <option value="">— assign agent —</option>
                             {activeAgents.map((pa) => (
@@ -1354,19 +1354,19 @@ export default function ProjectSettingsPage({
                                 return next;
                               });
                             }}
-                            className="ml-1 text-zinc-300 hover:text-red-400 transition-colors"
+                            className="ml-1 text-muted-foreground/50 hover:text-red-400 transition-colors"
                             title="Remove task"
                           >
                             <X size={13} />
                           </button>
                         </div>
                       </div>
-                      {t.description && <p className="mt-0.5 text-xs text-zinc-400">{t.description}</p>}
+                      {t.description && <p className="mt-0.5 text-xs text-muted-foreground/70">{t.description}</p>}
                       {(t.dependencies ?? []).length > 0 && (
-                        <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-zinc-400">
+                        <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-muted-foreground/70">
                           <span className="font-medium">Blocked by:</span>
                           {t.dependencies!.map((dep, d) => (
-                            <span key={d} className="rounded bg-amber-50 px-1.5 py-0.5 text-amber-700 font-medium">{dep}</span>
+                            <span key={d} className="rounded bg-amber-50 px-1.5 py-0.5 text-amber-300 font-medium">{dep}</span>
                           ))}
                         </p>
                       )}
@@ -1375,15 +1375,15 @@ export default function ProjectSettingsPage({
                 })}
               </div>
               {planDraft.tasks.some((t, i) => !(taskAssignees[i] ?? roleAgentMap.get(t.role.toLowerCase()))) && (
-                <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
                   All tasks must be assigned before you can apply the plan.
                 </p>
               )}
             </div>
 
             {/* Replace vs append toggle */}
-            <div className="rounded-lg border border-zinc-200 bg-white p-3 space-y-2">
-              <p className="text-xs font-semibold text-zinc-600">How to apply these tasks?</p>
+            <div className="rounded-lg border border-border bg-card p-3 space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground">How to apply these tasks?</p>
               <div className="flex flex-col gap-1.5">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -1392,8 +1392,8 @@ export default function ProjectSettingsPage({
                     onChange={() => setReplaceExisting(true)}
                     className="accent-zinc-800"
                   />
-                  <span className="text-sm text-zinc-700">Replace existing Backlog tasks</span>
-                  <span className="text-xs text-zinc-400">— removes current backlog, adds new plan</span>
+                  <span className="text-sm text-foreground/80">Replace existing Backlog tasks</span>
+                  <span className="text-xs text-muted-foreground/70">— removes current backlog, adds new plan</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -1402,8 +1402,8 @@ export default function ProjectSettingsPage({
                     onChange={() => setReplaceExisting(false)}
                     className="accent-zinc-800"
                   />
-                  <span className="text-sm text-zinc-700">Append to board</span>
-                  <span className="text-xs text-zinc-400">— keeps existing tasks, adds new ones</span>
+                  <span className="text-sm text-foreground/80">Append to board</span>
+                  <span className="text-xs text-muted-foreground/70">— keeps existing tasks, adds new ones</span>
                 </label>
               </div>
             </div>
@@ -1431,17 +1431,17 @@ export default function ProjectSettingsPage({
       <section className="mb-10">
         <div className="mb-4 flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <Brain size={18} className="text-violet-500" />
               Planning Agent
             </h2>
-            <p className="text-sm text-zinc-400 mt-0.5">
+            <p className="text-sm text-muted-foreground/70 mt-0.5">
               A built-in AI planner for this project. Customize its behaviour and publish up to 3 versions.
             </p>
           </div>
           <button
             onClick={() => setShowPlannerLogs(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 hover:border-violet-300 hover:text-violet-700 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-violet-300 hover:text-violet-300 transition-colors"
           >
             <ScrollText size={13} /> View logs
           </button>
@@ -1449,23 +1449,23 @@ export default function ProjectSettingsPage({
 
         {planningAgentLoading ? (
           <div className="space-y-3">
-            <div className="h-28 animate-pulse rounded-2xl bg-zinc-100" />
-            <div className="h-28 animate-pulse rounded-2xl bg-zinc-100" />
+            <div className="h-28 animate-pulse rounded-2xl bg-muted" />
+            <div className="h-28 animate-pulse rounded-2xl bg-muted" />
           </div>
         ) : planningAgent && (
           <div className="space-y-4">
             {/* Base prompt (readonly) */}
-            <div className="rounded-2xl border border-zinc-200 bg-white p-5">
+            <div className="rounded-2xl border border-border bg-card p-5">
               <div className="mb-2 flex items-center gap-2">
-                <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Base Prompt (readonly)</span>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Base Prompt (readonly)</span>
               </div>
-              <pre className="whitespace-pre-wrap font-mono text-xs text-zinc-400 leading-relaxed">{planningAgent.basePrompt}</pre>
+              <pre className="whitespace-pre-wrap font-mono text-xs text-muted-foreground/70 leading-relaxed">{planningAgent.basePrompt}</pre>
             </div>
 
             {/* Custom prompt */}
-            <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-3">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-violet-600">Custom Prompt (appended)</span>
+                <span className="rounded-full bg-violet-900/40 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-violet-400">Custom Prompt (appended)</span>
               </div>
               <Textarea
                 value={draftPrompt}
@@ -1476,7 +1476,7 @@ export default function ProjectSettingsPage({
                 maxLength={8000}
               />
               <div className="flex items-center justify-between">
-                <span className="text-xs text-zinc-400">{draftPrompt.length}/8000</span>
+                <span className="text-xs text-muted-foreground/70">{draftPrompt.length}/8000</span>
                 <Button
                   size="sm"
                   disabled={updatePrompt.isPending || draftPrompt === (planningAgent.customPrompt ?? '')}
@@ -1488,11 +1488,11 @@ export default function ProjectSettingsPage({
             </div>
 
             {/* Versions */}
-            <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-zinc-900">Published Versions</p>
-                  <p className="text-xs text-zinc-400 mt-0.5">{planningAgent.versions.length}/3 versions published</p>
+                  <p className="font-medium text-foreground">Published Versions</p>
+                  <p className="text-xs text-muted-foreground/70 mt-0.5">{planningAgent.versions.length}/3 versions published</p>
                 </div>
                 {planningAgent.versions.length < 3 && (
                   <div className="flex items-center gap-2">
@@ -1514,11 +1514,11 @@ export default function ProjectSettingsPage({
               </div>
 
               {publishVersion.isError && (
-                <p className="text-xs text-red-500">{(publishVersion.error as any)?.response?.data?.message ?? 'Failed to publish'}</p>
+                <p className="text-xs text-red-400">{(publishVersion.error as any)?.response?.data?.message ?? 'Failed to publish'}</p>
               )}
 
               {planningAgent.versions.length === 0 ? (
-                <p className="text-sm text-zinc-400">No versions published yet. Save your custom prompt and publish it as a version.</p>
+                <p className="text-sm text-muted-foreground/70">No versions published yet. Save your custom prompt and publish it as a version.</p>
               ) : (
                 <div className="space-y-2">
                   {planningAgent.versions.map((v: PlanningAgentVersion) => {
@@ -1526,17 +1526,17 @@ export default function ProjectSettingsPage({
                     return (
                       <div
                         key={v.id}
-                        className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${isActive ? 'border-violet-200 bg-violet-50' : 'border-zinc-100 bg-zinc-50'}`}
+                        className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${isActive ? 'border-violet-200 bg-violet-900/20' : 'border-border/50 bg-background'}`}
                       >
-                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${isActive ? 'bg-violet-600 text-white' : 'bg-zinc-200 text-zinc-600'}`}>
+                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${isActive ? 'bg-violet-600 text-white' : 'bg-muted text-muted-foreground'}`}>
                           v{v.versionNumber}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-zinc-800">{v.label ?? `Version ${v.versionNumber}`}</p>
-                          <p className="text-xs text-zinc-400">Published {new Date(v.publishedAt).toLocaleDateString()}</p>
+                          <p className="text-sm font-medium text-foreground">{v.label ?? `Version ${v.versionNumber}`}</p>
+                          <p className="text-xs text-muted-foreground/70">Published {new Date(v.publishedAt).toLocaleDateString()}</p>
                         </div>
                         {isActive && (
-                          <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-semibold text-violet-700">Active</span>
+                          <span className="rounded-full bg-violet-900/40 px-2 py-0.5 text-[11px] font-semibold text-violet-300">Active</span>
                         )}
                         <div className="flex items-center gap-1 shrink-0">
                           {isActive ? (
@@ -1562,7 +1562,7 @@ export default function ProjectSettingsPage({
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-7 w-7 text-zinc-300 hover:text-red-400 hover:bg-red-50"
+                            className="h-7 w-7 text-muted-foreground/50 hover:text-red-400 hover:bg-red-50"
                             disabled={deleteVersion.isPending}
                             onClick={() => deleteVersion.mutate(v.id)}
                           >
@@ -1576,7 +1576,7 @@ export default function ProjectSettingsPage({
               )}
 
               {planningAgent.activeVersionId === null && (
-                <p className="text-xs text-zinc-400 flex items-center gap-1">
+                <p className="text-xs text-muted-foreground/70 flex items-center gap-1">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-400" />
                   Currently using draft prompt (no version active)
                 </p>
@@ -1592,8 +1592,8 @@ export default function ProjectSettingsPage({
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900">Resource Keys</h2>
-            <p className="text-sm text-zinc-400">
+            <h2 className="text-lg font-semibold text-foreground">Resource Keys</h2>
+            <p className="text-sm text-muted-foreground/70">
               Encrypted secrets agents can access (e.g. GitHub tokens, API keys). Values are write-only.
             </p>
           </div>
@@ -1640,7 +1640,7 @@ export default function ProjectSettingsPage({
                   <button
                     type="button"
                     onClick={() => setShowKeyValue((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-foreground/80"
                   >
                     {showKeyValue ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
@@ -1671,7 +1671,7 @@ export default function ProjectSettingsPage({
             {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}
           </div>
         ) : keys.length === 0 && !showAddKey ? (
-          <div className="rounded-xl border border-dashed border-zinc-300 py-10 text-center text-sm text-zinc-400">
+          <div className="rounded-xl border border-dashed border-zinc-300 py-10 text-center text-sm text-muted-foreground/70">
             No keys stored yet
           </div>
         ) : (
@@ -1679,28 +1679,28 @@ export default function ProjectSettingsPage({
             {keys.map((k) => (
               <div
                 key={k.id}
-                className="flex items-center gap-3 rounded-xl border border-zinc-100 bg-white px-4 py-3"
+                className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3"
               >
-                <KeyRound size={16} className="shrink-0 text-zinc-400" />
+                <KeyRound size={16} className="shrink-0 text-muted-foreground/70" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-900">{k.name}</p>
+                  <p className="text-sm font-medium text-foreground">{k.name}</p>
                   {k.description && (
-                    <p className="text-xs text-zinc-400 truncate">{k.description}</p>
+                    <p className="text-xs text-muted-foreground/70 truncate">{k.description}</p>
                   )}
                 </div>
-                <span className="text-xs text-zinc-300 shrink-0">
+                <span className="text-xs text-muted-foreground/50 shrink-0">
                   {new Date(k.createdAt).toLocaleDateString()}
                 </span>
                 <div className="flex items-center gap-1 shrink-0">
                   {copiedKeyId === k.id ? (
                     <CopiedBadge />
                   ) : (
-                    <span className="text-xs font-mono text-zinc-300">••••••••</span>
+                    <span className="text-xs font-mono text-muted-foreground/50">••••••••</span>
                   )}
                   <button
                     onClick={() => deleteKey.mutate(k.id)}
                     disabled={deleteKey.isPending}
-                    className="ml-2 text-zinc-300 hover:text-red-400"
+                    className="ml-2 text-muted-foreground/50 hover:text-red-400"
                     title="Delete key"
                   >
                     <Trash2 size={14} />
@@ -1715,8 +1715,8 @@ export default function ProjectSettingsPage({
       {/* ── Sandbox ───────────────────────────────────────────────────────── */}
       <section className="mb-10">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900">Sandbox</h2>
-          <p className="text-sm text-zinc-400">
+          <h2 className="text-lg font-semibold text-foreground">Sandbox</h2>
+          <p className="text-sm text-muted-foreground/70">
             Choose the sandbox provider for agent runs in this project.
             Agents use the sandbox to execute code, run builds, and push to Git.
           </p>
@@ -1728,16 +1728,16 @@ export default function ProjectSettingsPage({
                 <Box size={16} className="text-cyan-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-zinc-900">Provider</p>
-                <p className="text-xs text-zinc-400">
+                <p className="text-sm font-medium text-foreground">Provider</p>
+                <p className="text-xs text-muted-foreground/70">
                   Configure the E2B API key in{' '}
-                  <Link href={`/${locale}/workspaces/${slug}/settings`} className="text-violet-600 hover:underline">
+                  <Link href={`/${locale}/workspaces/${slug}/settings`} className="text-violet-400 hover:underline">
                     workspace settings
                   </Link>
                 </p>
               </div>
               <select
-                className="rounded-md border border-zinc-200 px-3 py-2 text-sm bg-white"
+                className="rounded-md border border-border px-3 py-2 text-sm bg-card"
                 value={project?.sandboxProvider ?? 'none'}
                 onChange={(e) => updateSandboxProvider.mutate(e.target.value === 'none' ? null : e.target.value)}
                 disabled={updateSandboxProvider.isPending}
@@ -1747,7 +1747,7 @@ export default function ProjectSettingsPage({
               </select>
             </div>
             {project?.sandboxProvider === 'e2b' && (
-              <p className="text-xs text-zinc-400 bg-cyan-50 rounded-lg px-3 py-2">
+              <p className="text-xs text-muted-foreground/70 bg-cyan-50 rounded-lg px-3 py-2">
                 Agents will run in isolated E2B Ubuntu sandboxes with access to shell, git, build tools, and file I/O.
               </p>
             )}
