@@ -2,13 +2,17 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { TwoFactorController } from './two-factor.controller';
+import { TwoFactorService } from './two-factor.service';
+import { KeysModule } from '../keys/keys.module';
 import * as admin from 'firebase-admin';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { HttpsProxyAgent } = require('https-proxy-agent');
 
 @Module({
-  providers: [AuthService],
-  controllers: [AuthController],
+  imports: [KeysModule],
+  providers: [AuthService, TwoFactorService],
+  controllers: [AuthController, TwoFactorController],
   exports: [AuthService],
 })
 export class AuthModule implements OnModuleInit {

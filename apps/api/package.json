@@ -35,7 +35,9 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "firebase-admin": "^13.7.0",
+    "https-proxy-agent": "^5.0.1",
     "ioredis": "^5.10.0",
+    "otplib": "^12.0.1",
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "passport-jwt": "^4.0.1",
@@ -43,8 +45,7 @@
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.3",
     "stripe": "^20.4.1",
-    "undici": "^7.24.3",
-    "https-proxy-agent": "^5.0.1"
+    "undici": "^7.24.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

@@ -176,6 +176,23 @@ export const plannerApi = {
     api.get(`/api/projects/${projectId}/planner/runs`).then((r) => r.data),
 };
 
+// ─── Two-Factor Auth ──────────────────────────────────────────────────────────
+export const twoFactorApi = {
+  setup: (): Promise<{ secret: string; otpauthUrl: string }> =>
+    api.get('/api/users/2fa/setup').then((r) => r.data),
+  enable: (data: { secret: string; token: string }): Promise<void> =>
+    api.post('/api/users/2fa/enable', data).then((r) => r.data),
+  disable: (data: { token: string }): Promise<void> =>
+    api.post('/api/users/2fa/disable', data).then((r) => r.data),
+  verify: (data: { token: string }): Promise<void> =>
+    api.post('/api/users/2fa/verify', data).then((r) => r.data),
+};
+
+export const usersApi = {
+  me: (): Promise<{ id: string; email: string; name: string; totpEnabled: boolean }> =>
+    api.get('/api/auth/me').then((r) => r.data),
+};
+
 // ─── Agent Runs ───────────────────────────────────────────────────────────────
 export const agentRunsApi = {
   list: (projectId: string, taskId: string): Promise<AgentRunLog[]> =>

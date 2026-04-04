@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useAuth } from '@/contexts/auth';
 import { auth } from '@/lib/firebase';
+import QRCode from 'react-qr-code';
+import { twoFactorApi, usersApi } from '@/lib/api';
 import {
   updateProfile,
   updatePassword,
@@ -199,6 +201,63 @@ function ProfileTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
 
 function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['user']> }) {
   const isPasswordUser = user.providerData.some((p) => p.providerId === 'password');
+
+  // 2FA state
+  const [totpEnabled, setTotpEnabled] = useState(false);
+  const [tfaStep, setTfaStep] = useState<'idle' | 'loading' | 'scan' | 'verify' | 'disabling'>('idle');
+  const [setupData, setSetupData] = useState<{ secret: string; otpauthUrl: string } | null>(null);
+  const [tfaToken, setTfaToken] = useState('');
+  const [tfaSaving, setTfaSaving] = useState(false);
+  const [tfaError, setTfaError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      usersApi.me().then((p) => setTotpEnabled(p.totpEnabled)).catch(() => {});
+    }
+  }, [user]);
+
+  const handleStartEnable = async () => {
+    setTfaStep('loading');
+    setTfaError('');
+    try {
+      const data = await twoFactorApi.setup();
+      setSetupData(data);
+      setTfaStep('scan');
+    } catch {
+      setTfaStep('idle');
+    }
+  };
+
+  const handleEnableTfa = async () => {
+    if (!setupData) return;
+    setTfaSaving(true);
+    setTfaError('');
+    try {
+      await twoFactorApi.enable({ secret: setupData.secret, token: tfaToken });
+      setTotpEnabled(true);
+      setTfaStep('idle');
+      setTfaToken('');
+    } catch {
+      setTfaError('Invalid code. Please try again.');
+    } finally {
+      setTfaSaving(false);
+    }
+  };
+
+  const handleDisableTfa = async () => {
+    setTfaSaving(true);
+    setTfaError('');
+    try {
+      await twoFactorApi.disable({ token: tfaToken });
+      setTotpEnabled(false);
+      setTfaStep('idle');
+      setTfaToken('');
+    } catch {
+      setTfaError('Invalid code. Please try again.');
+    } finally {
+      setTfaSaving(false);
+    }
+  };
 
   // Email section
   const [newEmail, setNewEmail] = useState('');
@@ -428,6 +487,140 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
           </div>
         </div>
       )}
+
+      {/* Two-Factor Authentication card */}
+      <div className="rounded-xl border border-border bg-card p-5 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <Shield size={18} className="text-primary" />
+            </div>
+            <div>
+              <h3 className="font-medium text-foreground">Two-Factor Authentication</h3>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Add an extra layer of security using an authenticator app.
+              </p>
+            </div>
+          </div>
+          <span
+            className={cn(
+              'rounded-full px-2.5 py-0.5 text-xs font-medium',
+              totpEnabled
+                ? 'bg-emerald-500/15 text-emerald-400'
+                : 'bg-muted text-muted-foreground',
+            )}
+          >
+            {totpEnabled ? 'Enabled' : 'Disabled'}
+          </span>
+        </div>
+
+        {/* Idle state */}
+        {tfaStep === 'idle' && (
+          <div>
+            {totpEnabled ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                onClick={() => { setTfaStep('disabling'); setTfaToken(''); setTfaError(''); }}
+              >
+                Disable 2FA
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={handleStartEnable}>
+                Enable 2FA
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Loading */}
+        {tfaStep === 'loading' && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+            <Loader2 size={14} className="animate-spin" />
+            Loading setup…
+          </div>
+        )}
+
+        {/* Scan QR */}
+        {tfaStep === 'scan' && setupData && (
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="rounded-xl bg-white p-3">
+              <QRCode value={setupData.otpauthUrl} size={180} />
+            </div>
+            <p className="text-xs text-muted-foreground text-center max-w-xs">
+              Scan this QR code with Google Authenticator, Authy, or any TOTP app.
+            </p>
+            <details className="w-full">
+              <summary className="text-xs text-muted-foreground cursor-pointer">
+                Can&apos;t scan? Enter key manually
+              </summary>
+              <code className="mt-2 block break-all rounded bg-muted px-3 py-2 text-xs font-mono text-foreground">
+                {setupData.secret}
+              </code>
+            </details>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setTfaStep('idle')}>Cancel</Button>
+              <Button size="sm" onClick={() => setTfaStep('verify')}>I&apos;ve scanned it →</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Verify token to enable */}
+        {tfaStep === 'verify' && (
+          <div className="space-y-3 max-w-sm">
+            <p className="text-sm text-muted-foreground">Enter the 6-digit code from your app to confirm setup:</p>
+            <Input
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="000000"
+              className="text-center text-xl tracking-[0.4em] font-mono"
+              value={tfaToken}
+              onChange={(e) => setTfaToken(e.target.value.replace(/\D/g, ''))}
+            />
+            {tfaError && <p className="text-xs text-red-400">{tfaError}</p>}
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => { setTfaStep('idle'); setTfaToken(''); setTfaError(''); }}>Cancel</Button>
+              <Button
+                size="sm"
+                disabled={tfaToken.length !== 6 || tfaSaving}
+                onClick={handleEnableTfa}
+              >
+                {tfaSaving ? <Loader2 size={14} className="animate-spin" /> : 'Enable 2FA'}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Disable flow */}
+        {tfaStep === 'disabling' && (
+          <div className="space-y-3 max-w-sm">
+            <p className="text-sm text-muted-foreground">Enter your current 6-digit code to disable 2FA:</p>
+            <Input
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="000000"
+              className="text-center text-xl tracking-[0.4em] font-mono"
+              value={tfaToken}
+              onChange={(e) => setTfaToken(e.target.value.replace(/\D/g, ''))}
+            />
+            {tfaError && <p className="text-xs text-red-400">{tfaError}</p>}
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => { setTfaStep('idle'); setTfaToken(''); setTfaError(''); }}>Cancel</Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={tfaToken.length !== 6 || tfaSaving}
+                onClick={handleDisableTfa}
+              >
+                {tfaSaving ? <Loader2 size={14} className="animate-spin" /> : 'Disable 2FA'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

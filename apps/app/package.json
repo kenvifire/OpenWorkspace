@@ -25,6 +25,7 @@
     "next-intl": "^4.8.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-qr-code": "^2.0.18",
     "shadcn": "^4.0.0",
     "socket.io-client": "^4.8.3",
     "tailwind-merge": "^3.5.0",
