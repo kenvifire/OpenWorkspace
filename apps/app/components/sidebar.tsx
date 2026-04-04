@@ -9,7 +9,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { workspacesApi, myAgentsApi, skillsApi, mcpsApi } from '@/lib/api';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -72,8 +72,20 @@ export function Sidebar() {
     { label: t('dashboard'), href: `/${locale}/dashboard`, icon: <LayoutDashboard size={15} /> },
     { label: t('marketplace'), href: `/${locale}/marketplace`, icon: <Store size={15} /> },
     { label: t('billing'), href: `/${locale}/billing`, icon: <CreditCard size={15} /> },
-    { label: t('settings'), href: `/${locale}/settings`, icon: <Settings size={15} /> },
   ];
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -274,27 +286,55 @@ export function Sidebar() {
 
       {/* User */}
       <div className="mt-auto border-t border-[oklch(0.22_0.02_265)] pt-4">
-        <div className="flex items-center gap-2.5 px-2">
-          {user?.photoURL ? (
-            <img src={user.photoURL} alt="" className="h-7 w-7 rounded-full object-cover ring-1 ring-[oklch(0.22_0.02_265)]" />
-          ) : (
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-500/20 text-xs font-semibold text-violet-300">
-              {user?.displayName?.[0] ?? user?.email?.[0] ?? '?'}
-            </span>
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-zinc-200">
-              {user?.displayName || user?.email?.split('@')[0] || 'Account'}
-            </p>
-            <p className="truncate text-xs text-zinc-500">{user?.email}</p>
-          </div>
+        <div ref={menuRef} className="relative">
           <button
-            onClick={handleSignOut}
-            className="ml-auto shrink-0 rounded-lg p-1 text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors"
-            title="Sign out"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-white/5 transition-colors"
           >
-            <LogOut size={14} />
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt="" className="h-7 w-7 rounded-full object-cover ring-1 ring-[oklch(0.22_0.02_265)] shrink-0" />
+            ) : (
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-xs font-semibold text-violet-300">
+                {user?.displayName?.[0] ?? user?.email?.[0] ?? '?'}
+              </span>
+            )}
+            <div className="min-w-0 flex-1 text-left">
+              <p className="truncate text-sm font-medium text-zinc-200">
+                {user?.displayName || user?.email?.split('@')[0] || 'Account'}
+              </p>
+              <p className="truncate text-xs text-zinc-500">{user?.email}</p>
+            </div>
+            <Settings size={14} className="shrink-0 text-zinc-500" />
           </button>
+
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                transition={{ duration: 0.12 }}
+                className="absolute bottom-full left-0 right-0 mb-1 overflow-hidden rounded-xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] shadow-xl shadow-black/40"
+              >
+                <Link
+                  href={`/${locale}/settings`}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
+                >
+                  <Settings size={14} className="text-zinc-500" />
+                  Settings
+                </Link>
+                <div className="mx-3 border-t border-[oklch(0.22_0.02_265)]" />
+                <button
+                  onClick={handleSignOut}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/5 hover:text-red-400 transition-colors"
+                >
+                  <LogOut size={14} className="text-zinc-500" />
+                  Sign out
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </aside>
