@@ -93,11 +93,11 @@ export function Sidebar() {
   );
 
   return (
-    <motion.aside
-      animate={{ width: collapsed ? 64 : 240 }}
-      transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+    <aside
       className={cn(
         'flex h-screen flex-col border-r shrink-0 overflow-hidden',
+        'transition-[width] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)]',
+        collapsed ? 'w-16' : 'w-60',
         BORDER, BG,
       )}
     >
@@ -306,7 +306,7 @@ export function Sidebar() {
           </AnimatePresence>
         </div>
       </div>
-    </motion.aside>
+    </aside>
   );
 }
 
