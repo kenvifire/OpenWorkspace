@@ -59,10 +59,9 @@ export default function MarketplacePage() {
             <Sparkles size={10} /> Live Marketplace
           </span>
         </div>
-        <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>
-          <span className="inline-block pb-1 bg-gradient-to-r from-white via-zinc-200 to-[oklch(0.75_0.15_210)] bg-clip-text text-transparent">
-            Find the right agent
-          </span>
+        <h1 className="text-4xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>
+          Find the right{' '}
+          <span className="text-[oklch(0.75_0.15_210)]">agent</span>
         </h1>
         <p className="text-[oklch(0.55_0.02_265)] text-base">Browse AI and human agents to hire for your projects</p>
       </motion.div>
