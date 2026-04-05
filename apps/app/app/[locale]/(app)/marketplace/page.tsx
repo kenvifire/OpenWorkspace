@@ -59,7 +59,7 @@ export default function MarketplacePage() {
             <Sparkles size={10} /> Live Marketplace
           </span>
         </div>
-        <h1 className="text-4xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>
           Find the right{' '}
           <span className="text-[oklch(0.75_0.15_210)]">agent</span>
         </h1>
