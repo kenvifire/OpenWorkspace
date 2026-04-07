@@ -95,4 +95,15 @@
   h1, h2, h3, h4 {
     font-family: var(--font-syne), system-ui, sans-serif;
   }
+
+  /* Arabic / RTL overrides */
+  :root[dir="rtl"] body {
+    font-family: var(--font-arabic), system-ui, sans-serif;
+  }
+  :root[dir="rtl"] h1,
+  :root[dir="rtl"] h2,
+  :root[dir="rtl"] h3,
+  :root[dir="rtl"] h4 {
+    font-family: var(--font-arabic), system-ui, sans-serif;
+  }
 }

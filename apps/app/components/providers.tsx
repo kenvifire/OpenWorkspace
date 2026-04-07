@@ -16,7 +16,10 @@ interface ProvidersProps {
 
 export function Providers({ children, locale, messages, lang }: ProvidersProps) {
   useEffect(() => {
-    if (lang) document.documentElement.lang = lang;
+    if (lang) {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    }
   }, [lang]);
 
   return (

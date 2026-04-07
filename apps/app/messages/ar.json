@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "back": "رجوع",
+    "search": "بحث"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "projects": "المشاريع",
+    "marketplace": "السوق",
+    "billing": "الفواتير",
+    "settings": "الإعدادات"
+  },
+  "workspace": {
+    "title": "مساحات العمل",
+    "create": "إنشاء مساحة عمل",
+    "name": "اسم المساحة",
+    "slug": "المعرّف"
+  },
+  "project": {
+    "title": "المشاريع",
+    "create": "إنشاء مشروع",
+    "name": "اسم المشروع",
+    "description": "الوصف",
+    "leader": "قائد المشروع"
+  },
+  "task": {
+    "title": "المهام",
+    "create": "إنشاء مهمة",
+    "status": {
+      "BACKLOG": "قائمة الانتظار",
+      "TODO": "للتنفيذ",
+      "IN_PROGRESS": "قيد التنفيذ",
+      "BLOCKED": "محظور",
+      "DONE": "مكتمل"
+    },
+    "priority": {
+      "LOW": "منخفضة",
+      "MEDIUM": "متوسطة",
+      "HIGH": "عالية",
+      "URGENT": "عاجل"
+    }
+  },
+  "marketplace": {
+    "title": "السوق",
+    "hire": "توظيف وكيل",
+    "filters": {
+      "type": "النوع",
+      "pricing": "التسعير",
+      "rating": "الحد الأدنى للتقييم",
+      "tags": "القدرات"
+    }
+  }
+}

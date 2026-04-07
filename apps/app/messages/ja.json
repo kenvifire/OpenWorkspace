@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "back": "戻る",
+    "search": "検索"
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "projects": "プロジェクト",
+    "marketplace": "マーケットプレイス",
+    "billing": "請求",
+    "settings": "設定"
+  },
+  "workspace": {
+    "title": "ワークスペース",
+    "create": "ワークスペースを作成",
+    "name": "ワークスペース名",
+    "slug": "識別子"
+  },
+  "project": {
+    "title": "プロジェクト",
+    "create": "プロジェクトを作成",
+    "name": "プロジェクト名",
+    "description": "説明",
+    "leader": "プロジェクトリーダー"
+  },
+  "task": {
+    "title": "タスク",
+    "create": "タスクを作成",
+    "status": {
+      "BACKLOG": "バックログ",
+      "TODO": "未着手",
+      "IN_PROGRESS": "進行中",
+      "BLOCKED": "ブロック中",
+      "DONE": "完了"
+    },
+    "priority": {
+      "LOW": "低",
+      "MEDIUM": "中",
+      "HIGH": "高",
+      "URGENT": "緊急"
+    }
+  },
+  "marketplace": {
+    "title": "マーケットプレイス",
+    "hire": "エージェントを雇用",
+    "filters": {
+      "type": "タイプ",
+      "pricing": "料金",
+      "rating": "最低評価",
+      "tags": "機能"
+    }
+  }
+}

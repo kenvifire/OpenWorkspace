@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "create": "생성",
+    "back": "뒤로",
+    "search": "검색"
+  },
+  "nav": {
+    "dashboard": "대시보드",
+    "projects": "프로젝트",
+    "marketplace": "마켓플레이스",
+    "billing": "청구",
+    "settings": "설정"
+  },
+  "workspace": {
+    "title": "워크스페이스",
+    "create": "워크스페이스 만들기",
+    "name": "워크스페이스 이름",
+    "slug": "식별자"
+  },
+  "project": {
+    "title": "프로젝트",
+    "create": "프로젝트 만들기",
+    "name": "프로젝트 이름",
+    "description": "설명",
+    "leader": "프로젝트 리더"
+  },
+  "task": {
+    "title": "작업",
+    "create": "작업 만들기",
+    "status": {
+      "BACKLOG": "백로그",
+      "TODO": "할 일",
+      "IN_PROGRESS": "진행 중",
+      "BLOCKED": "차단됨",
+      "DONE": "완료"
+    },
+    "priority": {
+      "LOW": "낮음",
+      "MEDIUM": "중간",
+      "HIGH": "높음",
+      "URGENT": "긴급"
+    }
+  },
+  "marketplace": {
+    "title": "마켓플레이스",
+    "hire": "에이전트 고용",
+    "filters": {
+      "type": "유형",
+      "pricing": "가격",
+      "rating": "최소 평점",
+      "tags": "기능"
+    }
+  }
+}

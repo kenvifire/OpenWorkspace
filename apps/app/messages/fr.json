@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "back": "Retour",
+    "search": "Rechercher"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "projects": "Projets",
+    "marketplace": "Marché",
+    "billing": "Facturation",
+    "settings": "Paramètres"
+  },
+  "workspace": {
+    "title": "Espaces de travail",
+    "create": "Créer un espace de travail",
+    "name": "Nom de l'espace",
+    "slug": "Identifiant"
+  },
+  "project": {
+    "title": "Projets",
+    "create": "Créer un projet",
+    "name": "Nom du projet",
+    "description": "Description",
+    "leader": "Chef de projet"
+  },
+  "task": {
+    "title": "Tâches",
+    "create": "Créer une tâche",
+    "status": {
+      "BACKLOG": "À planifier",
+      "TODO": "À faire",
+      "IN_PROGRESS": "En cours",
+      "BLOCKED": "Bloqué",
+      "DONE": "Terminé"
+    },
+    "priority": {
+      "LOW": "Faible",
+      "MEDIUM": "Moyenne",
+      "HIGH": "Haute",
+      "URGENT": "Urgent"
+    }
+  },
+  "marketplace": {
+    "title": "Marché",
+    "hire": "Recruter un agent",
+    "filters": {
+      "type": "Type",
+      "pricing": "Tarification",
+      "rating": "Note minimale",
+      "tags": "Capacités"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "back": "Zurück",
+    "search": "Suchen"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projekte",
+    "marketplace": "Marktplatz",
+    "billing": "Abrechnung",
+    "settings": "Einstellungen"
+  },
+  "workspace": {
+    "title": "Arbeitsbereiche",
+    "create": "Arbeitsbereich erstellen",
+    "name": "Name des Arbeitsbereichs",
+    "slug": "Kennung"
+  },
+  "project": {
+    "title": "Projekte",
+    "create": "Projekt erstellen",
+    "name": "Projektname",
+    "description": "Beschreibung",
+    "leader": "Projektleiter"
+  },
+  "task": {
+    "title": "Aufgaben",
+    "create": "Aufgabe erstellen",
+    "status": {
+      "BACKLOG": "Rückstand",
+      "TODO": "Zu erledigen",
+      "IN_PROGRESS": "In Bearbeitung",
+      "BLOCKED": "Blockiert",
+      "DONE": "Erledigt"
+    },
+    "priority": {
+      "LOW": "Niedrig",
+      "MEDIUM": "Mittel",
+      "HIGH": "Hoch",
+      "URGENT": "Dringend"
+    }
+  },
+  "marketplace": {
+    "title": "Marktplatz",
+    "hire": "Agent beauftragen",
+    "filters": {
+      "type": "Typ",
+      "pricing": "Preisgestaltung",
+      "rating": "Mindestbewertung",
+      "tags": "Fähigkeiten"
+    }
+  }
+}
