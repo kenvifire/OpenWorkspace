@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { workspacesApi, billingApi } from '@/lib/api';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { useState, Suspense } from 'react';
 import { motion } from 'framer-motion';
 
 function PaymentBanner() {
+  const t = useTranslations('billing');
   const searchParams = useSearchParams();
   const paymentSuccess = searchParams.get('success') === '1';
   const paymentCancelled = searchParams.get('cancelled') === '1';
@@ -21,7 +23,7 @@ function PaymentBanner() {
       className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-800 bg-emerald-950/50 px-4 py-3.5 text-sm text-emerald-400"
     >
       <CheckCircle2 size={16} className="shrink-0 text-emerald-500" />
-      Payment successful — thank you! Your balance has been updated.
+      {t('paymentSuccess')}
     </motion.div>
   ) : (
     <motion.div
@@ -30,12 +32,13 @@ function PaymentBanner() {
       className="mb-6 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-sm text-muted-foreground"
     >
       <XCircle size={16} className="shrink-0 text-muted-foreground/70" />
-      Payment cancelled. No charge was made.
+      {t('paymentCancelled')}
     </motion.div>
   );
 }
 
 export default function BillingPage() {
+  const t = useTranslations('billing');
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>('');
 
   const { data: workspacesRaw } = useQuery({
@@ -71,12 +74,12 @@ export default function BillingPage() {
         className="mb-8 flex items-end justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Billing</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Current billing cycle usage and payments</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Select value={selectedWorkspaceId} onValueChange={(v) => setSelectedWorkspaceId(v ?? '')}>
           <SelectTrigger className="w-48 bg-card">
-            <SelectValue placeholder="Select workspace" />
+            <SelectValue placeholder={t('selectWorkspace')} />
           </SelectTrigger>
           <SelectContent alignItemWithTrigger={false}>
             {workspaces.map((ws) => (
@@ -94,7 +97,7 @@ export default function BillingPage() {
       ) : !summary ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card py-24 text-center">
           <CreditCard size={32} className="mb-3 text-muted-foreground/50" />
-          <p className="text-sm text-muted-foreground/70">Select a workspace to view billing</p>
+          <p className="text-sm text-muted-foreground/70">{t('selectWorkspacePrompt')}</p>
         </div>
       ) : (
         <motion.div
@@ -103,43 +106,39 @@ export default function BillingPage() {
           transition={{ duration: 0.3, delay: 0.05 }}
           className="space-y-5"
         >
-          {/* Top cards */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {/* Total */}
             <div className="sm:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-700 p-6 text-white shadow-sm">
               <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-card/5 blur-2xl" />
-              <p className="text-sm font-medium text-muted-foreground/70">Current cycle total</p>
+              <p className="text-sm font-medium text-muted-foreground/70">{t('currentCycleTotal')}</p>
               <p className="mt-2 text-5xl font-bold tracking-tight">{summary.totalFormatted}</p>
               <p className="mt-2 text-xs text-muted-foreground/70">
                 {new Date(summary.periodStart).toLocaleDateString()} – {new Date(summary.periodEnd).toLocaleDateString()}
               </p>
             </div>
-            {/* Pay card */}
             <div className="flex flex-col rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border">
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-900/40">
                 <DollarSign size={18} className="text-violet-400" />
               </div>
-              <p className="text-sm font-medium text-foreground/80">Pay this cycle</p>
-              <p className="mt-0.5 text-xs text-muted-foreground/70">Securely via Stripe</p>
+              <p className="text-sm font-medium text-foreground/80">{t('payThisCycle')}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground/70">{t('viaStripe')}</p>
               <Button
                 onClick={handleCheckout}
                 disabled={summary.totalCents === 0}
                 className="mt-auto w-full"
               >
-                Pay {summary.totalFormatted}
+                {t('pay', { amount: summary.totalFormatted })}
               </Button>
             </div>
           </div>
 
-          {/* Breakdown */}
           <div className="rounded-2xl bg-card p-6 shadow-sm ring-1 ring-border">
             <div className="mb-5 flex items-center gap-2">
               <TrendingUp size={16} className="text-muted-foreground/70" />
-              <h2 className="font-semibold text-foreground">Breakdown by project</h2>
+              <h2 className="font-semibold text-foreground">{t('breakdownByProject')}</h2>
             </div>
 
             {summary.byProject.length === 0 ? (
-              <p className="text-sm text-muted-foreground/70">No usage this cycle</p>
+              <p className="text-sm text-muted-foreground/70">{t('noUsage')}</p>
             ) : (
               <div className="space-y-5">
                 {summary.byProject.map((p: {

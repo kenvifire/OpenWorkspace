@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { marketplaceApi } from '@/lib/api';
 import type { MarketplaceSearchParams, Agent } from '@openworkspace/api-types';
@@ -23,6 +23,7 @@ const AGENT_GRADIENTS = [
 
 export default function MarketplacePage() {
   const locale = useLocale();
+  const tm = useTranslations('marketplace');
   const [search, setSearch] = useState('');
   const [type, setType] = useState('ALL');
   const [pricing, setPricing] = useState('ALL');
@@ -56,14 +57,14 @@ export default function MarketplacePage() {
       >
         <div className="flex items-center gap-2 mb-3">
           <span className="flex items-center gap-1.5 rounded-full bg-violet-500/20 border border-violet-500/30 px-3 py-1 text-[11px] font-semibold text-violet-300">
-            <Sparkles size={10} /> Live Marketplace
+            <Sparkles size={10} /> {tm('liveBadge')}
           </span>
         </div>
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>
-          Find the right{' '}
-          <span className="text-[oklch(0.75_0.15_210)]">agent</span>
+          {tm('heading')}{' '}
+          <span className="text-[oklch(0.75_0.15_210)]">{tm('headingAccent')}</span>
         </h1>
-        <p className="text-[oklch(0.55_0.02_265)] text-base">Browse AI and human agents to hire for your projects</p>
+        <p className="text-[oklch(0.55_0.02_265)] text-base">{tm('subheading')}</p>
       </motion.div>
 
       {/* Filters */}
@@ -76,7 +77,7 @@ export default function MarketplacePage() {
         <div className="relative flex-1 min-w-52">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[oklch(0.55_0.02_265)]" />
           <Input
-            placeholder="Search agents…"
+            placeholder={tm('searchPlaceholder')}
             className="pl-9 bg-[oklch(0.12_0.014_265)] border-[oklch(0.22_0.02_265)] text-zinc-200 placeholder:text-[oklch(0.55_0.02_265)]"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
@@ -85,27 +86,27 @@ export default function MarketplacePage() {
 
         {/* Pill-style type filters */}
         <div className="flex items-center gap-1.5 rounded-xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] p-1">
-          {['ALL', 'AI', 'HUMAN'].map((t) => (
+          {(['ALL', 'AI', 'HUMAN'] as const).map((typeVal) => (
             <button
-              key={t}
-              onClick={() => { setType(t); setPage(1); }}
+              key={typeVal}
+              onClick={() => { setType(typeVal); setPage(1); }}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                type === t
+                type === typeVal
                   ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
                   : 'text-[oklch(0.55_0.02_265)] hover:text-zinc-300 hover:bg-white/5'
               }`}
             >
-              {t === 'ALL' ? 'All Types' : t === 'AI' ? 'AI Agents' : 'Human Agents'}
+              {typeVal === 'ALL' ? tm('allTypes') : typeVal === 'AI' ? tm('aiAgents') : tm('humanAgents')}
             </button>
           ))}
         </div>
 
         <Select value={pricing} onValueChange={(v) => { setPricing(v ?? 'ALL'); setPage(1); }}>
-          <SelectTrigger className="w-40 bg-[oklch(0.12_0.014_265)] border-[oklch(0.22_0.02_265)] text-zinc-200"><SelectValue placeholder="Pricing" /></SelectTrigger>
+          <SelectTrigger className="w-40 bg-[oklch(0.12_0.014_265)] border-[oklch(0.22_0.02_265)] text-zinc-200"><SelectValue placeholder={tm('filters.pricing')} /></SelectTrigger>
           <SelectContent alignItemWithTrigger={false}>
-            <SelectItem value="ALL">All pricing</SelectItem>
-            <SelectItem value="PER_JOB">Per job</SelectItem>
-            <SelectItem value="PER_TOKEN">Per token</SelectItem>
+            <SelectItem value="ALL">{tm('allPricing')}</SelectItem>
+            <SelectItem value="PER_JOB">{tm('perJob')}</SelectItem>
+            <SelectItem value="PER_TOKEN">{tm('perToken')}</SelectItem>
           </SelectContent>
         </Select>
       </motion.div>
@@ -120,7 +121,7 @@ export default function MarketplacePage() {
       ) : agents.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] py-24 text-center">
           <Bot size={32} className="mb-3 text-[oklch(0.22_0.02_265)]" />
-          <p className="font-medium text-[oklch(0.55_0.02_265)]">No agents match your filters</p>
+          <p className="font-medium text-[oklch(0.55_0.02_265)]">{tm('noAgentsMatch')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -186,7 +187,7 @@ export default function MarketplacePage() {
                       </span>
                     </span>
                     <span className="flex items-center gap-1 text-xs text-[oklch(0.55_0.02_265)] group-hover:text-violet-300 transition-colors">
-                      View <ArrowRight size={12} />
+                      {tm('viewAgent')} <ArrowRight size={12} />
                     </span>
                   </div>
                 </div>

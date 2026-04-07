@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { workspacesApi } from '@/lib/api';
 import { useAuth } from '@/contexts/auth';
@@ -27,6 +27,8 @@ const AVATAR_GLOWS = [
 
 export default function DashboardPage() {
   const locale = useLocale();
+  const t = useTranslations('dashboard');
+  const tw = useTranslations('workspace');
   const { user } = useAuth();
   const { data: workspaces = [], isLoading } = useQuery({
     queryKey: ['workspaces'],
@@ -36,14 +38,13 @@ export default function DashboardPage() {
 
   const greeting = (() => {
     const h = new Date().getHours();
-    if (h < 12) return 'Good morning';
-    if (h < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (h < 12) return t('greetingMorning');
+    if (h < 18) return t('greetingAfternoon');
+    return t('greetingEvening');
   })();
 
   return (
     <div className="min-h-full p-8">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -57,8 +58,8 @@ export default function DashboardPage() {
           </h1>
           <p className="mt-2 text-sm text-[oklch(0.55_0.02_265)]">
             {workspaces.length > 0
-              ? `You have ${workspaces.length} workspace${workspaces.length !== 1 ? 's' : ''}`
-              : 'Create your first workspace to get started'}
+              ? tw('projects', { count: workspaces.length })
+              : t('getStarted')}
           </p>
         </div>
         <Link
@@ -66,11 +67,10 @@ export default function DashboardPage() {
           className={buttonVariants({ className: 'shadow-[0_0_20px_oklch(0.68_0.18_285/0.4)] hover:shadow-[0_0_28px_oklch(0.68_0.18_285/0.6)] transition-shadow' })}
         >
           <Plus size={15} className="mr-1.5" />
-          New Workspace
+          {t('newWorkspace')}
         </Link>
       </motion.div>
 
-      {/* Content */}
       {isLoading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
@@ -84,21 +84,20 @@ export default function DashboardPage() {
           transition={{ duration: 0.3 }}
           className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] py-28 text-center"
         >
-          {/* Decorative CSS illustration */}
           <div className="mb-6 relative flex h-20 w-20 items-center justify-center">
             <div className="absolute inset-0 rounded-2xl bg-violet-500/10 border border-violet-500/20" />
             <div className="absolute -top-2 -right-2 h-6 w-6 rounded-lg bg-[oklch(0.75_0.15_210/0.15)] border border-[oklch(0.75_0.15_210/0.3)]" />
             <div className="absolute -bottom-2 -left-2 h-4 w-4 rounded-md bg-violet-500/20 border border-violet-500/30" />
             <FolderKanban size={28} className="text-violet-400 relative z-10" />
           </div>
-          <p className="font-semibold text-zinc-200 text-lg" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>No workspaces yet</p>
-          <p className="mt-2 text-sm text-[oklch(0.55_0.02_265)] max-w-xs">Workspaces help you organise projects, team members, and AI agents.</p>
+          <p className="font-semibold text-zinc-200 text-lg" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>{t('noWorkspaces')}</p>
+          <p className="mt-2 text-sm text-[oklch(0.55_0.02_265)] max-w-xs">{t('noWorkspacesDesc')}</p>
           <Link
             href={`/${locale}/workspaces/new`}
             className={buttonVariants({ className: 'mt-7 shadow-[0_0_20px_oklch(0.68_0.18_285/0.4)] hover:shadow-[0_0_28px_oklch(0.68_0.18_285/0.6)] transition-shadow' })}
           >
             <Plus size={14} className="mr-1.5" />
-            Create your first workspace
+            {t('createFirstWorkspace')}
           </Link>
         </motion.div>
       ) : (
@@ -113,31 +112,27 @@ export default function DashboardPage() {
             >
               <Link href={`/${locale}/workspaces/${ws.slug}`}>
                 <div className="group relative overflow-hidden rounded-2xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] p-5 shadow-lg shadow-black/30 transition-all hover:border-[oklch(0.32_0.04_265)] hover:shadow-[0_8px_32px_black/50]">
-                  {/* gradient accent */}
                   <div className={`absolute right-0 top-0 h-28 w-28 -translate-y-8 translate-x-8 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} opacity-10 blur-2xl group-hover:opacity-20 transition-opacity`} />
-
                   <div className="flex items-start justify-between">
                     <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} text-sm font-bold text-white ${AVATAR_GLOWS[i % AVATAR_GLOWS.length]}`}>
                       {ws.name[0].toUpperCase()}
                     </div>
                     <ArrowRight size={15} className="text-zinc-600 group-hover:text-zinc-400 transition-colors mt-0.5" />
                   </div>
-
                   <div className="mt-3">
                     <p className="font-semibold text-zinc-100" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>{ws.name}</p>
                     {(ws as any).description && (
                       <p className="mt-0.5 text-sm text-[oklch(0.55_0.02_265)] line-clamp-1">{(ws as any).description}</p>
                     )}
                   </div>
-
                   <div className="mt-4 flex gap-4 text-xs text-[oklch(0.55_0.02_265)] border-t border-[oklch(0.22_0.02_265)] pt-3">
                     <span className="flex items-center gap-1.5">
                       <FolderKanban size={12} />
-                      {ws._count?.projects ?? 0} projects
+                      {tw('projects', { count: ws._count?.projects ?? 0 })}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <Users size={12} />
-                      {ws._count?.members ?? 0} members
+                      {tw('members', { count: ws._count?.members ?? 0 })}
                     </span>
                   </div>
                 </div>

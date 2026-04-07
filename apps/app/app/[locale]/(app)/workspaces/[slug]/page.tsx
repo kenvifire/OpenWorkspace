@@ -2,7 +2,7 @@
 
 import { use, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { workspacesApi, projectsApi } from '@/lib/api';
 import type { WorkspaceMemberRole } from '@openworkspace/api-types';
@@ -15,6 +15,9 @@ import { motion } from 'framer-motion';
 export default function WorkspacePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const locale = useLocale();
+  const t = useTranslations('workspace');
+  const tn = useTranslations('nav');
+  const tc = useTranslations('common');
   const qc = useQueryClient();
 
   const [showInvite, setShowInvite] = useState(false);
@@ -64,7 +67,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
     <div className="min-h-full p-8">
       {/* Breadcrumb */}
       <div className="mb-6 flex items-center gap-1.5 text-xs text-[oklch(0.55_0.02_265)]">
-        <Link href={`/${locale}/dashboard`} className="hover:text-zinc-300 transition-colors">Dashboard</Link>
+        <Link href={`/${locale}/dashboard`} className="hover:text-zinc-300 transition-colors">{tn('dashboard')}</Link>
         <ChevronRight size={12} />
         <span className="text-zinc-300">{workspace.name}</span>
       </div>
@@ -87,10 +90,10 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
         </div>
         <div className="flex gap-2">
           <Link href={`/${locale}/workspaces/${slug}/settings`} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-            <Settings size={13} className="mr-1.5" /> Settings
+            <Settings size={13} className="mr-1.5" /> {tn('settings')}
           </Link>
           <Link href={`/${locale}/workspaces/${slug}/projects/new`} className={buttonVariants({ size: 'sm', className: 'shadow-[0_0_16px_oklch(0.68_0.18_285/0.35)] hover:shadow-[0_0_24px_oklch(0.68_0.18_285/0.5)] transition-shadow' })}>
-            <Plus size={14} className="mr-1.5" /> New Project
+            <Plus size={14} className="mr-1.5" /> {t('newProject')}
           </Link>
         </div>
       </motion.div>
@@ -105,7 +108,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
         >
           <div className="mb-4 flex items-center gap-2">
             <FolderKanban size={14} className="text-[oklch(0.55_0.02_265)]" />
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.55_0.02_265)]">Projects</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.55_0.02_265)]">{tn('projects')}</h2>
             <span className="rounded-full bg-[oklch(0.22_0.02_265)] px-1.5 py-0.5 text-[11px] font-medium text-[oklch(0.55_0.02_265)]">{projects.length}</span>
           </div>
 
@@ -116,9 +119,9 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
           ) : projects.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] py-16 text-center">
               <FolderKanban size={28} className="mb-3 text-[oklch(0.22_0.02_265)]" />
-              <p className="text-sm font-medium text-[oklch(0.55_0.02_265)]">No projects yet</p>
+              <p className="text-sm font-medium text-[oklch(0.55_0.02_265)]">{t('noProjects')}</p>
               <Link href={`/${locale}/workspaces/${slug}/projects/new`} className={buttonVariants({ variant: 'outline', size: 'sm', className: 'mt-3' })}>
-                Create first project
+                {t('createFirstProject')}
               </Link>
             </div>
           ) : (
@@ -145,11 +148,11 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
                       <div className="flex shrink-0 items-center gap-4 text-xs text-[oklch(0.55_0.02_265)]">
                         <span className="flex items-center gap-1">
                           <FolderKanban size={11} />
-                          {p._count?.tasks ?? 0} tasks
+                          {t('tasks', { count: p._count?.tasks ?? 0 })}
                         </span>
                         <span className="flex items-center gap-1">
                           <Bot size={11} />
-                          {p._count?.projectAgents ?? 0} agents
+                          {t('members', { count: p._count?.projectAgents ?? 0 })}
                         </span>
                         <ArrowRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
                       </div>
@@ -170,14 +173,14 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Users size={14} className="text-[oklch(0.55_0.02_265)]" />
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.55_0.02_265)]">Members</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.55_0.02_265)]">{t('membersHeading')}</h2>
               <span className="rounded-full bg-[oklch(0.22_0.02_265)] px-1.5 py-0.5 text-[11px] font-medium text-[oklch(0.55_0.02_265)]">{workspace.members?.length ?? 0}</span>
             </div>
             <button
               onClick={() => setShowInvite((v) => !v)}
               className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[oklch(0.55_0.02_265)] hover:bg-[oklch(0.22_0.02_265)] hover:text-zinc-300 transition-colors"
             >
-              <UserPlus size={12} /> Invite
+              <UserPlus size={12} /> {t('invite')}
             </button>
           </div>
 
@@ -188,7 +191,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
               className="mb-3 rounded-2xl border border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] p-4 shadow-lg shadow-black/30 space-y-2"
             >
               <Input
-                placeholder="colleague@example.com"
+                placeholder={t('inviteEmailPlaceholder')}
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 className="h-8 text-sm"
@@ -196,18 +199,18 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
               <Select value={inviteRole} onValueChange={(v) => setInviteRole((v ?? 'MEMBER') as WorkspaceMemberRole)}>
                 <SelectTrigger className="h-8 text-sm w-full"><SelectValue /></SelectTrigger>
                 <SelectContent alignItemWithTrigger={false}>
-                  <SelectItem value="MEMBER">Member</SelectItem>
-                  <SelectItem value="OWNER">Owner</SelectItem>
+                  <SelectItem value="MEMBER">{t('memberRole')}</SelectItem>
+                  <SelectItem value="OWNER">{t('ownerRole')}</SelectItem>
                 </SelectContent>
               </Select>
               <div className="flex gap-2 pt-1">
-                <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowInvite(false)}>Cancel</Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowInvite(false)}>{tc('cancel')}</Button>
                 <Button size="sm" className="flex-1" disabled={!inviteEmail || inviteMember.isPending} onClick={() => inviteMember.mutate()}>
-                  {inviteMember.isPending ? 'Inviting…' : 'Invite'}
+                  {inviteMember.isPending ? t('inviting') : t('invite')}
                 </Button>
               </div>
               {inviteMember.isError && (
-                <p className="text-xs text-red-400">{(inviteMember.error as any)?.response?.data?.message ?? 'Failed to invite'}</p>
+                <p className="text-xs text-red-400">{(inviteMember.error as any)?.response?.data?.message ?? t('failedToInvite')}</p>
               )}
             </motion.div>
           )}

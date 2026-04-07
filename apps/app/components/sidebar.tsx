@@ -28,6 +28,7 @@ export function Sidebar() {
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations('nav');
+  const tb = useTranslations('board');
   const { user, signOut } = useAuth();
 
   // Collapse state — persisted
@@ -120,7 +121,7 @@ export function Sidebar() {
         )}
         <button
           onClick={toggle}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={collapsed ? t('expandSidebar') : t('collapseSidebar')}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors"
         >
           <PanelLeft size={16} />
@@ -168,7 +169,7 @@ export function Sidebar() {
               transition={{ duration: 0.15 }}
             >
               {/* Workspaces */}
-              <Section label="Workspaces" open={workspacesOpen} onToggle={() => setWorkspacesOpen(o => !o)}>
+              <Section label={t('workspaces')} open={workspacesOpen} onToggle={() => setWorkspacesOpen(o => !o)}>
                 {(workspaces as any[]).map((ws, i) => (
                   <Link
                     key={ws.id}
@@ -190,16 +191,16 @@ export function Sidebar() {
                   </Link>
                 ))}
                 <Link href={`/${locale}/workspaces/new`} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors">
-                  <Plus size={13} />New workspace
+                  <Plus size={13} />{t('newWorkspace')}
                 </Link>
               </Section>
 
               {/* Agents */}
-              <Section label="Agents" open={agentsOpen} onToggle={() => setAgentsOpen(o => !o)}>
+              <Section label={t('agents')} open={agentsOpen} onToggle={() => setAgentsOpen(o => !o)}>
                 <Link href={`/${locale}/agents`} className={cn('relative flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm transition-colors', pathname === `/${locale}/agents` ? 'bg-violet-500/10 font-medium text-violet-300' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200')}>
                   {pathname === `/${locale}/agents` && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-r bg-violet-400" />}
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-violet-500/20 text-violet-400"><Brain size={11} /></span>
-                  <span className="truncate">Planning Agent</span>
+                  <span className="truncate">{tb('plannerAgent')}</span>
                 </Link>
                 {(agents as any[]).map((agent) => (
                   <Link key={agent.id} href={`/${locale}/agents`} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-zinc-400 hover:bg-white/5 hover:text-zinc-200 transition-colors">
@@ -208,12 +209,12 @@ export function Sidebar() {
                   </Link>
                 ))}
                 <Link href={`/${locale}/agents`} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors">
-                  <Plus size={13} />New agent
+                  <Plus size={13} />{t('newAgent')}
                 </Link>
               </Section>
 
               {/* Skills */}
-              <Section label="Skills" open={skillsOpen} onToggle={() => setSkillsOpen(o => !o)}>
+              <Section label={t('skills')} open={skillsOpen} onToggle={() => setSkillsOpen(o => !o)}>
                 {(skills as any[]).map((skill) => (
                   <Link key={skill.id} href={`/${locale}/skills`} className={cn('flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm transition-colors', pathname === `/${locale}/skills` ? 'bg-violet-500/10 font-medium text-violet-300' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200')}>
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-amber-500/20 text-amber-400"><Zap size={11} /></span>
@@ -221,12 +222,12 @@ export function Sidebar() {
                   </Link>
                 ))}
                 <Link href={`/${locale}/skills`} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors">
-                  <Plus size={13} />New skill
+                  <Plus size={13} />{t('newSkill')}
                 </Link>
               </Section>
 
               {/* MCP */}
-              <Section label="MCP Servers" open={mcpsOpen} onToggle={() => setMcpsOpen(o => !o)}>
+              <Section label={t('mcpServers')} open={mcpsOpen} onToggle={() => setMcpsOpen(o => !o)}>
                 {(mcps as any[]).map((mcp) => (
                   <Link key={mcp.id} href={`/${locale}/mcp`} className={cn('flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm transition-colors', pathname === `/${locale}/mcp` ? 'bg-violet-500/10 font-medium text-violet-300' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200')}>
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-indigo-500/20 text-indigo-400"><Server size={11} /></span>
@@ -234,7 +235,7 @@ export function Sidebar() {
                   </Link>
                 ))}
                 <Link href={`/${locale}/mcp`} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors">
-                  <Plus size={13} />New MCP
+                  <Plus size={13} />{t('newMcp')}
                 </Link>
               </Section>
             </motion.div>
@@ -295,11 +296,11 @@ export function Sidebar() {
                 )}
               >
                 <Link href={`/${locale}/settings`} onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors">
-                  <Settings size={14} className="text-zinc-500" />Settings
+                  <Settings size={14} className="text-zinc-500" />{t('settings')}
                 </Link>
                 <div className={cn('mx-3 border-t', BORDER)} />
                 <button onClick={handleSignOut} className="flex w-full items-center gap-2.5 px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/5 hover:text-red-400 transition-colors">
-                  <LogOut size={14} className="text-zinc-500" />Sign out
+                  <LogOut size={14} className="text-zinc-500" />{t('signOut')}
                 </button>
               </motion.div>
             )}
