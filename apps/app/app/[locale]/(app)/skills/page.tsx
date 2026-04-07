@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { skillsApi, myAgentsApi } from '@/lib/api';
 import type { Skill, CreateSkillDto, UpdateSkillDto } from '@/lib/api';
@@ -427,6 +428,7 @@ function SkillForm({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const t = useTranslations('skills');
   const qc = useQueryClient();
   const [name, setName] = useState(initial?.name ?? preset?.name ?? '');
   const [description, setDescription] = useState(initial?.description ?? preset?.description ?? '');
@@ -467,7 +469,7 @@ function SkillForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Name</Label>
+          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('nameLabel')}</Label>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -479,23 +481,23 @@ function SkillForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Type</Label>
+          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('typeLabel')}</Label>
           <Select value={type} onValueChange={(v) => setType((v ?? 'PROMPT') as 'PROMPT' | 'WEBHOOK')}>
             <SelectTrigger className="w-full bg-[#0f0f1a] border-[#1e1e3a] text-white focus:border-violet-500/50"><SelectValue /></SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
-              <SelectItem value="PROMPT">Prompt</SelectItem>
-              <SelectItem value="WEBHOOK">Webhook</SelectItem>
+              <SelectItem value="PROMPT">{t('typePrompt')}</SelectItem>
+              <SelectItem value="WEBHOOK">{t('typeWebhook')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Description</Label>
+        <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('descLabel')}</Label>
         <Input
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Short description"
+          placeholder={t('descPlaceholder')}
           required
           minLength={5}
           maxLength={500}
@@ -504,11 +506,11 @@ function SkillForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Instructions</Label>
+        <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('instructionsLabel')}</Label>
         <Textarea
           value={instructions}
           onChange={(e) => setInstructions(e.target.value)}
-          placeholder={type === 'PROMPT' ? 'When the user asks about X, you should…' : 'Call this webhook with…'}
+          placeholder={type === 'PROMPT' ? t('instructionsPromptPlaceholder') : t('instructionsWebhookPlaceholder')}
           rows={6}
           maxLength={8000}
           className="resize-none font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
@@ -519,10 +521,10 @@ function SkillForm({
 
       {type === 'WEBHOOK' && (
         <div className="space-y-3 rounded-xl border border-[#1e1e3a] bg-card/[0.03] p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-violet-400">Webhook Config</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-violet-400">{t('webhookConfigSection')}</p>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="sm:col-span-2 space-y-1.5">
-              <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">URL</Label>
+              <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('urlLabel')}</Label>
               <Input
                 value={webhookUrl}
                 onChange={(e) => setWebhookUrl(e.target.value)}
@@ -532,7 +534,7 @@ function SkillForm({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Method</Label>
+              <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('methodLabel')}</Label>
               <Select value={webhookMethod} onValueChange={(v) => setWebhookMethod(v ?? 'POST')}>
                 <SelectTrigger className="bg-[#0f0f1a] border-[#1e1e3a] text-white focus:border-violet-500/50"><SelectValue /></SelectTrigger>
                 <SelectContent alignItemWithTrigger={false}>
@@ -544,7 +546,7 @@ function SkillForm({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Headers <span className="text-muted-foreground normal-case">(JSON)</span></Label>
+            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('headersLabel')}</Label>
             <Input
               value={webhookHeaders}
               onChange={(e) => setWebhookHeaders(e.target.value)}
@@ -555,7 +557,7 @@ function SkillForm({
         </div>
       )}
 
-      {error && <p className="text-sm text-red-400 font-mono">{(error as any)?.response?.data?.message ?? 'Something went wrong'}</p>}
+      {error && <p className="text-sm text-red-400 font-mono">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>}
 
       <div className="flex justify-end gap-2 pt-2">
         <button
@@ -563,14 +565,14 @@ function SkillForm({
           onClick={onClose}
           className="px-4 py-2 rounded-lg text-sm font-medium bg-card/5 hover:bg-card/10 border border-white/10 text-muted-foreground/50 transition-all duration-200"
         >
-          Cancel
+          {t('cancel')}
         </button>
         <button
           type="submit"
           disabled={isPending}
           className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isPending ? 'Saving…' : initial ? 'Save changes' : 'Create skill'}
+          {isPending ? t('savingBtn') : initial ? t('saveChanges') : t('createSkillBtn')}
         </button>
       </div>
     </form>
@@ -580,6 +582,7 @@ function SkillForm({
 // ─── Assign Agents Panel ──────────────────────────────────────────────────────
 
 function AssignAgentsPanel({ skill }: { skill: Skill }) {
+  const t = useTranslations('skills');
   const qc = useQueryClient();
   const { data: agents = [] } = useQuery<Agent[]>({ queryKey: ['my-agents'], queryFn: myAgentsApi.list });
   const { data: agentSkills = [] } = useQuery<any[]>({
@@ -600,7 +603,7 @@ function AssignAgentsPanel({ skill }: { skill: Skill }) {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['skill-agents', skill.id] }); qc.invalidateQueries({ queryKey: ['my-skills'] }); },
   });
 
-  if (agents.length === 0) return <p className="text-sm text-muted-foreground">No personal agents yet.</p>;
+  if (agents.length === 0) return <p className="text-sm text-muted-foreground">{t('noPersonalAgents')}</p>;
 
   return (
     <div className="space-y-2">
@@ -626,7 +629,7 @@ function AssignAgentsPanel({ skill }: { skill: Skill }) {
                 : 'bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-300'
             }`}
           >
-            {assigned ? <><X size={11} />Remove</> : <><Check size={11} />Assign</>}
+            {assigned ? <><X size={11} />{t('remove')}</> : <><Check size={11} />{t('assign')}</>}
           </button>
         </div>
       ))}
@@ -637,6 +640,7 @@ function AssignAgentsPanel({ skill }: { skill: Skill }) {
 // ─── Skill Card ───────────────────────────────────────────────────────────────
 
 function SkillCard({ skill }: { skill: Skill }) {
+  const t = useTranslations('skills');
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [showAgents, setShowAgents] = useState(false);
@@ -649,7 +653,7 @@ function SkillCard({ skill }: { skill: Skill }) {
   if (editing) {
     return (
       <div className="rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] p-5">
-        <h3 className="text-base font-semibold text-white mb-4">Edit Skill</h3>
+        <h3 className="text-base font-semibold text-white mb-4">{t('editSkillTitle')}</h3>
         <SkillForm initial={skill} onClose={() => setEditing(false)} onSuccess={() => setEditing(false)} />
       </div>
     );
@@ -678,7 +682,7 @@ function SkillCard({ skill }: { skill: Skill }) {
             </span>
           </div>
           <p className="mt-0.5 text-sm text-muted-foreground/70 line-clamp-1">{skill.description}</p>
-          <p className="mt-1.5 text-xs text-muted-foreground">Assigned to <span className="font-medium text-muted-foreground/70">{agentCount}</span> agent{agentCount !== 1 ? 's' : ''}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{t('assignedToAgents')} <span className="font-medium text-muted-foreground/70">{agentCount}</span> {agentCount !== 1 ? t('agentsSuffix') : t('agentSuffix')}</p>
         </div>
         <div className="flex shrink-0 items-center gap-1">
           <button
@@ -689,7 +693,7 @@ function SkillCard({ skill }: { skill: Skill }) {
                 : 'bg-card/5 hover:bg-card/10 border-white/10 text-muted-foreground/70 hover:text-muted-foreground/50'
             }`}
           >
-            {showAgents ? 'Hide agents' : 'Assign agents'}
+            {showAgents ? t('hideAgents') : t('assignAgents')}
           </button>
           <button
             onClick={() => setEditing(true)}
@@ -713,7 +717,7 @@ function SkillCard({ skill }: { skill: Skill }) {
       )}
       {showAgents && (
         <div className="mt-4 border-t border-[#1e1e3a] pt-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Agents</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('agentsSection')}</p>
           <AssignAgentsPanel skill={skill} />
         </div>
       )}
@@ -729,6 +733,7 @@ function HubSkillCard({ item, installed, onInstall, installing }: {
   onInstall: () => void;
   installing: boolean;
 }) {
+  const t = useTranslations('skills');
   return (
     <motion.div
       whileHover={{ y: -2 }}
@@ -758,7 +763,7 @@ function HubSkillCard({ item, installed, onInstall, installing }: {
                 : 'bg-violet-600 hover:bg-violet-900/200 text-white border-transparent'
           }`}
         >
-          {installed ? <><Check size={11} />Installed</> : installing ? 'Installing…' : <><Download size={11} />Install</>}
+          {installed ? <><Check size={11} />{t('installed')}</> : installing ? t('installingBtn') : <><Download size={11} />{t('install')}</>}
         </button>
       </div>
     </motion.div>
@@ -768,6 +773,7 @@ function HubSkillCard({ item, installed, onInstall, installing }: {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SkillsPage() {
+  const t = useTranslations('skills');
   const qc = useQueryClient();
   const [pageTab, setPageTab] = useState<'mine' | 'hub'>('mine');
   const [creating, setCreating] = useState(false);
@@ -808,36 +814,36 @@ export default function SkillsPage() {
         className="mb-6 flex items-end justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">Skills</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Reusable capabilities you can assign to your agents.</p>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">{t('title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         {pageTab === 'mine' && !creating && (
           <button
             onClick={openBlank}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
           >
-            <Plus size={14} />New skill
+            <Plus size={14} />{t('newSkill')}
           </button>
         )}
       </motion.div>
 
       {/* Tabs */}
       <div className="mb-6 flex gap-1 rounded-xl bg-[#0f0f1a] border border-[#1e1e3a] p-1 w-fit">
-        {(['mine', 'hub'] as const).map((t) => (
+        {(['mine', 'hub'] as const).map((tab) => (
           <button
-            key={t}
-            onClick={() => { setPageTab(t); setCreating(false); }}
+            key={tab}
+            onClick={() => { setPageTab(tab); setCreating(false); }}
             className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
-              pageTab === t
+              pageTab === tab
                 ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30'
                 : 'text-muted-foreground hover:text-muted-foreground/50'
             }`}
           >
-            {t === 'mine' ? (
-              `My Skills (${skills.length})`
+            {tab === 'mine' ? (
+              t('mySkillsTab').replace('{count}', String(skills.length))
             ) : (
               <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent font-semibold">
-                ✦ Skill Hub
+                {t('skillHubTab')}
               </span>
             )}
           </button>
@@ -851,7 +857,7 @@ export default function SkillsPage() {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
               <div className="rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] p-5">
                 <h3 className="text-base font-semibold text-white mb-4">
-                  {activePreset ? 'Create skill from hub' : 'Create Skill'}
+                  {activePreset ? t('createSkillFromHub') : t('createSkill')}
                 </h3>
                 <SkillForm preset={activePreset} onClose={closeForm} onSuccess={closeForm} />
               </div>
@@ -867,20 +873,20 @@ export default function SkillsPage() {
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600">
                 <Zap size={26} className="text-white" />
               </div>
-              <p className="font-semibold text-muted-foreground/50">No skills yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">Create your own or install one from the Skill Hub.</p>
+              <p className="font-semibold text-muted-foreground/50">{t('noSkillsYet')}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t('noSkillsDesc')}</p>
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={openBlank}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
                 >
-                  <Plus size={14} />New skill
+                  <Plus size={14} />{t('newSkill')}
                 </button>
                 <button
                   onClick={() => setPageTab('hub')}
                   className="px-4 py-2 rounded-lg text-sm font-medium bg-card/5 hover:bg-card/10 border border-white/10 text-muted-foreground/50 transition-all duration-200"
                 >
-                  Browse hub
+                  {t('browseHub')}
                 </button>
               </div>
             </div>
@@ -906,7 +912,7 @@ export default function SkillsPage() {
               <Input
                 value={hubSearch}
                 onChange={(e) => setHubSearch(e.target.value)}
-                placeholder="Search skills…"
+                placeholder={t('searchPlaceholder')}
                 className="pl-9 bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
               />
             </div>
@@ -928,7 +934,7 @@ export default function SkillsPage() {
           </div>
 
           {filteredHub.length === 0 ? (
-            <p className="py-12 text-center text-sm text-muted-foreground">No skills match your search.</p>
+            <p className="py-12 text-center text-sm text-muted-foreground">{t('noSearchResults')}</p>
           ) : (
             <div className="space-y-3">
               {filteredHub.map((item, i) => (

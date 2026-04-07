@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { mcpsApi, myAgentsApi } from '@/lib/api';
 import type { Mcp, CreateMcpDto, UpdateMcpDto } from '@/lib/api';
@@ -254,6 +255,7 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const t = useTranslations('mcp');
   const qc = useQueryClient();
   const [name, setName] = useState(initial?.name ?? preset?.name ?? '');
   const [description, setDescription] = useState(initial?.description ?? preset?.description ?? '');
@@ -285,11 +287,11 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
     <form onSubmit={(e) => { e.preventDefault(); if (initial) updateMutation.mutate(); else createMutation.mutate(); }} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Name</Label>
+          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('nameLabel')}</Label>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="filesystem"
+            placeholder={t('namePlaceholder')}
             required
             minLength={2}
             maxLength={80}
@@ -297,24 +299,24 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
           />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Transport</Label>
+          <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('transportLabel')}</Label>
           <Select value={transport} onValueChange={(v) => setTransport((v ?? 'SSE') as 'SSE' | 'HTTP' | 'STDIO')}>
             <SelectTrigger className="w-full bg-[#0f0f1a] border-[#1e1e3a] text-white focus:border-violet-500/50"><SelectValue /></SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
-              <SelectItem value="SSE">SSE (Server-Sent Events)</SelectItem>
-              <SelectItem value="HTTP">HTTP (Streamable)</SelectItem>
-              <SelectItem value="STDIO">STDIO (Local process)</SelectItem>
+              <SelectItem value="SSE">{t('sseTransport')}</SelectItem>
+              <SelectItem value="HTTP">{t('httpTransport')}</SelectItem>
+              <SelectItem value="STDIO">{t('stdioTransport')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Description</Label>
+        <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('descLabel')}</Label>
         <Input
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="What tools does this MCP server provide?"
+          placeholder={t('descPlaceholder')}
           required
           minLength={5}
           maxLength={500}
@@ -324,9 +326,9 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
 
       {transport !== 'STDIO' && (
         <div className="space-y-3 rounded-xl border border-[#1e1e3a] bg-card/[0.03] p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">Connection</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">{t('connectionSection')}</p>
           <div className="space-y-1.5">
-            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Server URL</Label>
+            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('serverUrlLabel')}</Label>
             <Input
               value={url}
               onChange={(e) => setUrl(e.target.value)}
@@ -337,7 +339,7 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Headers <span className="text-muted-foreground normal-case">(JSON)</span></Label>
+            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('headersLabel')}</Label>
             <Input
               value={headers}
               onChange={(e) => setHeaders(e.target.value)}
@@ -350,9 +352,9 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
 
       {transport === 'STDIO' && (
         <div className="space-y-3 rounded-xl border border-[#1e1e3a] bg-card/[0.03] p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">Process Config</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">{t('processSection')}</p>
           <div className="space-y-1.5">
-            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Command</Label>
+            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('commandLabel')}</Label>
             <Input
               value={command}
               onChange={(e) => setCommand(e.target.value)}
@@ -362,7 +364,7 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">Arguments <span className="text-muted-foreground normal-case">(comma-separated)</span></Label>
+            <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('argsLabel')}</Label>
             <Input
               value={args}
               onChange={(e) => setArgs(e.target.value)}
@@ -373,7 +375,7 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
         </div>
       )}
 
-      {error && <p className="text-sm text-red-400 font-mono">{(error as any)?.response?.data?.message ?? 'Something went wrong'}</p>}
+      {error && <p className="text-sm text-red-400 font-mono">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>}
 
       <div className="flex justify-end gap-2 pt-2">
         <button
@@ -381,14 +383,14 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
           onClick={onClose}
           className="px-4 py-2 rounded-lg text-sm font-medium bg-card/5 hover:bg-card/10 border border-white/10 text-muted-foreground/50 transition-all duration-200"
         >
-          Cancel
+          {t('cancel')}
         </button>
         <button
           type="submit"
           disabled={isPending}
           className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isPending ? 'Saving…' : initial ? 'Save changes' : 'Create MCP'}
+          {isPending ? t('savingBtn') : initial ? t('saveChanges') : t('createMcpBtn')}
         </button>
       </div>
     </form>
@@ -398,6 +400,7 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
 // ─── Assign Agents Panel ──────────────────────────────────────────────────────
 
 function AssignAgentsPanel({ mcp }: { mcp: Mcp }) {
+  const t = useTranslations('mcp');
   const qc = useQueryClient();
   const { data: agents = [] } = useQuery<Agent[]>({ queryKey: ['my-agents'], queryFn: myAgentsApi.list });
   const { data: agentMcps = [] } = useQuery<any[]>({
@@ -418,7 +421,7 @@ function AssignAgentsPanel({ mcp }: { mcp: Mcp }) {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['mcp-agents', mcp.id] }); qc.invalidateQueries({ queryKey: ['my-mcps'] }); },
   });
 
-  if (agents.length === 0) return <p className="text-sm text-muted-foreground">No personal agents yet.</p>;
+  if (agents.length === 0) return <p className="text-sm text-muted-foreground">{t('noPersonalAgents')}</p>;
 
   return (
     <div className="space-y-2">
@@ -444,7 +447,7 @@ function AssignAgentsPanel({ mcp }: { mcp: Mcp }) {
                 : 'bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-300'
             }`}
           >
-            {assigned ? <><X size={11} />Remove</> : <><Check size={11} />Assign</>}
+            {assigned ? <><X size={11} />{t('removeBtn')}</> : <><Check size={11} />{t('assignBtn')}</>}
           </button>
         </div>
       ))}
@@ -461,6 +464,7 @@ const TRANSPORT_META = {
 };
 
 function McpCard({ mcp }: { mcp: Mcp }) {
+  const t = useTranslations('mcp');
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [showAgents, setShowAgents] = useState(false);
@@ -476,7 +480,7 @@ function McpCard({ mcp }: { mcp: Mcp }) {
   if (editing) {
     return (
       <div className="rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] p-5">
-        <h3 className="text-base font-semibold text-white mb-4">Edit MCP</h3>
+        <h3 className="text-base font-semibold text-white mb-4">{t('editMcp')}</h3>
         <McpForm initial={mcp} onClose={() => setEditing(false)} onSuccess={() => setEditing(false)} />
       </div>
     );
@@ -506,7 +510,7 @@ function McpCard({ mcp }: { mcp: Mcp }) {
               {mcp.url ?? `${mcp.command} ${(mcp.args ?? []).join(' ')}`}
             </p>
           )}
-          <p className="mt-1.5 text-xs text-muted-foreground">Assigned to <span className="font-medium text-muted-foreground/70">{mcp._count?.agents ?? 0}</span> agent{(mcp._count?.agents ?? 0) !== 1 ? 's' : ''}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{t('assignedToAgents')} <span className="font-medium text-muted-foreground/70">{mcp._count?.agents ?? 0}</span> {(mcp._count?.agents ?? 0) !== 1 ? t('agentsSuffixPlural') : t('agentsSuffix')}</p>
         </div>
         <div className="flex shrink-0 items-center gap-1">
           <button
@@ -517,7 +521,7 @@ function McpCard({ mcp }: { mcp: Mcp }) {
                 : 'bg-card/5 hover:bg-card/10 border-white/10 text-muted-foreground/70 hover:text-muted-foreground/50'
             }`}
           >
-            {showAgents ? 'Hide agents' : 'Assign agents'}
+            {showAgents ? t('hideAgents') : t('assignAgents')}
           </button>
           <button
             onClick={() => setEditing(true)}
@@ -536,7 +540,7 @@ function McpCard({ mcp }: { mcp: Mcp }) {
       </div>
       {showAgents && (
         <div className="mt-4 border-t border-[#1e1e3a] pt-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Agents</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('agentsSection')}</p>
           <AssignAgentsPanel mcp={mcp} />
         </div>
       )}
@@ -552,6 +556,7 @@ function HubMcpCard({ item, installed, onInstall, installing }: {
   onInstall: () => void;
   installing: boolean;
 }) {
+  const t = useTranslations('mcp');
   return (
     <motion.div
       whileHover={{ y: -2 }}
@@ -589,7 +594,7 @@ function HubMcpCard({ item, installed, onInstall, installing }: {
                 : 'bg-violet-600 hover:bg-violet-900/200 text-white border-transparent'
           }`}
         >
-          {installed ? <><Check size={11} />Installed</> : installing ? 'Installing…' : <><Download size={11} />Install</>}
+          {installed ? <><Check size={11} />{t('installed')}</> : installing ? t('installingBtn') : <><Download size={11} />{t('install')}</>}
         </button>
       </div>
     </motion.div>
@@ -599,6 +604,7 @@ function HubMcpCard({ item, installed, onInstall, installing }: {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function McpPage() {
+  const t = useTranslations('mcp');
   const qc = useQueryClient();
   const [pageTab, setPageTab] = useState<'mine' | 'hub'>('mine');
   const [creating, setCreating] = useState(false);
@@ -635,36 +641,36 @@ export default function McpPage() {
         className="mb-6 flex items-end justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">MCP Servers</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Connect Model Context Protocol servers to extend your agents with external tools.</p>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">{t('title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         {pageTab === 'mine' && !creating && (
           <button
             onClick={() => setCreating(true)}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
           >
-            <Plus size={14} />New MCP
+            <Plus size={14} />{t('newMcp')}
           </button>
         )}
       </motion.div>
 
       {/* Tabs */}
       <div className="mb-6 flex gap-1 rounded-xl bg-[#0f0f1a] border border-[#1e1e3a] p-1 w-fit">
-        {(['mine', 'hub'] as const).map((t) => (
+        {(['mine', 'hub'] as const).map((tab) => (
           <button
-            key={t}
-            onClick={() => { setPageTab(t); setCreating(false); }}
+            key={tab}
+            onClick={() => { setPageTab(tab); setCreating(false); }}
             className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
-              pageTab === t
+              pageTab === tab
                 ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30'
                 : 'text-muted-foreground hover:text-muted-foreground/50'
             }`}
           >
-            {t === 'mine' ? (
-              `My MCP Servers (${mcps.length})`
+            {tab === 'mine' ? (
+              t('myMcpsTab', { count: mcps.length })
             ) : (
               <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent font-semibold">
-                ✦ MCP Hub
+                {t('mcpHubTab')}
               </span>
             )}
           </button>
@@ -677,7 +683,7 @@ export default function McpPage() {
           {creating && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
               <div className="rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] p-5">
-                <h3 className="text-base font-semibold text-white mb-4">Create MCP Server</h3>
+                <h3 className="text-base font-semibold text-white mb-4">{t('createMcpServer')}</h3>
                 <McpForm onClose={() => setCreating(false)} onSuccess={() => setCreating(false)} />
               </div>
             </motion.div>
@@ -692,20 +698,20 @@ export default function McpPage() {
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500">
                 <Server size={26} className="text-white" />
               </div>
-              <p className="font-semibold text-muted-foreground/50">No MCP servers yet</p>
-              <p className="mt-1 text-sm text-muted-foreground max-w-sm">Connect MCP servers to give your agents access to files, databases, APIs, and more.</p>
+              <p className="font-semibold text-muted-foreground/50">{t('noMcpsYet')}</p>
+              <p className="mt-1 text-sm text-muted-foreground max-w-sm">{t('noMcpsDesc')}</p>
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => setCreating(true)}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
                 >
-                  <Plus size={14} />New MCP
+                  <Plus size={14} />{t('newMcp')}
                 </button>
                 <button
                   onClick={() => setPageTab('hub')}
                   className="px-4 py-2 rounded-lg text-sm font-medium bg-card/5 hover:bg-card/10 border border-white/10 text-muted-foreground/50 transition-all duration-200"
                 >
-                  Browse hub
+                  {t('browseHub')}
                 </button>
               </div>
             </div>
@@ -730,7 +736,7 @@ export default function McpPage() {
               <Input
                 value={hubSearch}
                 onChange={(e) => setHubSearch(e.target.value)}
-                placeholder="Search MCP servers…"
+                placeholder={t('searchPlaceholder')}
                 className="pl-9 bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
               />
             </div>
@@ -752,7 +758,7 @@ export default function McpPage() {
           </div>
 
           {filteredHub.length === 0 ? (
-            <p className="py-12 text-center text-sm text-muted-foreground">No MCP servers match your search.</p>
+            <p className="py-12 text-center text-sm text-muted-foreground">{t('noSearchResults')}</p>
           ) : (
             <div className="space-y-3">
               {filteredHub.map((item, i) => (

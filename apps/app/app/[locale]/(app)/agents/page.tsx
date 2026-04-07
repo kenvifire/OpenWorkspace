@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { AgentVersion } from '@openworkspace/api-types';
 import { Bot, Plus, Pencil, Trash2, Eye, EyeOff, ChevronRight, Cpu, Layers, GitBranch, RotateCcw, ChevronDown, Brain, Zap, Globe, Check, X, KeyRound } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 const LLM_PROVIDERS = [
   { value: 'anthropic', label: 'Anthropic', color: 'bg-orange-100 text-orange-700' },
@@ -52,6 +52,7 @@ function AgentForm({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const t = useTranslations('agents');
   const qc = useQueryClient();
   const [name, setName] = useState(initial?.name ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
@@ -105,18 +106,18 @@ function AgentForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label>Name</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Code Assistant" required minLength={2} maxLength={80} />
+          <Label>{t('nameLabel')}</Label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('namePlaceholder')} required minLength={2} maxLength={80} />
         </div>
         <div className="space-y-1.5">
-          <Label>Description</Label>
-          <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What does this agent do?" maxLength={2000} />
+          <Label>{t('descLabel')}</Label>
+          <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t('descPlaceholder')} maxLength={2000} />
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label>LLM Provider</Label>
+          <Label>{t('providerLabel')}</Label>
           <Select value={llmProvider} onValueChange={(v) => handleProviderChange(v)}>
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
@@ -127,17 +128,17 @@ function AgentForm({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Model</Label>
-          <Input value={modelName} onChange={(e) => setModelName(e.target.value)} placeholder="e.g. claude-sonnet-4-6" required />
+          <Label>{t('modelLabel')}</Label>
+          <Input value={modelName} onChange={(e) => setModelName(e.target.value)} placeholder={t('modelPlaceholder')} required />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <Label>System Prompt</Label>
+        <Label>{t('systemPromptLabel')}</Label>
         <Textarea
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
-          placeholder="You are a helpful assistant that..."
+          placeholder={t('systemPromptPlaceholder')}
           rows={5}
           maxLength={8000}
           className="resize-none font-mono text-sm"
@@ -146,13 +147,13 @@ function AgentForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label>API Key {initial && <span className="text-muted-foreground/70">(leave blank to keep current)</span>}</Label>
+        <Label>{t('apiKeyLabel')} {initial && <span className="text-muted-foreground/70">{t('apiKeyKeepCurrent')}</span>}</Label>
         <div className="relative">
           <Input
             type={showApiKey ? 'text' : 'password'}
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder="sk-... (overrides workspace key)"
+            placeholder={t('apiKeyPlaceholder')}
             className="pr-10"
           />
           <button
@@ -167,27 +168,27 @@ function AgentForm({
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <Label>Temperature</Label>
+          <Label>{t('temperatureLabel')}</Label>
           <Input type="number" value={temperature} onChange={(e) => setTemperature(e.target.value)} min={0} max={2} step={0.1} />
         </div>
         <div className="space-y-1.5">
-          <Label>Max Tokens</Label>
-          <Input type="number" value={maxTokens} onChange={(e) => setMaxTokens(e.target.value)} min={1} placeholder="Default" />
+          <Label>{t('maxTokensLabel')}</Label>
+          <Input type="number" value={maxTokens} onChange={(e) => setMaxTokens(e.target.value)} min={1} placeholder={t('maxTokensDefault')} />
         </div>
         <div className="space-y-1.5">
-          <Label>Max Iterations</Label>
+          <Label>{t('maxIterationsLabel')}</Label>
           <Input type="number" value={maxIterations} onChange={(e) => setMaxIterations(e.target.value)} min={1} max={100} />
         </div>
       </div>
 
       {error && (
-        <p className="text-sm text-red-400">{(error as any)?.response?.data?.message ?? 'Something went wrong'}</p>
+        <p className="text-sm text-red-400">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>
       )}
 
       <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+        <Button type="button" variant="outline" onClick={onClose}>{t('cancel')}</Button>
         <Button type="submit" disabled={isPending}>
-          {isPending ? 'Saving…' : initial ? 'Save changes' : 'Create agent'}
+          {isPending ? t('savingBtn') : initial ? t('saveChanges') : t('createAgentBtn')}
         </Button>
       </div>
     </form>
@@ -197,6 +198,7 @@ function AgentForm({
 // ─── Add to Project dialog ────────────────────────────────────────────────────
 
 function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => void }) {
+  const t = useTranslations('agents');
   const locale = useLocale();
   const qc = useQueryClient();
   const [workspaceSlug, setWorkspaceSlug] = useState('');
@@ -231,15 +233,15 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
   if (rawKey) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">Agent added. The project key is shown once — store it securely.</p>
+        <p className="text-sm text-muted-foreground">{t('agentAdded')}</p>
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <code className="flex-1 break-all font-mono text-xs text-amber-900">{rawKey}</code>
-          <Button size="sm" variant="outline" onClick={copy}>{copied ? 'Copied!' : 'Copy'}</Button>
+          <Button size="sm" variant="outline" onClick={copy}>{copied ? t('copied') : t('copy')}</Button>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Close</Button>
+          <Button variant="outline" onClick={onClose}>{t('close')}</Button>
           <Link href={`/${locale}/workspaces/${workspaceSlug}/projects/${projectId}/settings`} className={buttonVariants()}>
-            View project <ChevronRight size={14} className="ml-1" />
+            {t('viewProject')} <ChevronRight size={14} className="ml-1" />
           </Link>
         </div>
       </div>
@@ -249,9 +251,9 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
-        <Label>Workspace</Label>
+        <Label>{t('workspaceLabel')}</Label>
         <Select value={workspaceSlug} onValueChange={(v) => { setWorkspaceSlug(v ?? ''); setProjectId(''); }}>
-          <SelectTrigger><SelectValue placeholder="Select workspace" /></SelectTrigger>
+          <SelectTrigger><SelectValue placeholder={t('selectWorkspace')} /></SelectTrigger>
           <SelectContent>
             {workspaces.map((w: any) => <SelectItem key={w.slug} value={w.slug}>{w.name}</SelectItem>)}
           </SelectContent>
@@ -259,9 +261,9 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
       </div>
       {selectedWorkspace && (
         <div className="space-y-1.5">
-          <Label>Project</Label>
+          <Label>{t('projectLabel')}</Label>
           <Select value={projectId} onValueChange={(v) => setProjectId(v ?? '')}>
-            <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t('selectProject')} /></SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
               {projects.map((p: Project) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
             </SelectContent>
@@ -270,7 +272,7 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
       )}
       {projectId && (
         <div className="space-y-1.5">
-          <Label>Role</Label>
+          <Label>{t('roleLabel')}</Label>
           <Select value={role} onValueChange={(v) => setRole(v ?? 'DEVELOPER')}>
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
@@ -279,11 +281,11 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
           </Select>
         </div>
       )}
-      {hire.error && <p className="text-sm text-red-400">{(hire.error as any)?.response?.data?.message ?? 'Failed to add agent'}</p>}
+      {hire.error && <p className="text-sm text-red-400">{(hire.error as any)?.response?.data?.message ?? t('failedToAdd')}</p>}
       <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={onClose}>Cancel</Button>
+        <Button variant="outline" onClick={onClose}>{t('cancel')}</Button>
         <Button onClick={() => hire.mutate()} disabled={!projectId || hire.isPending}>
-          {hire.isPending ? 'Adding…' : 'Add to project'}
+          {hire.isPending ? t('adding') : t('addToProject')}
         </Button>
       </div>
     </div>
@@ -299,6 +301,7 @@ const PROVIDER_COLORS: Record<string, string> = {
 };
 
 function AgentVersionsPanel({ agent }: { agent: Agent }) {
+  const t = useTranslations('agents');
   const qc = useQueryClient();
   const [publishLabel, setPublishLabel] = useState('');
 
@@ -331,33 +334,33 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <GitBranch size={13} className="text-muted-foreground/70" />
-          <span className="text-xs font-semibold text-muted-foreground">{versions.length}/3 versions</span>
+          <span className="text-xs font-semibold text-muted-foreground">{t('versionsCount').replace('{count}', String(versions.length))}</span>
           {activeVersionId === null && versions.length > 0 && (
-            <span className="text-[10px] text-muted-foreground/70">(using draft)</span>
+            <span className="text-[10px] text-muted-foreground/70">{t('usingDraft')}</span>
           )}
         </div>
         {versions.length < 3 && (
           <div className="flex items-center gap-1.5">
             <input
               type="text"
-              placeholder="Label (optional)"
+              placeholder={t('labelOptionalPlaceholder')}
               value={publishLabel}
               onChange={(e) => setPublishLabel(e.target.value)}
               className="h-7 w-32 rounded-md border border-border bg-card px-2.5 text-xs outline-none focus:border-zinc-400"
             />
             <Button size="sm" className="h-7 text-xs" disabled={publishVersion.isPending} onClick={() => publishVersion.mutate()}>
-              {publishVersion.isPending ? '…' : 'Publish'}
+              {publishVersion.isPending ? '…' : t('publish')}
             </Button>
           </div>
         )}
       </div>
 
       {publishVersion.isError && (
-        <p className="text-xs text-red-400">{(publishVersion.error as any)?.response?.data?.message ?? 'Failed to publish'}</p>
+        <p className="text-xs text-red-400">{(publishVersion.error as any)?.response?.data?.message ?? t('failedToPublish')}</p>
       )}
 
       {versions.length === 0 ? (
-        <p className="text-xs text-muted-foreground/70">No versions yet. Publish to snapshot the current config.</p>
+        <p className="text-xs text-muted-foreground/70">{t('noVersionsYet')}</p>
       ) : (
         <div className="space-y-1.5">
           {versions.map((v) => {
@@ -371,11 +374,11 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
                   v{v.versionNumber}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-foreground/80 truncate">{v.label ?? `Version ${v.versionNumber}`}</p>
+                  <p className="text-xs font-medium text-foreground/80 truncate">{v.label ?? t('versionLabel').replace('{number}', String(v.versionNumber))}</p>
                   <p className="text-[10px] text-muted-foreground/70">{new Date(v.publishedAt).toLocaleDateString()}</p>
                 </div>
                 {isActive && (
-                  <span className="rounded-full bg-sky-900/40 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300">Active</span>
+                  <span className="rounded-full bg-sky-900/40 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300">{t('activeVersionBadge')}</span>
                 )}
                 <div className="flex items-center gap-1 shrink-0">
                   {isActive ? (
@@ -384,7 +387,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
                       disabled={activateVersion.isPending}
                       className="flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      <RotateCcw size={9} /> Draft
+                      <RotateCcw size={9} /> {t('draftBtn')}
                     </button>
                   ) : (
                     <button
@@ -392,7 +395,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
                       disabled={activateVersion.isPending}
                       className="flex items-center gap-1 rounded-md bg-sky-600 px-2 py-0.5 text-[10px] font-medium text-white hover:bg-sky-700 transition-colors"
                     >
-                      Activate
+                      {t('activateBtn')}
                     </button>
                   )}
                   <button
@@ -415,6 +418,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
 // ─── Agent Capabilities Panel (Skills + MCPs) ─────────────────────────────────
 
 function AgentCapabilitiesPanel({ agent }: { agent: Agent }) {
+  const t = useTranslations('agents');
   const qc = useQueryClient();
   const [tab, setTab] = useState<'skills' | 'mcps'>('skills');
 
@@ -471,16 +475,16 @@ function AgentCapabilitiesPanel({ agent }: { agent: Agent }) {
     <div className="mt-3 rounded-xl border border-border/50 bg-background p-4 space-y-3">
       {/* Tabs */}
       <div className="flex gap-3 border-b border-border">
-        {(['skills', 'mcps'] as const).map((t) => (
+        {(['skills', 'mcps'] as const).map((capTab) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={capTab}
+            onClick={() => setTab(capTab)}
             className={`pb-2 text-xs font-semibold uppercase tracking-wide border-b-2 transition-colors ${
-              tab === t ? 'border-zinc-800 text-foreground' : 'border-transparent text-muted-foreground/70 hover:text-muted-foreground'
+              tab === capTab ? 'border-zinc-800 text-foreground' : 'border-transparent text-muted-foreground/70 hover:text-muted-foreground'
             }`}
           >
-            {t === 'skills' ? (
-              <span className="flex items-center gap-1.5"><Zap size={11} /> Skills</span>
+            {capTab === 'skills' ? (
+              <span className="flex items-center gap-1.5"><Zap size={11} /> {t('noSkills').split('.')[0].replace('No skills yet', 'Skills')}</span>
             ) : (
               <span className="flex items-center gap-1.5"><Globe size={11} /> MCPs</span>
             )}
@@ -491,7 +495,7 @@ function AgentCapabilitiesPanel({ agent }: { agent: Agent }) {
       {/* Skills tab */}
       {tab === 'skills' && (
         allSkills.length === 0 ? (
-          <p className="text-xs text-muted-foreground/70">No skills yet. Create one in the Skills page.</p>
+          <p className="text-xs text-muted-foreground/70">{t('noSkillsCapabilities')}</p>
         ) : (
           <div className="space-y-1.5">
             {allSkills.map((skill) => {
