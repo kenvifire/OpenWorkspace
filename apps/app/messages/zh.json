@@ -275,7 +275,8 @@
     "paymentMethods": "付款方式",
     "paymentMethodsDesc": "通过 Stripe 管理您保存的付款方式。",
     "paymentMethodsHint": "付款方式管理需要 Stripe 客户设置，请联系支持进行配置。",
-    "goToStripe": "前往 Stripe 控制台"
+    "goToStripe": "前往 Stripe 控制台",
+    "billing": "账单"
   },
   "providers": {
     "title": "提供者控制台",

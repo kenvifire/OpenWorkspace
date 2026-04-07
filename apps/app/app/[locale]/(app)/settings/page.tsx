@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuth } from '@/contexts/auth';
 import { auth } from '@/lib/firebase';
 import QRCode from 'react-qr-code';
@@ -44,13 +44,6 @@ const AVATAR_GRADIENTS = [
   'from-slate-500 to-zinc-600',
 ];
 
-const tabs = [
-  { id: 'profile', label: 'Profile', icon: User },
-  { id: 'account', label: 'Account', icon: Shield },
-  { id: 'language', label: 'Language', icon: Globe },
-  { id: 'billing', label: 'Billing', icon: CreditCard },
-];
-
 const languages = [
   { code: 'en', label: 'English', nativeLabel: 'English', flag: '🇺🇸' },
   { code: 'zh', label: 'Chinese', nativeLabel: '中文', flag: '🇨🇳' },
@@ -65,24 +58,19 @@ const languages = [
 
 function getFriendlyFirebaseError(code: string, fallback: string): string {
   switch (code) {
-    case 'auth/wrong-password':
-      return 'Incorrect password';
-    case 'auth/email-already-in-use':
-      return 'That email is already in use';
-    case 'auth/invalid-email':
-      return 'Invalid email address';
-    case 'auth/weak-password':
-      return 'Password must be at least 6 characters';
-    case 'auth/requires-recent-login':
-      return 'Please sign out and sign in again before making this change';
-    default:
-      return fallback;
+    case 'auth/wrong-password': return 'Incorrect password';
+    case 'auth/email-already-in-use': return 'That email is already in use';
+    case 'auth/invalid-email': return 'Invalid email address';
+    case 'auth/weak-password': return 'Password must be at least 6 characters';
+    case 'auth/requires-recent-login': return 'Please sign out and sign in again before making this change';
+    default: return fallback;
   }
 }
 
 // ─── Profile Tab ─────────────────────────────────────────────────────────────
 
 function ProfileTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['user']> }) {
+  const t = useTranslations('settings');
   const [displayName, setDisplayName] = useState(user.displayName ?? '');
   const [avatarGradient, setAvatarGradient] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -112,7 +100,7 @@ function ProfileTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
   };
 
   const creationTime = user.metadata.creationTime
-    ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', {
+    ? new Date(user.metadata.creationTime).toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -122,8 +110,8 @@ function ProfileTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Profile</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Manage your public profile information.</p>
+        <h2 className="text-xl font-semibold text-foreground">{t('profile')}</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('profileDesc')}</p>
       </div>
 
       {/* Avatar */}
@@ -159,23 +147,23 @@ function ProfileTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
       {/* Form */}
       <div className="flex flex-col gap-4 max-w-md">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="displayName">Display name</Label>
+          <Label htmlFor="displayName">{t('displayName')}</Label>
           <Input
             id="displayName"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Your name"
+            placeholder={t('yourNamePlaceholder')}
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label>Email</Label>
+          <Label>{t('emailLabel')}</Label>
           <Input value={user.email ?? ''} readOnly className="opacity-60 cursor-not-allowed" />
-          <p className="text-xs text-muted-foreground">To change your email, go to the Account tab.</p>
+          <p className="text-xs text-muted-foreground">{t('emailHint')}</p>
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label>Account created</Label>
+          <Label>{t('accountCreated')}</Label>
           <p className="text-sm text-muted-foreground py-1">{creationTime}</p>
         </div>
 
@@ -187,16 +175,13 @@ function ProfileTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
         )}
 
         <div className="flex items-center gap-3 pt-1">
-          <Button
-            onClick={handleSave}
-            disabled={!displayName.trim() || saving}
-          >
+          <Button onClick={handleSave} disabled={!displayName.trim() || saving}>
             {saving ? (
               <Loader2 size={14} className="animate-spin mr-1.5" />
             ) : saveSuccess ? (
               <Check size={14} className="mr-1.5 text-green-400" />
             ) : null}
-            {saveSuccess ? 'Saved!' : 'Save changes'}
+            {saveSuccess ? t('saved') : t('saveChanges')}
           </Button>
         </div>
       </div>
@@ -207,6 +192,8 @@ function ProfileTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
 // ─── Account Tab ─────────────────────────────────────────────────────────────
 
 function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['user']> }) {
+  const t = useTranslations('settings');
+  const tc = useTranslations('common');
   const isPasswordUser = user.providerData.some((p) => p.providerId === 'password');
 
   // 2FA state
@@ -245,7 +232,7 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
       setTfaStep('idle');
       setTfaToken('');
     } catch {
-      setTfaError('Invalid code. Please try again.');
+      setTfaError(t('invalidCode'));
     } finally {
       setTfaSaving(false);
     }
@@ -260,7 +247,7 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
       setTfaStep('idle');
       setTfaToken('');
     } catch {
-      setTfaError('Invalid code. Please try again.');
+      setTfaError(t('invalidCode'));
     } finally {
       setTfaSaving(false);
     }
@@ -302,11 +289,11 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
   const handlePasswordChange = async () => {
     setPwError('');
     if (newPassword.length < 8) {
-      setPwError('New password must be at least 8 characters');
+      setPwError(t('passwordTooShort'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPwError('Passwords do not match');
+      setPwError(t('passwordMismatch'));
       return;
     }
     setPwSaving(true);
@@ -329,42 +316,42 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Account</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Update your email address and password.</p>
+        <h2 className="text-xl font-semibold text-foreground">{t('account')}</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('accountDesc')}</p>
       </div>
 
       {/* Email card */}
       <div className="rounded-xl border border-border bg-card p-5 flex flex-col gap-4">
         <div>
-          <h3 className="font-medium text-foreground">Email address</h3>
-          <p className="text-sm text-muted-foreground mt-0.5">Current: {user.email}</p>
+          <h3 className="font-medium text-foreground">{t('emailAddress')}</h3>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('currentEmail')} {user.email}</p>
         </div>
 
         {emailStep === 'sent' ? (
           <div className="flex items-start gap-3 rounded-lg bg-emerald-950/40 border border-emerald-800/50 px-4 py-3 text-sm text-emerald-400">
             <Check size={15} className="mt-0.5 shrink-0" />
-            <span>Check your new inbox — click the link to confirm the change.</span>
+            <span>{t('verificationSent')}</span>
           </div>
         ) : (
           <div className="flex flex-col gap-3 max-w-sm">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="newEmail">New email address</Label>
+              <Label htmlFor="newEmail">{t('newEmail')}</Label>
               <Input
                 id="newEmail"
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                placeholder="new@example.com"
+                placeholder={t('newEmailPlaceholder')}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="emailPassword">Confirm password</Label>
+              <Label htmlFor="emailPassword">{t('confirmPassword')}</Label>
               <Input
                 id="emailPassword"
                 type="password"
                 value={emailPassword}
                 onChange={(e) => setEmailPassword(e.target.value)}
-                placeholder="Your current password"
+                placeholder={t('currentPasswordHint')}
               />
             </div>
             {emailError && (
@@ -380,7 +367,7 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
               className="w-fit"
             >
               {emailSaving && <Loader2 size={14} className="animate-spin mr-1.5" />}
-              Send verification email
+              {t('sendVerification')}
             </Button>
           </div>
         )}
@@ -390,19 +377,19 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
       {!isPasswordUser ? (
         <div className="flex items-start gap-3 rounded-xl border border-border bg-card px-5 py-4 text-sm text-muted-foreground">
           <Shield size={16} className="mt-0.5 shrink-0 text-sky-400" />
-          <span>Your account uses Google sign-in. Password changes are managed through Google.</span>
+          <span>{t('googleSignIn')}</span>
         </div>
       ) : (
         <div className="rounded-xl border border-border bg-card p-5 flex flex-col gap-4">
           <div>
-            <h3 className="font-medium text-foreground">Password</h3>
-            <p className="text-sm text-muted-foreground mt-0.5">Choose a strong password.</p>
+            <h3 className="font-medium text-foreground">{t('passwordSection')}</h3>
+            <p className="text-sm text-muted-foreground mt-0.5">{t('passwordDesc')}</p>
           </div>
 
           <div className="flex flex-col gap-3 max-w-sm">
             {/* Current password */}
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="currentPw">Current password</Label>
+              <Label htmlFor="currentPw">{t('currentPasswordLabel')}</Label>
               <div className="relative">
                 <Input
                   id="currentPw"
@@ -425,14 +412,14 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
 
             {/* New password */}
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="newPw">New password</Label>
+              <Label htmlFor="newPw">{t('newPasswordLabel')}</Label>
               <div className="relative">
                 <Input
                   id="newPw"
                   type={showNewPw ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Min. 8 characters"
+                  placeholder={t('newPasswordPlaceholder')}
                   className="pr-9"
                 />
                 <button
@@ -448,14 +435,14 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
 
             {/* Confirm password */}
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="confirmPw">Confirm new password</Label>
+              <Label htmlFor="confirmPw">{t('confirmNewPassword')}</Label>
               <div className="relative">
                 <Input
                   id="confirmPw"
                   type={showConfirmPw ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Repeat new password"
+                  placeholder={t('repeatNewPassword')}
                   className="pr-9"
                 />
                 <button
@@ -488,7 +475,7 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
                 ) : pwSuccess ? (
                   <Check size={14} className="mr-1.5 text-green-400" />
                 ) : null}
-                {pwSuccess ? 'Updated!' : 'Update password'}
+                {pwSuccess ? t('updated') : t('updatePassword')}
               </Button>
             </div>
           </div>
@@ -503,10 +490,8 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
               <Shield size={18} className="text-primary" />
             </div>
             <div>
-              <h3 className="font-medium text-foreground">Two-Factor Authentication</h3>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Add an extra layer of security using an authenticator app.
-              </p>
+              <h3 className="font-medium text-foreground">{t('twoFactor')}</h3>
+              <p className="text-sm text-muted-foreground mt-0.5">{t('twoFactorDesc')}</p>
             </div>
           </div>
           <span
@@ -517,11 +502,10 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
                 : 'bg-muted text-muted-foreground',
             )}
           >
-            {totpEnabled ? 'Enabled' : 'Disabled'}
+            {totpEnabled ? t('twoFactorEnabled') : t('twoFactorDisabled')}
           </span>
         </div>
 
-        {/* Idle state */}
         {tfaStep === 'idle' && (
           <div>
             {totpEnabled ? (
@@ -531,52 +515,45 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
                 className="text-destructive border-destructive/50 hover:bg-destructive/10"
                 onClick={() => { setTfaStep('disabling'); setTfaToken(''); setTfaError(''); }}
               >
-                Disable 2FA
+                {t('disable2fa')}
               </Button>
             ) : (
               <Button variant="outline" size="sm" onClick={handleStartEnable}>
-                Enable 2FA
+                {t('enable2fa')}
               </Button>
             )}
           </div>
         )}
 
-        {/* Loading */}
         {tfaStep === 'loading' && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
             <Loader2 size={14} className="animate-spin" />
-            Loading setup…
+            {t('loadingSetup')}
           </div>
         )}
 
-        {/* Scan QR */}
         {tfaStep === 'scan' && setupData && (
           <div className="flex flex-col items-center gap-4 py-4">
             <div className="rounded-xl bg-white p-3">
               <QRCode value={setupData.otpauthUrl} size={180} />
             </div>
-            <p className="text-xs text-muted-foreground text-center max-w-xs">
-              Scan this QR code with Google Authenticator, Authy, or any TOTP app.
-            </p>
+            <p className="text-xs text-muted-foreground text-center max-w-xs">{t('scanQr')}</p>
             <details className="w-full">
-              <summary className="text-xs text-muted-foreground cursor-pointer">
-                Can&apos;t scan? Enter key manually
-              </summary>
+              <summary className="text-xs text-muted-foreground cursor-pointer">{t('cantScan')}</summary>
               <code className="mt-2 block break-all rounded bg-muted px-3 py-2 text-xs font-mono text-foreground">
                 {setupData.secret}
               </code>
             </details>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setTfaStep('idle')}>Cancel</Button>
-              <Button size="sm" onClick={() => setTfaStep('verify')}>I&apos;ve scanned it →</Button>
+              <Button variant="outline" size="sm" onClick={() => setTfaStep('idle')}>{tc('cancel')}</Button>
+              <Button size="sm" onClick={() => setTfaStep('verify')}>{t('scannedIt')}</Button>
             </div>
           </div>
         )}
 
-        {/* Verify token to enable */}
         {tfaStep === 'verify' && (
           <div className="space-y-3 max-w-sm">
-            <p className="text-sm text-muted-foreground">Enter the 6-digit code from your app to confirm setup:</p>
+            <p className="text-sm text-muted-foreground">{t('enterCode')}</p>
             <Input
               type="text"
               inputMode="numeric"
@@ -588,22 +565,17 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
             />
             {tfaError && <p className="text-xs text-red-400">{tfaError}</p>}
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => { setTfaStep('idle'); setTfaToken(''); setTfaError(''); }}>Cancel</Button>
-              <Button
-                size="sm"
-                disabled={tfaToken.length !== 6 || tfaSaving}
-                onClick={handleEnableTfa}
-              >
-                {tfaSaving ? <Loader2 size={14} className="animate-spin" /> : 'Enable 2FA'}
+              <Button variant="outline" size="sm" onClick={() => { setTfaStep('idle'); setTfaToken(''); setTfaError(''); }}>{tc('cancel')}</Button>
+              <Button size="sm" disabled={tfaToken.length !== 6 || tfaSaving} onClick={handleEnableTfa}>
+                {tfaSaving ? <Loader2 size={14} className="animate-spin" /> : t('enable2fa')}
               </Button>
             </div>
           </div>
         )}
 
-        {/* Disable flow */}
         {tfaStep === 'disabling' && (
           <div className="space-y-3 max-w-sm">
-            <p className="text-sm text-muted-foreground">Enter your current 6-digit code to disable 2FA:</p>
+            <p className="text-sm text-muted-foreground">{t('enterCurrentCode')}</p>
             <Input
               type="text"
               inputMode="numeric"
@@ -615,14 +587,9 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
             />
             {tfaError && <p className="text-xs text-red-400">{tfaError}</p>}
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => { setTfaStep('idle'); setTfaToken(''); setTfaError(''); }}>Cancel</Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                disabled={tfaToken.length !== 6 || tfaSaving}
-                onClick={handleDisableTfa}
-              >
-                {tfaSaving ? <Loader2 size={14} className="animate-spin" /> : 'Disable 2FA'}
+              <Button variant="outline" size="sm" onClick={() => { setTfaStep('idle'); setTfaToken(''); setTfaError(''); }}>{tc('cancel')}</Button>
+              <Button variant="destructive" size="sm" disabled={tfaToken.length !== 6 || tfaSaving} onClick={handleDisableTfa}>
+                {tfaSaving ? <Loader2 size={14} className="animate-spin" /> : t('disable2fa')}
               </Button>
             </div>
           </div>
@@ -635,14 +602,15 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
 // ─── Language Tab ─────────────────────────────────────────────────────────────
 
 function LanguageTab() {
+  const t = useTranslations('settings');
   const locale = useLocale();
   const router = useRouter();
 
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Language</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Choose the display language for your interface.</p>
+        <h2 className="text-xl font-semibold text-foreground">{t('language')}</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('languageDesc')}</p>
       </div>
 
       <div className="flex flex-wrap gap-4">
@@ -678,13 +646,15 @@ function LanguageTab() {
 // ─── Billing Tab ─────────────────────────────────────────────────────────────
 
 function BillingTab() {
+  const t = useTranslations('settings');
+  const tc = useTranslations('common');
   const locale = useLocale();
 
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Billing</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Manage your subscription, usage, and payment details.</p>
+        <h2 className="text-xl font-semibold text-foreground">{t('billing')}</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('billingDesc')}</p>
       </div>
 
       {/* Usage card */}
@@ -693,19 +663,14 @@ function BillingTab() {
           <CreditCard size={18} className="text-primary" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-foreground">Billing &amp; Usage</h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            View your current billing cycle, usage breakdown, and make payments.
-          </p>
+          <h3 className="font-medium text-foreground">{t('billingUsage')}</h3>
+          <p className="text-sm text-muted-foreground mt-1">{t('billingUsageDesc')}</p>
           <div className="mt-4">
             <Link
               href={`/${locale}/billing`}
-              className={cn(
-                buttonVariants({ variant: 'default', size: 'sm' }),
-                'gap-1.5',
-              )}
+              className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'gap-1.5')}
             >
-              Go to Billing
+              {t('goToBilling')}
               <ChevronRight size={14} />
             </Link>
           </div>
@@ -719,18 +684,14 @@ function BillingTab() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-medium text-foreground">Payment Methods</h3>
-            <Badge variant="secondary" className="text-xs">Coming soon</Badge>
+            <h3 className="font-medium text-foreground">{t('paymentMethods')}</h3>
+            <Badge variant="secondary" className="text-xs">{tc('comingSoon')}</Badge>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage your saved payment methods via Stripe.
-          </p>
-          <p className="text-xs text-muted-foreground/70 mt-2">
-            Payment method management requires Stripe Customer setup. Contact support to configure.
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">{t('paymentMethodsDesc')}</p>
+          <p className="text-xs text-muted-foreground/70 mt-2">{t('paymentMethodsHint')}</p>
           <div className="mt-4">
             <Button variant="outline" size="sm" disabled className="gap-1.5 opacity-50 cursor-not-allowed">
-              Go to Stripe Dashboard
+              {t('goToStripe')}
               <ChevronRight size={14} />
             </Button>
           </div>
@@ -743,8 +704,16 @@ function BillingTab() {
 // ─── Main Settings Page ───────────────────────────────────────────────────────
 
 export default function SettingsPage() {
+  const t = useTranslations('settings');
   const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
+
+  const tabs = [
+    { id: 'profile', label: t('profile'), icon: User },
+    { id: 'account', label: t('account'), icon: Shield },
+    { id: 'language', label: t('language'), icon: Globe },
+    { id: 'billing', label: t('billing'), icon: CreditCard },
+  ];
 
   if (loading) {
     return (
@@ -767,9 +736,9 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-syne)' }}>
-          Settings
+          {t('title')}
         </h1>
-        <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
+        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Horizontal tab nav */}

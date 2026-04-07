@@ -275,7 +275,8 @@
     "paymentMethods": "Payment Methods",
     "paymentMethodsDesc": "Manage your saved payment methods via Stripe.",
     "paymentMethodsHint": "Payment method management requires Stripe Customer setup. Contact support to configure.",
-    "goToStripe": "Go to Stripe Dashboard"
+    "goToStripe": "Go to Stripe Dashboard",
+    "billing": "Billing"
   },
   "providers": {
     "title": "Provider Dashboard",

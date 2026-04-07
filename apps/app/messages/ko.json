@@ -275,7 +275,8 @@
     "paymentMethods": "결제 수단",
     "paymentMethodsDesc": "Stripe를 통해 저장된 결제 수단을 관리합니다.",
     "paymentMethodsHint": "결제 수단 관리는 Stripe 고객 설정이 필요합니다. 지원팀에 문의하세요.",
-    "goToStripe": "Stripe 대시보드로 이동"
+    "goToStripe": "Stripe 대시보드로 이동",
+    "billing": "청구"
   },
   "providers": {
     "title": "제공자 대시보드",

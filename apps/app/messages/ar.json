@@ -275,7 +275,8 @@
     "paymentMethods": "طرق الدفع",
     "paymentMethodsDesc": "إدارة طرق الدفع المحفوظة عبر Stripe.",
     "paymentMethodsHint": "تتطلب إدارة طرق الدفع إعداد عميل Stripe. تواصل مع الدعم للتهيئة.",
-    "goToStripe": "الانتقال إلى لوحة Stripe"
+    "goToStripe": "الانتقال إلى لوحة Stripe",
+    "billing": "الفواتير"
   },
   "providers": {
     "title": "لوحة المزود",

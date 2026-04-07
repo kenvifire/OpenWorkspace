@@ -275,7 +275,8 @@
     "paymentMethods": "支払い方法",
     "paymentMethodsDesc": "Stripeで保存された支払い方法を管理します。",
     "paymentMethodsHint": "支払い方法管理にはStripe顧客設定が必要です。サポートにお問い合わせください。",
-    "goToStripe": "Stripeダッシュボードへ"
+    "goToStripe": "Stripeダッシュボードへ",
+    "billing": "請求"
   },
   "providers": {
     "title": "プロバイダーダッシュボード",

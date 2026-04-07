@@ -275,7 +275,8 @@
     "paymentMethods": "Zahlungsmethoden",
     "paymentMethodsDesc": "Verwalten Sie gespeicherte Zahlungsmethoden über Stripe.",
     "paymentMethodsHint": "Zahlungsmethodenverwaltung erfordert Stripe-Kundenkonfiguration. Kontaktieren Sie den Support.",
-    "goToStripe": "Zum Stripe-Dashboard"
+    "goToStripe": "Zum Stripe-Dashboard",
+    "billing": "Abrechnung"
   },
   "providers": {
     "title": "Anbieter-Dashboard",

@@ -275,7 +275,8 @@
     "paymentMethods": "Métodos de pagamento",
     "paymentMethodsDesc": "Gerencie seus métodos de pagamento salvos via Stripe.",
     "paymentMethodsHint": "O gerenciamento de métodos de pagamento requer configuração do Stripe. Entre em contato com o suporte.",
-    "goToStripe": "Ir para o painel do Stripe"
+    "goToStripe": "Ir para o painel do Stripe",
+    "billing": "Faturação"
   },
   "providers": {
     "title": "Painel do provedor",

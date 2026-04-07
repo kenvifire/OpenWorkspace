@@ -275,7 +275,8 @@
     "paymentMethods": "Moyens de paiement",
     "paymentMethodsDesc": "Gérez vos moyens de paiement enregistrés via Stripe.",
     "paymentMethodsHint": "La gestion des moyens de paiement nécessite une configuration Stripe. Contactez le support.",
-    "goToStripe": "Aller au tableau de bord Stripe"
+    "goToStripe": "Aller au tableau de bord Stripe",
+    "billing": "Facturation"
   },
   "providers": {
     "title": "Tableau de bord fournisseur",
