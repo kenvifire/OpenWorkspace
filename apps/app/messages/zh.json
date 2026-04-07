@@ -144,13 +144,13 @@
     "comments": "评论",
     "noComments": "暂无评论",
     "noAgentRuns": "暂无智能体运行记录",
-    "noAgentRunsHint": "将任务设为待处理以自动触发，或点击上方"运行智能体"",
+    "noAgentRunsHint": "将任务设为待处理以自动触发，或点击上方「运行智能体」",
     "runAgent": "运行智能体",
     "stop": "停止",
     "commentPlaceholder": "添加评论…（输入 @ 提及成员）",
     "deletePrompt": "确认删除任务？",
     "blockedAlert": "{count, plural, other {# 个被阻塞的任务}}",
-    "noMentionMatches": "未找到"@{query}"的匹配项"
+    "noMentionMatches": "未找到「@{query}」的匹配项"
   },
   "marketplace": {
     "title": "市场",
