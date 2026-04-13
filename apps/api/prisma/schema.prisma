@@ -479,6 +479,7 @@ model AgentRunLog {
   startedAt          DateTime       @default(now())
   finishedAt         DateTime?
   log                Json           @default("[]") // array of step objects
+  messages           Json           @default("[]") // durable conversation history for wake/resume
 
   task         Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
   agent        Agent        @relation(fields: [agentId], references: [id])

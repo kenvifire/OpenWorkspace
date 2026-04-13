@@ -116,6 +116,7 @@ async def _process_job(job: dict) -> None:
     project_agent_id: str = job["projectAgentId"]
     project_id: str = job["projectId"]
     workspace_id: str = job["workspaceId"]
+    is_wake: bool = job.get("wake", "false").lower() == "true"
 
     pool = await get_pool()
 
@@ -290,12 +291,31 @@ async def _process_job(job: dict) -> None:
     )
     await events.publish("task:updated", {"projectId": project_id, "task": {"id": task_id, "status": "IN_PROGRESS"}})
 
-    messages: list[dict] = [{"role": "user", "content": initial_message}]
-    step_log: list[dict] = []
-    iterations = 0
+    # ── Wake/Resume: load saved conversation history if this is a resumed run ──
+    saved_run = await pool.fetchrow(
+        'SELECT messages, log, iterations, "totalInputTokens", "totalOutputTokens" FROM "AgentRunLog" WHERE id = $1',
+        run_log_id,
+    )
+    if is_wake and saved_run and saved_run["messages"]:
+        saved_messages = json.loads(saved_run["messages"]) if isinstance(saved_run["messages"], str) else saved_run["messages"]
+    else:
+        saved_messages = []
+
+    if saved_messages:
+        log.info("Run %s: waking from %d saved messages (iteration %d).", run_log_id, len(saved_messages), saved_run["iterations"])
+        messages: list[dict] = saved_messages
+        step_log: list[dict] = json.loads(saved_run["log"]) if isinstance(saved_run["log"], str) else list(saved_run["log"])
+        iterations = saved_run["iterations"]
+        total_input_tokens = saved_run["totalInputTokens"]
+        total_output_tokens = saved_run["totalOutputTokens"]
+    else:
+        messages: list[dict] = [{"role": "user", "content": initial_message}]
+        step_log: list[dict] = []
+        iterations = 0
+        total_input_tokens = 0
+        total_output_tokens = 0
+
     final_status = "COMPLETED"
-    total_input_tokens = 0
-    total_output_tokens = 0
 
     try:
         while iterations < max_iterations:
@@ -382,8 +402,8 @@ async def _process_job(job: dict) -> None:
 
             step_log.append(step)
 
-            # Flush log progress after every iteration so UI shows live progress
-            await _save_run_log(pool, run_log_id, iterations, "RUNNING", step_log, total_input_tokens, total_output_tokens)
+            # Flush log progress after every iteration so UI shows live progress + persist messages for wake/resume
+            await _save_run_log(pool, run_log_id, iterations, "RUNNING", step_log, total_input_tokens, total_output_tokens, messages)
 
         else:
             final_status = "MAX_ITERATIONS"
@@ -466,6 +486,7 @@ async def _resolve_api_key(
 async def _save_run_log(
     pool, run_log_id: str, iterations: int, status: str, steps: list[dict],
     total_input_tokens: int = 0, total_output_tokens: int = 0,
+    messages: list[dict] | None = None,
 ) -> None:
     await pool.execute(
         """
@@ -475,14 +496,16 @@ async def _save_run_log(
             log = $3::jsonb,
             "totalInputTokens" = $4,
             "totalOutputTokens" = $5,
+            messages = $6::jsonb,
             "finishedAt" = CASE WHEN $1 != 'RUNNING' THEN NOW() ELSE "finishedAt" END
-        WHERE id = $6
+        WHERE id = $7
         """,
         status,
         iterations,
         json.dumps(steps),
         total_input_tokens,
         total_output_tokens,
+        json.dumps(messages or []),
         run_log_id,
     )
 

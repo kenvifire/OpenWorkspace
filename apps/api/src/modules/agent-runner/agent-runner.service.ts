@@ -100,4 +100,41 @@ export class AgentRunnerService implements OnModuleInit, OnModuleDestroy {
     if (!log) throw new NotFoundException('Run log not found');
     return log;
   }
+
+  /**
+   * Wake (resume) a failed or stopped run from its saved conversation state.
+   * Re-enqueues the job to the Redis Stream with wake=true so the runner
+   * picks up where it left off rather than starting from scratch.
+   */
+  async wake(runLogId: string): Promise<void> {
+    const runLog = await this.prisma.agentRunLog.findUnique({
+      where: { id: runLogId },
+      include: { projectAgent: { include: { project: { select: { workspaceId: true } } } } },
+    });
+    if (!runLog) throw new NotFoundException('Run log not found');
+
+    const wakeableStatuses = ['FAILED', 'STOPPED', 'MAX_ITERATIONS'];
+    if (!wakeableStatuses.includes(runLog.status)) {
+      throw new Error(`Run ${runLogId} is in status ${runLog.status} and cannot be woken`);
+    }
+
+    await this.prisma.agentRunLog.update({
+      where: { id: runLogId },
+      data: { status: 'RUNNING', finishedAt: null },
+    });
+
+    await this.redis.xadd(
+      AGENT_RUN_STREAM,
+      '*',
+      'taskId', runLog.taskId,
+      'agentId', runLog.agentId,
+      'projectAgentId', runLog.projectAgentId,
+      'projectId', runLog.projectAgent.projectId,
+      'workspaceId', runLog.projectAgent.project.workspaceId,
+      'runLogId', runLogId,
+      'wake', 'true',
+    );
+
+    this.logger.log(`Woke run ${runLogId} for task ${runLog.taskId} via Redis Stream`);
+  }
 }

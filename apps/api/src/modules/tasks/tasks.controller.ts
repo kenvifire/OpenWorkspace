@@ -156,6 +156,14 @@ export class TasksController {
     return this.agentRunner.stop(taskId);
   }
 
+  @ApiBearerAuth('jwt')
+  @UseGuards(JwtAuthGuard)
+  @Post('projects/:projectId/tasks/:taskId/runs/:runLogId/wake')
+  @ApiOperation({ summary: 'Wake (resume) a failed or stopped agent run from its saved state' })
+  wakeRun(@Param('runLogId') runLogId: string) {
+    return this.agentRunner.wake(runLogId);
+  }
+
   // ─── Agent (Project Key) endpoints ────────────────────────────────────────
 
   @ApiSecurity('project-key')
