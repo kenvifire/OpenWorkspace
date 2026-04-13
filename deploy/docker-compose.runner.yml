@@ -1,0 +1,12 @@
+services:
+  runner:
+    image: ghcr.io/kenvifire/openworkspace/runner:latest
+    restart: unless-stopped
+    network_mode: host   # uses the SSH tunnel on localhost:15432/16379
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:15432/${POSTGRES_DB}
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 16379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      ENCRYPTION_SECRET: ${ENCRYPTION_SECRET}
+      RUNNER_INSTANCE: runner-us-1
