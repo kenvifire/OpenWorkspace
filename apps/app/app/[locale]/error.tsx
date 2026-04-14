@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function LocaleError({
   error,
@@ -33,12 +34,12 @@ export default function LocaleError({
           >
             Try again
           </button>
-          <a
+          <Link
             href="/"
             className="px-4 py-2 text-sm font-medium border rounded-md text-muted-foreground hover:bg-accent transition-colors"
           >
             Go home
-          </a>
+          </Link>
         </div>
       </div>
     </div>
