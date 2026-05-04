@@ -9,7 +9,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import { workspacesApi, myAgentsApi, skillsApi, mcpsApi } from '@/lib/api';
+import { workspacesApi, myAgentsApi, skillsApi, mcpsApi, type Skill, type Mcp } from '@/lib/api';
+import type { Workspace, Agent } from '@openworkspace/api-types';
 import { useRef, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -102,7 +103,7 @@ export function Sidebar() {
         {/* Workspaces */}
         <SectionLabel>{t('workspaces')}</SectionLabel>
         <div className="flex flex-col gap-0.5">
-          {(workspaces as any[]).map((ws, i) => {
+          {(workspaces as Workspace[]).map((ws, i) => {
             const active = pathname.includes(`/workspaces/${ws.slug}`);
             return (
               <Link
@@ -151,7 +152,7 @@ export function Sidebar() {
             <CategoryChip color="agent"><Brain size={10} /></CategoryChip>
             <span className="truncate">{tb('plannerAgent')}</span>
           </Link>
-          {(agents as any[]).map((agent) => (
+          {(agents as Agent[]).map((agent) => (
             <Link
               key={agent.id}
               href={`/${locale}/agents`}
@@ -167,7 +168,7 @@ export function Sidebar() {
         {/* Skills */}
         <SectionLabel>{t('skills')}</SectionLabel>
         <div className="flex flex-col gap-0.5">
-          {(skills as any[]).map((skill) => (
+          {(skills as Skill[]).map((skill) => (
             <Link
               key={skill.id}
               href={`/${locale}/skills`}
@@ -183,7 +184,7 @@ export function Sidebar() {
         {/* MCP */}
         <SectionLabel>{t('mcpServers')}</SectionLabel>
         <div className="flex flex-col gap-0.5">
-          {(mcps as any[]).map((mcp) => (
+          {(mcps as Mcp[]).map((mcp) => (
             <Link
               key={mcp.id}
               href={`/${locale}/mcp`}
