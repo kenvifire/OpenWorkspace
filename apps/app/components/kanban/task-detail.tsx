@@ -18,11 +18,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const RUN_STATUS_COLOR: Record<string, string> = {
-  RUNNING: 'bg-blue-100 text-blue-700',
-  COMPLETED: 'bg-green-100 text-green-700',
-  STOPPED: 'bg-zinc-100 text-zinc-600',
-  FAILED: 'bg-red-100 text-red-600',
-  MAX_ITERATIONS: 'bg-yellow-100 text-yellow-700',
+  RUNNING:        'bg-[var(--accent-agent-bg)] text-[var(--accent-agent)]',
+  COMPLETED:      'bg-[var(--accent-mcp-bg)] text-[var(--status-running)]',
+  STOPPED:        'bg-[var(--bg-elevated)] text-[var(--text-muted)]',
+  FAILED:         'bg-[var(--status-error)]/10 text-[var(--status-error)]',
+  MAX_ITERATIONS: 'bg-[var(--accent-skill-bg)] text-[var(--accent-skill)]',
 };
 
 interface TaskDetailProps {
@@ -41,7 +41,7 @@ interface Mentionable {
 function renderCommentContent(content: string) {
   return content.split(/(@\S+)/g).map((part, i) =>
     part.startsWith('@')
-      ? <span key={i} className="font-medium text-violet-600 bg-violet-50 rounded px-0.5">{part}</span>
+      ? <span key={i} className="font-medium text-[var(--accent-workspace)] bg-[var(--accent-workspace-bg)] rounded px-0.5">{part}</span>
       : <span key={i}>{part}</span>
   );
 }
@@ -50,37 +50,39 @@ function RunLogEntry({ run }: { run: AgentRunLog }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="rounded-lg border border-zinc-100 bg-white">
+    <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
       <button
         onClick={() => setExpanded((v) => !v)}
         className="flex w-full items-center gap-2 px-3 py-2 text-left"
       >
-        {expanded ? <ChevronDown size={13} className="shrink-0 text-zinc-400" /> : <ChevronRight size={13} className="shrink-0 text-zinc-400" />}
-        <span className={`rounded text-[10px] font-semibold px-1.5 py-0.5 ${RUN_STATUS_COLOR[run.status] ?? 'bg-zinc-100 text-zinc-500'}`}>
+        {expanded
+          ? <ChevronDown size={13} className="shrink-0 text-[var(--text-muted)]" />
+          : <ChevronRight size={13} className="shrink-0 text-[var(--text-muted)]" />
+        }
+        <span className={`rounded text-[10px] font-semibold px-1.5 py-0.5 ${RUN_STATUS_COLOR[run.status] ?? 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'}`}>
           {run.status}
         </span>
-        <span className="text-xs text-zinc-500">{run.iterations} iter</span>
+        <span className="text-xs text-[var(--text-secondary)]">{run.iterations} iter</span>
         {(run.totalInputTokens > 0 || run.totalOutputTokens > 0) && (
-          <span className="flex items-center gap-1 text-[10px] text-zinc-400">
+          <span className="flex items-center gap-1 text-[10px] text-[var(--text-muted)]">
             <Coins size={10} />
             {(run.totalInputTokens + run.totalOutputTokens).toLocaleString()} tok
-            <span className="text-zinc-300">({run.totalInputTokens.toLocaleString()} in / {run.totalOutputTokens.toLocaleString()} out)</span>
+            <span className="text-[var(--text-muted)]">({run.totalInputTokens.toLocaleString()} in / {run.totalOutputTokens.toLocaleString()} out)</span>
           </span>
         )}
-        <span className="ml-auto text-[10px] text-zinc-300">{new Date(run.startedAt).toLocaleString()}</span>
+        <span className="ml-auto text-[10px] text-[var(--text-muted)]">{new Date(run.startedAt).toLocaleString()}</span>
       </button>
 
       {expanded && (
-        <div className="border-t border-zinc-50 px-3 pb-3 pt-2 space-y-1.5 max-h-64 overflow-y-auto">
+        <div className="border-t border-[var(--border-subtle)] px-3 pb-3 pt-2 space-y-1.5 max-h-64 overflow-y-auto">
           {run.log.map((step, i) => (
             <div key={i} className="flex items-start gap-2 text-[11px]">
-              <span className="shrink-0 rounded px-1 py-0.5 font-mono font-medium bg-zinc-50 text-zinc-500">
+              <span className="shrink-0 rounded px-1 py-0.5 font-mono font-medium bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
                 #{step.iteration}
               </span>
               <div className="flex-1 overflow-x-auto">
-                {/* Per-step token + context stats */}
                 {(step.input_tokens != null || step.context_messages != null) && (
-                  <div className="mb-1 flex items-center gap-2.5 text-[9px] text-zinc-400">
+                  <div className="mb-1 flex items-center gap-2.5 text-[9px] text-[var(--text-muted)]">
                     {step.input_tokens != null && (
                       <span className="flex items-center gap-0.5">
                         <Coins size={8} /> {step.input_tokens.toLocaleString()} in / {(step.output_tokens ?? 0).toLocaleString()} out
@@ -94,23 +96,23 @@ function RunLogEntry({ run }: { run: AgentRunLog }) {
                   </div>
                 )}
                 {step.error && (
-                  <pre className="whitespace-pre-wrap text-red-600 font-mono text-[10px]">{step.error}</pre>
+                  <pre className="whitespace-pre-wrap text-[var(--status-error)] font-mono text-[10px]">{step.error}</pre>
                 )}
                 {step.llm_content && (
-                  <p className="text-zinc-600 text-[10px]">{step.llm_content}</p>
+                  <p className="text-[var(--text-secondary)] text-[10px]">{step.llm_content}</p>
                 )}
                 {step.tool_calls?.map((tc, j) => (
-                  <div key={j} className="mt-1 rounded bg-purple-50 px-1.5 py-1 text-purple-700">
+                  <div key={j} className="mt-1 rounded bg-[var(--accent-workspace-bg)] px-1.5 py-1 text-[var(--accent-workspace)]">
                     <span className="font-semibold">{tc.name}</span>
-                    <pre className="mt-0.5 whitespace-pre-wrap text-[9px] text-purple-500">{JSON.stringify(tc.arguments, null, 2)}</pre>
-                    <pre className="mt-0.5 whitespace-pre-wrap text-[9px] text-green-600">{tc.result}</pre>
+                    <pre className="mt-0.5 whitespace-pre-wrap text-[9px] text-[var(--accent-workspace)]/70">{JSON.stringify(tc.arguments, null, 2)}</pre>
+                    <pre className="mt-0.5 whitespace-pre-wrap text-[9px] text-[var(--status-running)]">{tc.result}</pre>
                   </div>
                 ))}
               </div>
-              <span className="shrink-0 text-zinc-300">{new Date(step.timestamp).toLocaleTimeString()}</span>
+              <span className="shrink-0 text-[var(--text-muted)]">{new Date(step.timestamp).toLocaleTimeString()}</span>
             </div>
           ))}
-          {run.log.length === 0 && <p className="text-xs text-zinc-300">No steps logged</p>}
+          {run.log.length === 0 && <p className="text-xs text-[var(--text-muted)]">No steps logged</p>}
         </div>
       )}
     </div>
@@ -130,7 +132,6 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Close on Escape key
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -149,7 +150,6 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
     enabled: open,
   });
 
-  // Sync description from fetched task (only when not dirty)
   useEffect(() => {
     if (task && !descriptionDirty) {
       setDescription(task.description ?? '');
@@ -277,7 +277,6 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
     if (!match) return;
     const before = textBeforeCursor.slice(0, textBeforeCursor.length - match[0].length);
     const after = comment.slice(cursor);
-    // Wrap name without spaces in it — use display name as-is, replacing spaces with underscores for the token
     const token = name.replace(/\s+/g, '_');
     const newComment = `${before}@${token} ${after}`;
     setComment(newComment);
@@ -296,43 +295,43 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative z-10 w-full max-w-2xl max-h-[85vh] rounded-xl bg-white shadow-2xl ring-1 ring-zinc-200 flex flex-col mx-4" onClick={(e) => e.stopPropagation()}>
+      <div className="relative z-10 w-full max-w-2xl max-h-[85vh] rounded-xl bg-[var(--bg-surface)] shadow-2xl ring-1 ring-[var(--border-default)] flex flex-col mx-4" onClick={(e) => e.stopPropagation()}>
         {isLoading || !task ? (
-          <div className="py-12 text-center text-sm text-zinc-400">Loading…</div>
+          <div className="py-12 text-center text-sm text-[var(--text-muted)]">Loading…</div>
         ) : (
           <>
             {/* Header */}
-            <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-zinc-100 shrink-0">
-              <h2 className="text-base font-semibold text-zinc-900 leading-snug">{task.title}</h2>
+            <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-[var(--border-subtle)] shrink-0">
+              <h2 className="text-base font-semibold text-[var(--text-primary)] leading-snug">{task.title}</h2>
               <div className="flex items-center gap-1 shrink-0">
                 {!confirmDelete ? (
                   <button
                     onClick={() => setConfirmDelete(true)}
-                    className="rounded-lg p-1 text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                    className="rounded-lg p-1 text-[var(--text-muted)] hover:bg-[var(--status-error)]/10 hover:text-[var(--status-error)] transition-colors"
                     title="Delete task"
                   >
                     <Trash2 size={15} />
                   </button>
                 ) : (
-                  <div className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-2 py-1">
-                    <span className="text-xs text-red-600">Delete task?</span>
+                  <div className="flex items-center gap-1.5 rounded-lg border border-[var(--status-error)]/30 bg-[var(--status-error)]/10 px-2 py-1">
+                    <span className="text-xs text-[var(--status-error)]">Delete task?</span>
                     <button
                       onClick={() => deleteTask.mutate()}
                       disabled={deleteTask.isPending}
-                      className="text-xs font-semibold text-red-600 hover:text-red-800 disabled:opacity-50"
+                      className="text-xs font-semibold text-[var(--status-error)] hover:opacity-80 disabled:opacity-50"
                     >
                       {deleteTask.isPending ? 'Deleting…' : 'Yes'}
                     </button>
-                    <span className="text-zinc-300">·</span>
-                    <button onClick={() => setConfirmDelete(false)} className="text-xs text-zinc-400 hover:text-zinc-600">
+                    <span className="text-[var(--text-muted)]">·</span>
+                    <button onClick={() => setConfirmDelete(false)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)]">
                       No
                     </button>
                   </div>
                 )}
-                <button onClick={onClose} className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors">
+                <button onClick={onClose} className="rounded-lg p-1 text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors">
                   <X size={16} />
                 </button>
               </div>
@@ -355,7 +354,7 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
               </Select>
               <Badge variant="outline" className="text-xs">{task.priority}</Badge>
               {task.dueDate && (
-                <span className="flex items-center gap-1 text-xs text-zinc-400">
+                <span className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
                   <Clock size={11} />
                   {new Date(task.dueDate).toLocaleDateString()}
                 </span>
@@ -370,26 +369,26 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
                     {task.assignee ? (
                       <span className="flex items-center gap-1.5 truncate">
                         {task.assignee.agent?.type === 'AI'
-                          ? <Bot size={12} className="shrink-0 text-violet-400" />
-                          : <User size={12} className="shrink-0 text-zinc-400" />
+                          ? <Bot size={12} className="shrink-0 text-[var(--accent-workspace)]" />
+                          : <User size={12} className="shrink-0 text-[var(--text-muted)]" />
                         }
                         {task.assignee.agent?.name}
                       </span>
                     ) : (
-                      <span className="text-zinc-400">Unassigned</span>
+                      <span className="text-[var(--text-muted)]">Unassigned</span>
                     )}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__unassigned__">
-                    <span className="text-zinc-400">Unassigned</span>
+                    <span className="text-[var(--text-muted)]">Unassigned</span>
                   </SelectItem>
                   {projectAgents.filter((pa) => pa.agent).map((pa) => (
                     <SelectItem key={pa.id} value={pa.id}>
                       <span className="flex items-center gap-1.5">
                         {pa.agent?.type === 'AI'
-                          ? <Bot size={12} className="shrink-0 text-violet-400" />
-                          : <User size={12} className="shrink-0 text-zinc-400" />
+                          ? <Bot size={12} className="shrink-0 text-[var(--accent-workspace)]" />
+                          : <User size={12} className="shrink-0 text-[var(--text-muted)]" />
                         }
                         {pa.agent?.name}
                       </span>
@@ -403,8 +402,8 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
                   {isRunning ? (
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50"
+                      variant="destructive"
+                      className="h-7 text-xs"
                       onClick={() => stopRun.mutate()}
                       disabled={stopRun.isPending}
                     >
@@ -413,7 +412,7 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
                   ) : (
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="action"
                       className="h-7 text-xs"
                       onClick={() => triggerRun.mutate()}
                       disabled={triggerRun.isPending}
@@ -426,13 +425,15 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-4 border-b border-zinc-100">
+            <div className="flex gap-4 border-b border-[var(--border-subtle)]">
               {(['details', 'logs'] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
                   className={`pb-2 text-sm font-medium capitalize border-b-2 transition-colors ${
-                    tab === t ? 'border-zinc-900 text-zinc-900' : 'border-transparent text-zinc-400 hover:text-zinc-600'
+                    tab === t
+                      ? 'border-[var(--accent-workspace)] text-[var(--accent-workspace)]'
+                      : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                   }`}
                 >
                   {t === 'logs' ? (
@@ -453,22 +454,22 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
                   const blockers = (task as any).blockedBy ?? [];
                   if (!blockReason && blockers.length === 0) return null;
                   return (
-                    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 space-y-2">
-                      <div className="flex items-center gap-2 text-red-700 font-medium text-sm">
+                    <div className="rounded-lg border border-[var(--status-error)]/30 bg-[var(--status-error)]/10 px-4 py-3 space-y-2">
+                      <div className="flex items-center gap-2 text-[var(--status-error)] font-medium text-sm">
                         <AlertTriangle size={14} className="shrink-0" />
                         Blocked
                       </div>
                       {blockReason && (
-                        <p className="text-sm text-red-600 whitespace-pre-wrap leading-relaxed">{blockReason.content}</p>
+                        <p className="text-sm text-[var(--status-error)] whitespace-pre-wrap leading-relaxed">{blockReason.content}</p>
                       )}
                       {blockers.length > 0 && (
                         <div className="space-y-1 pt-1">
-                          <p className="text-xs font-semibold text-red-500 uppercase tracking-wide">Waiting on</p>
+                          <p className="text-xs font-semibold text-[var(--status-error)] uppercase tracking-wide">Waiting on</p>
                           {blockers.map((dep: { blockingTask: { id: string; title: string; status: string } }) => (
-                            <div key={dep.blockingTask.id} className="flex items-center gap-2 text-xs text-red-600">
+                            <div key={dep.blockingTask.id} className="flex items-center gap-2 text-xs text-[var(--status-error)]">
                               <Link2 size={11} className="shrink-0" />
                               <span className="truncate">{dep.blockingTask.title}</span>
-                              <span className="ml-auto shrink-0 rounded px-1.5 py-0.5 bg-red-100 text-red-500 font-medium">
+                              <span className="ml-auto shrink-0 rounded px-1.5 py-0.5 bg-[var(--status-error)]/10 text-[var(--status-error)] font-medium">
                                 {dep.blockingTask.status}
                               </span>
                             </div>
@@ -514,10 +515,10 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
                   const totalOut = runLogs.reduce((s, r) => s + (r.totalOutputTokens ?? 0), 0);
                   if (totalIn === 0 && totalOut === 0) return null;
                   return (
-                    <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                      <Coins size={12} className="text-zinc-300" />
-                      <span className="font-medium text-zinc-600">{(totalIn + totalOut).toLocaleString()}</span> tokens
-                      <span className="text-zinc-300">({totalIn.toLocaleString()} in / {totalOut.toLocaleString()} out)</span>
+                    <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+                      <Coins size={12} className="text-[var(--text-muted)]" />
+                      <span className="font-medium text-[var(--text-secondary)]">{(totalIn + totalOut).toLocaleString()}</span> tokens
+                      <span className="text-[var(--text-muted)]">({totalIn.toLocaleString()} in / {totalOut.toLocaleString()} out)</span>
                     </div>
                   );
                 })()}
@@ -526,32 +527,32 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
 
                 {(task.activities?.length ?? 0) > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">Activity</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Activity</p>
                     {task.activities?.map((a) => (
-                      <div key={a.id} className="flex items-start gap-2 text-xs text-zinc-500">
+                      <div key={a.id} className="flex items-start gap-2 text-xs text-[var(--text-secondary)]">
                         <span>{a.actorType === 'agent' ? '🤖' : '👤'}</span>
                         <span>{a.action}</span>
-                        <span className="ml-auto text-zinc-300">{new Date(a.createdAt).toLocaleTimeString()}</span>
+                        <span className="ml-auto text-[var(--text-muted)]">{new Date(a.createdAt).toLocaleTimeString()}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
                 <div className="space-y-3">
-                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
                     <MessageSquare size={12} /> Comments
                   </p>
 
                   {task.comments?.length === 0 && (
-                    <p className="text-xs text-zinc-300">No comments yet</p>
+                    <p className="text-xs text-[var(--text-muted)]">No comments yet</p>
                   )}
 
                   {task.comments?.map((c: { id: string; content: string; authorType: string; createdAt: string }) => (
                     <div key={c.id} className="flex gap-2">
                       <span className="mt-0.5 shrink-0">{c.authorType === 'agent' ? '🤖' : '👤'}</span>
-                      <div className="rounded-lg bg-zinc-50 px-3 py-2 text-sm text-zinc-700 flex-1">
+                      <div className="rounded-lg bg-[var(--bg-elevated)] px-3 py-2 text-sm text-[var(--text-primary)] flex-1">
                         <p className="whitespace-pre-wrap">{renderCommentContent(c.content)}</p>
-                        <p className="mt-1 text-[10px] text-zinc-300">{new Date(c.createdAt).toLocaleString()}</p>
+                        <p className="mt-1 text-[10px] text-[var(--text-muted)]">{new Date(c.createdAt).toLocaleString()}</p>
                       </div>
                     </div>
                   ))}
@@ -563,10 +564,10 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
             {tab === 'logs' && (
               <div className="space-y-3">
                 {runLogs.length === 0 ? (
-                  <div className="py-8 text-center text-sm text-zinc-400">
+                  <div className="py-8 text-center text-sm text-[var(--text-muted)]">
                     No agent runs yet
                     {task.assignee?.agent?.type === 'AI' && (
-                      <p className="mt-1 text-xs text-zinc-300">Set task to TODO to auto-trigger, or click "Run agent" above</p>
+                      <p className="mt-1 text-xs text-[var(--text-muted)]">Set task to TODO to auto-trigger, or click &quot;Run agent&quot; above</p>
                     )}
                   </div>
                 ) : (
@@ -577,9 +578,9 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
             </div>
             </div>{/* end scrollable body */}
 
-            {/* Comment input — sticky footer, always inside panel */}
+            {/* Comment input — sticky footer */}
             {tab === 'details' && (
-              <div className="shrink-0 border-t border-zinc-100 px-6 py-3">
+              <div className="shrink-0 border-t border-[var(--border-subtle)] px-6 py-3">
                 <div className="relative">
                   <Textarea
                     ref={commentRef}
@@ -592,8 +593,8 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
                   />
                   {/* Mention dropdown */}
                   {mentionQuery !== null && filteredMentions.length > 0 && (
-                    <div className="absolute bottom-full mb-1 left-0 z-10 w-56 rounded-lg border border-zinc-200 bg-white shadow-lg overflow-hidden">
-                      <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-400 border-b border-zinc-100">
+                    <div className="absolute bottom-full mb-1 left-0 z-10 w-56 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-lg overflow-hidden">
+                      <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-muted)] border-b border-[var(--border-subtle)]">
                         Mention
                       </div>
                       {filteredMentions.map((m, i) => (
@@ -601,23 +602,25 @@ export function TaskDetail({ taskId, projectId, open, onClose }: TaskDetailProps
                           key={m.id}
                           onMouseDown={(e) => { e.preventDefault(); insertMention(m.name); }}
                           className={`flex w-full items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
-                            i === mentionIndex ? 'bg-violet-50 text-violet-700' : 'text-zinc-700 hover:bg-zinc-50'
+                            i === mentionIndex
+                              ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)]'
+                              : 'text-[var(--text-primary)] hover:bg-[var(--bg-overlay)]'
                           }`}
                         >
                           {m.type === 'AI'
-                            ? <Bot size={13} className="shrink-0 text-violet-400" />
-                            : <User size={13} className="shrink-0 text-zinc-400" />
+                            ? <Bot size={13} className="shrink-0 text-[var(--accent-workspace)]" />
+                            : <User size={13} className="shrink-0 text-[var(--text-muted)]" />
                           }
                           <span className="truncate">{m.name}</span>
                           {m.type === 'AI' && (
-                            <span className="ml-auto text-[10px] text-violet-400">AI</span>
+                            <span className="ml-auto text-[10px] text-[var(--accent-workspace)]">AI</span>
                           )}
                         </button>
                       ))}
                     </div>
                   )}
                   {mentionQuery !== null && filteredMentions.length === 0 && mentionQuery.length > 0 && (
-                    <div className="absolute bottom-full mb-1 left-0 z-10 w-48 rounded-lg border border-zinc-200 bg-white shadow-lg px-3 py-2 text-xs text-zinc-400">
+                    <div className="absolute bottom-full mb-1 left-0 z-10 w-48 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-lg px-3 py-2 text-xs text-[var(--text-muted)]">
                       No matches for &ldquo;@{mentionQuery}&rdquo;
                     </div>
                   )}
