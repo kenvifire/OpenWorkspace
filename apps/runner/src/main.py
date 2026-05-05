@@ -21,20 +21,39 @@ log = logging.getLogger(__name__)
 
 
 async def _cleanup_stale_runs() -> None:
-    """Mark any RUNNING AgentRunLogs as FAILED on startup — their stream messages are gone."""
+    """Mark any RUNNING AgentRunLogs as FAILED on startup and revert their tasks to TODO."""
     from src.database import get_pool
     pool = await get_pool()
-    result = await pool.execute(
+
+    # Atomically mark stale runs as FAILED and capture the affected task IDs
+    stale = await pool.fetch(
         """
         UPDATE "AgentRunLog"
-        SET status = 'FAILED'::"AgentRunStatus",
-            "finishedAt" = NOW()
+        SET status = 'FAILED'::"AgentRunStatus", "finishedAt" = NOW()
         WHERE status = 'RUNNING'
+        RETURNING "taskId"
         """
     )
-    count = int(result.split()[-1]) if result else 0
-    if count:
-        log.warning("Cleaned up %d stale RUNNING agent run(s) on startup.", count)
+    if not stale:
+        return
+
+    task_ids = [r["taskId"] for r in stale]
+    log.warning("Cleaned up %d stale RUNNING agent run(s) on startup.", len(task_ids))
+
+    # Revert any tasks that are still IN_PROGRESS back to TODO so they appear
+    # in the correct lane and can be re-triggered manually or via the next event.
+    reverted = await pool.execute(
+        """
+        UPDATE "Task"
+        SET status = 'TODO'::"TaskStatus", "updatedAt" = NOW()
+        WHERE id = ANY($1::text[])
+          AND status = 'IN_PROGRESS'::"TaskStatus"
+        """,
+        task_ids,
+    )
+    reverted_count = int(reverted.split()[-1]) if reverted else 0
+    if reverted_count:
+        log.warning("Reverted %d IN_PROGRESS task(s) to TODO after stale-run cleanup.", reverted_count)
 
 
 async def _main() -> None:

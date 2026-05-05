@@ -642,7 +642,8 @@ async def _unblock_dependents(completed_task_id: str, project_id: str, pool) -> 
                 "updatedAt" = NOW()
             WHERE id = $1 AND status = 'BLOCKED'::"TaskStatus"
             RETURNING id, status, "assigneeId", "projectId",
-                      (SELECT "agentId" FROM "ProjectAgent" WHERE id = "assigneeId") AS agent_id
+                      (SELECT "agentId" FROM "ProjectAgent" WHERE id = "assigneeId") AS agent_id,
+                      (SELECT a.type FROM "ProjectAgent" pa JOIN "Agent" a ON a.id = pa."agentId" WHERE pa.id = "assigneeId") AS agent_type
             """,
             blocked_id,
         )
@@ -654,8 +655,8 @@ async def _unblock_dependents(completed_task_id: str, project_id: str, pool) -> 
             "task": {"id": task_row["id"], "status": task_row["status"]},
         })
 
-        # Enqueue agent run if assignee is an AI agent
-        if task_row["status"] == "TODO" and task_row["assigneeId"] and task_row["agent_id"]:
+        # Enqueue agent run only for AI agents (human agents don't run in the runner)
+        if task_row["status"] == "TODO" and task_row["assigneeId"] and task_row["agent_type"] == "AI":
             pa_row = await pool.fetchrow(
                 """
                 SELECT pa.id, pa."projectId", p."workspaceId"
