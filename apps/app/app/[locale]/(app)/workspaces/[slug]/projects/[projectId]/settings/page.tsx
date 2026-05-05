@@ -25,11 +25,11 @@ import {
 
 // ─── Run status colours ──────────────────────────────────────────────────────
 const RUN_STATUS_COLOR: Record<string, string> = {
-  RUNNING: 'bg-blue-900/40 text-blue-300',
-  COMPLETED: 'bg-green-900/40 text-green-400',
-  STOPPED: 'bg-muted text-muted-foreground',
-  FAILED: 'bg-red-900/40 text-red-400',
-  MAX_ITERATIONS: 'bg-yellow-900/40 text-yellow-300',
+  RUNNING:        'bg-[var(--accent-agent-bg)] text-[var(--accent-agent)]',
+  COMPLETED:      'bg-[var(--accent-mcp-bg)] text-[var(--status-running)]',
+  STOPPED:        'bg-[var(--bg-elevated)] text-[var(--text-muted)]',
+  FAILED:         'bg-[var(--status-error)]/10 text-[var(--status-error)]',
+  MAX_ITERATIONS: 'bg-[var(--accent-skill-bg)] text-[var(--accent-skill)]',
 };
 
 // ─── Single run entry (collapsible) ─────────────────────────────────────────
@@ -85,16 +85,16 @@ function RunEntry({ run }: { run: AgentRunLog & { task?: { id: string; title: st
                   </div>
                 )}
                 {step.error && (
-                  <pre className="whitespace-pre-wrap text-red-400 font-mono text-[10px] bg-red-50 rounded px-1.5 py-1">{step.error}</pre>
+                  <pre className="whitespace-pre-wrap text-[var(--status-error)] font-mono text-[10px] bg-[var(--status-error)]/10 rounded px-1.5 py-1">{step.error}</pre>
                 )}
                 {step.llm_content && (
                   <p className="text-muted-foreground text-[10px]">{step.llm_content}</p>
                 )}
                 {step.tool_calls?.map((tc, j) => (
-                  <div key={j} className="rounded bg-purple-50 px-1.5 py-1 text-purple-700">
+                  <div key={j} className="rounded bg-[var(--accent-workspace-bg)] border border-[var(--accent-workspace-border)] px-1.5 py-1 text-[var(--accent-workspace)]">
                     <span className="font-semibold text-[10px]">{tc.name}</span>
-                    <pre className="mt-0.5 whitespace-pre-wrap text-[9px] text-purple-500">{JSON.stringify(tc.arguments, null, 2)}</pre>
-                    <pre className="mt-0.5 whitespace-pre-wrap text-[9px] text-green-600">{tc.result}</pre>
+                    <pre className="mt-0.5 whitespace-pre-wrap text-[9px] text-[var(--text-muted)]">{JSON.stringify(tc.arguments, null, 2)}</pre>
+                    <pre className="mt-0.5 whitespace-pre-wrap text-[9px] text-[var(--status-running)]">{tc.result}</pre>
                   </div>
                 ))}
               </div>
@@ -149,8 +149,8 @@ function AgentLogDrawer({
             <p className="text-xs text-muted-foreground/70">{agent.role}{agent.agent?.provider?.displayName ? ` · ${agent.agent.provider.displayName}` : ''}</p>
           </div>
           {runningRun && (
-            <span className="flex items-center gap-1.5 rounded-full bg-blue-900/40 px-2.5 py-1 text-xs font-medium text-blue-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span className="flex items-center gap-1.5 rounded-full bg-[var(--accent-agent-bg)] border border-[var(--accent-agent-border)] px-2.5 py-1 text-xs font-medium text-[var(--accent-agent)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-agent)] animate-pulse" />
               Running
             </span>
           )}
@@ -171,7 +171,7 @@ function AgentLogDrawer({
               <p className="text-[11px] text-muted-foreground/70">Tokens used</p>
             </div>
             <div className="text-center">
-              <p className={`text-lg font-bold ${failedRuns > 0 ? 'text-red-400' : 'text-foreground'}`}>{failedRuns}</p>
+              <p className={`text-lg font-bold ${failedRuns > 0 ? 'text-[var(--status-error)]' : 'text-foreground'}`}>{failedRuns}</p>
               <p className="text-[11px] text-muted-foreground/70">Failed</p>
             </div>
             <div className="text-center">
@@ -231,7 +231,7 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
       <div className="relative ml-auto z-10 flex h-full w-full max-w-2xl flex-col bg-card shadow-2xl">
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-border/50 px-6 py-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-900/40 text-violet-400">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-900/40 text-[var(--accent-workspace)]">
             <Brain size={17} />
           </div>
           <div className="flex-1 min-w-0">
@@ -256,7 +256,7 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
             </div>
             {failedCount > 0 && (
               <div className="text-center">
-                <p className="text-lg font-bold text-red-400">{failedCount}</p>
+                <p className="text-lg font-bold text-[var(--status-error)]">{failedCount}</p>
                 <p className="text-[11px] text-muted-foreground/70">Failed</p>
               </div>
             )}
@@ -271,7 +271,7 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
             </div>
           ) : runs.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 text-sm text-muted-foreground/70 gap-2">
-              <ScrollText size={28} className="text-zinc-200" />
+              <ScrollText size={28} className="text-[var(--border-default)]" />
               No planner runs yet. Click "Run planner" to generate a plan.
             </div>
           ) : runs.map((run) => {
@@ -284,7 +284,7 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
                   className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
                 >
                   {isOpen ? <ChevronDown size={13} className="shrink-0 text-muted-foreground/70" /> : <ChevronRight size={13} className="shrink-0 text-muted-foreground/70" />}
-                  <span className={`shrink-0 rounded text-[10px] font-semibold px-1.5 py-0.5 ${run.status === 'COMPLETED' ? 'bg-green-900/40 text-green-400' : 'bg-red-900/40 text-red-400'}`}>
+                  <span className={`shrink-0 rounded text-[10px] font-semibold px-1.5 py-0.5 ${run.status === 'COMPLETED' ? 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)]' : 'bg-[var(--status-error)]/10 text-[var(--status-error)]'}`}>
                     {run.status}
                   </span>
                   <span className="flex-1 text-xs text-muted-foreground">{new Date(run.startedAt).toLocaleString()}</span>
@@ -297,7 +297,7 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
                 {isOpen && (
                   <div className="border-t border-zinc-50 px-3 pb-3 pt-2 space-y-3">
                     {run.error && (
-                      <div className="rounded-md bg-red-50 px-3 py-2 text-xs text-red-700 font-mono">
+                      <div className="rounded-md bg-[var(--status-error)]/10 border border-[var(--status-error)]/25 px-3 py-2 text-xs text-[var(--status-error)] font-mono">
                         {run.error}
                       </div>
                     )}
@@ -314,13 +314,13 @@ function PlannerLogDrawer({ projectId, onClose }: { projectId: string; onClose: 
                         </p>
                         <div className="space-y-1">
                           {run.planOutput.tasks?.slice(0, 8).map((t, i) => (
-                            <div key={i} className="flex items-center gap-2 rounded bg-background px-2 py-1.5">
+                            <div key={i} className="flex items-center gap-2 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] px-2 py-1.5">
                               <span className="text-xs font-medium text-foreground flex-1 truncate">{t.title}</span>
                               <span className="text-[10px] text-muted-foreground/70">{t.role}</span>
                               {t.priority && (
                                 <span className={`text-[9px] font-semibold px-1 py-0.5 rounded ${
-                                  t.priority === 'HIGH' || t.priority === 'URGENT' ? 'bg-red-50 text-red-400' :
-                                  t.priority === 'MEDIUM' ? 'bg-yellow-50 text-yellow-600' : 'bg-muted text-muted-foreground'
+                                  t.priority === 'HIGH' || t.priority === 'URGENT' ? 'bg-[var(--status-error)]/10 text-[var(--status-error)]' :
+                                  t.priority === 'MEDIUM' ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)]' : 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'
                                 }`}>{t.priority}</span>
                               )}
                             </div>
@@ -394,7 +394,7 @@ function ProjectAgentCapabilities({ projectId, projectAgentId }: { projectId: st
             key={t}
             onClick={() => setTab(t)}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-              tab === t ? 'bg-violet-900/40 text-violet-300' : 'text-muted-foreground hover:text-foreground'
+              tab === t ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
             }`}
           >
             {t === 'skills' ? `Skills (${assignedSkillIds.size})` : `MCPs (${assignedMcpIds.size})`}
@@ -419,8 +419,8 @@ function ProjectAgentCapabilities({ projectId, projectAgentId }: { projectId: st
                   disabled={assignSkill.isPending || removeSkill.isPending}
                   className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
                     assigned
-                      ? 'bg-violet-900/40 text-violet-300 hover:bg-red-50 hover:text-red-400'
-                      : 'bg-muted text-muted-foreground hover:bg-violet-900/40 hover:text-violet-300'
+                      ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] hover:bg-[var(--status-error)]/10 hover:text-[var(--status-error)]'
+                      : 'bg-muted text-muted-foreground hover:bg-violet-900/40 hover:text-[var(--accent-workspace)]'
                   }`}
                 >
                   {assigned ? 'Remove' : 'Assign'}
@@ -448,8 +448,8 @@ function ProjectAgentCapabilities({ projectId, projectAgentId }: { projectId: st
                   disabled={assignMcp.isPending || removeMcp.isPending}
                   className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
                     assigned
-                      ? 'bg-violet-900/40 text-violet-300 hover:bg-red-50 hover:text-red-400'
-                      : 'bg-muted text-muted-foreground hover:bg-violet-900/40 hover:text-violet-300'
+                      ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] hover:bg-[var(--status-error)]/10 hover:text-[var(--status-error)]'
+                      : 'bg-muted text-muted-foreground hover:bg-violet-900/40 hover:text-[var(--accent-workspace)]'
                   }`}
                 >
                   {assigned ? 'Remove' : 'Assign'}
@@ -464,7 +464,7 @@ function ProjectAgentCapabilities({ projectId, projectAgentId }: { projectId: st
 }
 
 function CopiedBadge() {
-  return <span className="text-xs text-green-600 flex items-center gap-1"><Check size={11} /> Copied</span>;
+  return <span className="text-xs text-[var(--status-running)] flex items-center gap-1"><Check size={11} /> Copied</span>;
 }
 
 // ─── Agent Config Editor ─────────────────────────────────────────────────────
@@ -577,7 +577,7 @@ function AgentConfigEditor({ agent, onClose }: { agent: ProjectAgent; onClose: (
         </div>
       </div>
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-[var(--status-error)]">{error}</p>}
 
       <div className="flex gap-2 pt-1">
         <Button variant="outline" size="sm" className="flex-1" onClick={onClose}>Cancel</Button>
@@ -592,9 +592,9 @@ function AgentConfigEditor({ agent, onClose }: { agent: ProjectAgent; onClose: (
 // ─── Recycle Bin Drawer ───────────────────────────────────────────────────────
 
 const PRIORITY_COLOR: Record<string, string> = {
-  URGENT: 'bg-red-50 text-red-400',
-  HIGH: 'bg-orange-50 text-orange-600',
-  MEDIUM: 'bg-yellow-50 text-yellow-600',
+  URGENT: 'bg-[var(--status-error)]/10 text-[var(--status-error)]',
+  HIGH: 'bg-[var(--accent-skill-bg)] text-[var(--accent-skill)]',
+  MEDIUM: 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)]',
   LOW: 'bg-muted text-muted-foreground',
 };
 
@@ -654,7 +654,7 @@ function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: 
           )}
           {!isLoading && deleted.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Recycle size={32} className="mb-3 text-zinc-200" />
+              <Recycle size={32} className="mb-3 text-[var(--border-default)]" />
               <p className="text-sm text-muted-foreground/70">Recycle bin is empty</p>
             </div>
           )}
@@ -676,7 +676,7 @@ function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: 
                   <button
                     onClick={() => restore.mutate(task.id)}
                     disabled={restore.isPending}
-                    className="rounded px-2 py-1 text-xs font-medium text-green-400 hover:bg-green-50 disabled:opacity-50 transition-colors"
+                    className="rounded px-2 py-1 text-xs font-medium text-[var(--status-running)] hover:bg-[var(--bg-elevated)] disabled:opacity-50 transition-colors"
                     title="Restore task"
                   >
                     Restore
@@ -686,7 +686,7 @@ function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: 
                       <button
                         onClick={() => permanentlyDelete.mutate(task.id)}
                         disabled={permanentlyDelete.isPending}
-                        className="text-xs font-semibold text-red-400 hover:text-red-800 disabled:opacity-50"
+                        className="text-xs font-semibold text-[var(--status-error)] hover:text-[var(--text-secondary)] disabled:opacity-50"
                       >
                         {permanentlyDelete.isPending ? '…' : 'Delete'}
                       </button>
@@ -695,7 +695,7 @@ function RecycleBinDrawer({ projectId, onClose }: { projectId: string; onClose: 
                   ) : (
                     <button
                       onClick={() => setConfirmId(task.id)}
-                      className="rounded p-1 text-muted-foreground/70 hover:bg-red-50 hover:text-red-400 transition-colors"
+                      className="rounded p-1 text-muted-foreground/70 hover:bg-[var(--status-error)]/10 hover:text-[var(--status-error)] transition-colors"
                       title="Permanently delete"
                     >
                       <Trash2 size={13} />
@@ -966,7 +966,7 @@ export default function ProjectSettingsPage({
           <div className="flex items-center justify-between">
             <div className="text-xs text-muted-foreground/70">
               {updateDescription.isPending && (
-                <span className="flex items-center gap-1.5 text-violet-400">
+                <span className="flex items-center gap-1.5 text-[var(--accent-workspace)]">
                   <Sparkles size={11} className="animate-pulse" /> Running planner…
                 </span>
               )}
@@ -980,7 +980,7 @@ export default function ProjectSettingsPage({
             </Button>
           </div>
           {updateDescription.isError && (
-            <p className="text-xs text-red-400">
+            <p className="text-xs text-[var(--status-error)]">
               {(updateDescription.error as any)?.response?.data?.message ?? 'Failed to save'}
             </p>
           )}
@@ -1006,7 +1006,7 @@ export default function ProjectSettingsPage({
             {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
           </div>
         ) : activeAgents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-zinc-300 py-10 text-center text-sm text-muted-foreground/70">
+          <div className="rounded-xl border border-dashed border-[var(--border-default)] py-10 text-center text-sm text-muted-foreground/70">
             No agents hired yet
           </div>
         ) : (
@@ -1026,7 +1026,7 @@ export default function ProjectSettingsPage({
                     </button>
                     <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setSelectedAgent(pa)}>
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-foreground hover:text-violet-300 transition-colors">{pa.agent!.name}</p>
+                        <p className="font-medium text-foreground hover:text-[var(--accent-workspace)] transition-colors">{pa.agent!.name}</p>
                         <Badge variant="secondary" className="text-[10px]">{pa.role}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground/70">{pa.agent!.provider?.displayName}</p>
@@ -1035,7 +1035,7 @@ export default function ProjectSettingsPage({
                     <div className="flex items-center gap-3">
                       {/* Agreement status */}
                       {agreed ? (
-                        <div className="flex items-center gap-1 text-xs text-green-600">
+                        <div className="flex items-center gap-1 text-xs text-[var(--status-running)]">
                           <ShieldCheck size={13} /> Agreement accepted
                         </div>
                       ) : !isHuman ? (
@@ -1075,8 +1075,8 @@ export default function ProjectSettingsPage({
                         onClick={() => setCapabilitiesOpenId(capabilitiesOpenId === pa.id ? null : pa.id)}
                         className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border transition-colors ${
                           capabilitiesOpenId === pa.id
-                            ? 'border-violet-200 bg-violet-900/20 text-violet-300'
-                            : 'border-border text-muted-foreground hover:border-violet-200 hover:text-violet-400'
+                            ? 'border-[var(--accent-workspace-border)] bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)]'
+                            : 'border-border text-muted-foreground hover:border-violet-200 hover:text-[var(--accent-workspace)]'
                         }`}
                         title="Skills & MCPs"
                       >
@@ -1089,8 +1089,8 @@ export default function ProjectSettingsPage({
                           onClick={() => setConfigOpenId(configOpenId === pa.id ? null : pa.id)}
                           className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border transition-colors ${
                             configOpenId === pa.id
-                              ? 'border-blue-200 bg-blue-50 text-blue-300'
-                              : 'border-border text-muted-foreground hover:border-blue-200 hover:text-blue-600'
+                              ? 'border-[var(--accent-agent-border)] bg-[var(--accent-agent-bg)] text-[var(--accent-agent)]'
+                              : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--accent-agent-border)] hover:text-[var(--accent-agent)]'
                           }`}
                           title="Edit agent config"
                         >
@@ -1102,7 +1102,7 @@ export default function ProjectSettingsPage({
                       <button
                         onClick={() => removeAgent.mutate(pa.id)}
                         disabled={removeAgent.isPending}
-                        className="text-muted-foreground/50 hover:text-red-400"
+                        className="text-muted-foreground/50 hover:text-[var(--status-error)]"
                         title="Remove agent"
                       >
                         <Trash2 size={15} />
@@ -1153,7 +1153,7 @@ export default function ProjectSettingsPage({
                             <button key={s} onClick={() => setReviewRating(s)}>
                               <Star
                                 size={20}
-                                className={s <= reviewRating ? 'text-amber-400' : 'text-zinc-200'}
+                                className={s <= reviewRating ? 'text-amber-400' : 'text-[var(--border-default)]'}
                                 fill={s <= reviewRating ? 'currentColor' : 'none'}
                               />
                             </button>
@@ -1167,7 +1167,7 @@ export default function ProjectSettingsPage({
                           onChange={(e) => setReviewComment(e.target.value)}
                         />
                         {submitReview.isError && (
-                          <p className="text-xs text-red-400">
+                          <p className="text-xs text-[var(--status-error)]">
                             {(submitReview.error as any)?.response?.data?.message ?? 'Failed to submit review'}
                           </p>
                         )}
@@ -1243,14 +1243,14 @@ export default function ProjectSettingsPage({
               const plannerPa = activeAgents.find((a) => a.id === project.plannerProjectAgentId);
               return (
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-green-600 flex items-center gap-1">
+                  <p className="text-xs text-[var(--status-running)] flex items-center gap-1">
                     <CheckCheck size={12} /> Planner assigned
                     {plannerPa && <span className="text-muted-foreground ml-1">— {plannerPa.agent?.name}</span>}
                   </p>
                   {plannerPa && (
                     <button
                       onClick={() => setSelectedAgent(plannerPa)}
-                      className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-800"
+                      className="flex items-center gap-1 text-xs text-[var(--accent-workspace)] hover:text-violet-800"
                     >
                       <ScrollText size={12} /> View logs
                     </button>
@@ -1274,7 +1274,7 @@ export default function ProjectSettingsPage({
         )}
 
         {runPlanner.isError && (
-          <p className="mt-2 text-xs text-red-400">
+          <p className="mt-2 text-xs text-[var(--status-error)]">
             {(runPlanner.error as any)?.response?.data?.message ?? 'Planner failed'}
           </p>
         )}
@@ -1312,19 +1312,19 @@ export default function ProjectSettingsPage({
                     ? ((assigneePa as any).agent?.name ?? assigneePa.customRole ?? assigneePa.role)
                     : null;
                   return (
-                    <div key={i} className={`rounded-lg bg-card border px-3 py-2 ${assigneeId ? 'border-border/50' : 'border-red-200 bg-red-50/30'}`}>
+                    <div key={i} className={`rounded-lg bg-[var(--bg-surface)] border px-3 py-2 ${assigneeId ? 'border-[var(--border-subtle)]' : 'border-[var(--status-error)]/25 bg-[var(--status-error)]/5'}`}>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium text-foreground">{t.title}</span>
                         <span className="text-xs text-muted-foreground/70">→ {t.role}</span>
                         {t.priority && (
                           <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                            t.priority === 'HIGH' || t.priority === 'URGENT' ? 'bg-red-50 text-red-400' :
-                            t.priority === 'MEDIUM' ? 'bg-yellow-50 text-yellow-600' : 'bg-muted text-muted-foreground'
+                            t.priority === 'HIGH' || t.priority === 'URGENT' ? 'bg-[var(--status-error)]/10 text-[var(--status-error)]' :
+                            t.priority === 'MEDIUM' ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)]' : 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'
                           }`}>{t.priority}</span>
                         )}
                         <div className="ml-auto flex items-center gap-1.5">
                           {assigneeName && (
-                            <span className="text-[11px] px-1.5 py-0.5 rounded bg-green-50 text-green-400 font-medium flex items-center gap-1">
+                            <span className="text-[11px] px-1.5 py-0.5 rounded bg-[var(--accent-mcp-bg)] text-[var(--status-running)] font-medium flex items-center gap-1">
                               <Bot size={10} />
                               {assigneeName}
                             </span>
@@ -1332,7 +1332,7 @@ export default function ProjectSettingsPage({
                           <select
                             value={taskAssignees[i] ?? autoAssigneeId ?? ''}
                             onChange={(e) => setTaskAssignees((prev) => ({ ...prev, [i]: e.target.value }))}
-                            className={`text-xs border rounded px-1.5 py-0.5 bg-card focus:outline-none ${assigneeId ? 'border-border text-muted-foreground' : 'border-red-300 text-red-400'}`}
+                            className={`text-xs border rounded px-1.5 py-0.5 bg-card focus:outline-none ${assigneeId ? 'border-border text-muted-foreground' : 'border-red-300 text-[var(--status-error)]'}`}
                           >
                             <option value="">— assign agent —</option>
                             {activeAgents.map((pa) => (
@@ -1354,7 +1354,7 @@ export default function ProjectSettingsPage({
                                 return next;
                               });
                             }}
-                            className="ml-1 text-muted-foreground/50 hover:text-red-400 transition-colors"
+                            className="ml-1 text-muted-foreground/50 hover:text-[var(--status-error)] transition-colors"
                             title="Remove task"
                           >
                             <X size={13} />
@@ -1366,7 +1366,7 @@ export default function ProjectSettingsPage({
                         <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-muted-foreground/70">
                           <span className="font-medium">Blocked by:</span>
                           {t.dependencies!.map((dep, d) => (
-                            <span key={d} className="rounded bg-amber-50 px-1.5 py-0.5 text-amber-300 font-medium">{dep}</span>
+                            <span key={d} className="rounded bg-[var(--accent-skill-bg)] border border-[var(--accent-skill-border)] px-1.5 py-0.5 text-[var(--accent-skill)] font-medium">{dep}</span>
                           ))}
                         </p>
                       )}
@@ -1375,7 +1375,7 @@ export default function ProjectSettingsPage({
                 })}
               </div>
               {planDraft.tasks.some((t, i) => !(taskAssignees[i] ?? roleAgentMap.get(t.role.toLowerCase()))) && (
-                <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-[var(--status-error)] flex items-center gap-1">
                   All tasks must be assigned before you can apply the plan.
                 </p>
               )}
@@ -1432,7 +1432,7 @@ export default function ProjectSettingsPage({
         <div className="mb-4 flex items-start justify-between">
           <div>
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Brain size={18} className="text-violet-500" />
+              <Brain size={18} className="text-[var(--accent-workspace)]" />
               Planning Agent
             </h2>
             <p className="text-sm text-muted-foreground/70 mt-0.5">
@@ -1441,7 +1441,7 @@ export default function ProjectSettingsPage({
           </div>
           <button
             onClick={() => setShowPlannerLogs(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-violet-300 hover:text-violet-300 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-violet-300 hover:text-[var(--accent-workspace)] transition-colors"
           >
             <ScrollText size={13} /> View logs
           </button>
@@ -1465,7 +1465,7 @@ export default function ProjectSettingsPage({
             {/* Custom prompt */}
             <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-violet-900/40 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-violet-400">Custom Prompt (appended)</span>
+                <span className="rounded-full bg-violet-900/40 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--accent-workspace)]">Custom Prompt (appended)</span>
               </div>
               <Textarea
                 value={draftPrompt}
@@ -1514,7 +1514,7 @@ export default function ProjectSettingsPage({
               </div>
 
               {publishVersion.isError && (
-                <p className="text-xs text-red-400">{(publishVersion.error as any)?.response?.data?.message ?? 'Failed to publish'}</p>
+                <p className="text-xs text-[var(--status-error)]">{(publishVersion.error as any)?.response?.data?.message ?? 'Failed to publish'}</p>
               )}
 
               {planningAgent.versions.length === 0 ? (
@@ -1536,7 +1536,7 @@ export default function ProjectSettingsPage({
                           <p className="text-xs text-muted-foreground/70">Published {new Date(v.publishedAt).toLocaleDateString()}</p>
                         </div>
                         {isActive && (
-                          <span className="rounded-full bg-violet-900/40 px-2 py-0.5 text-[11px] font-semibold text-violet-300">Active</span>
+                          <span className="rounded-full bg-[var(--accent-workspace-bg)] border border-[var(--accent-workspace-border)] px-2 py-0.5 text-[11px] font-semibold text-[var(--accent-workspace)]">Active</span>
                         )}
                         <div className="flex items-center gap-1 shrink-0">
                           {isActive ? (
@@ -1562,7 +1562,7 @@ export default function ProjectSettingsPage({
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-7 w-7 text-muted-foreground/50 hover:text-red-400 hover:bg-red-50"
+                            className="h-7 w-7 text-muted-foreground/50 hover:text-[var(--status-error)] hover:bg-[var(--status-error)]/10"
                             disabled={deleteVersion.isPending}
                             onClick={() => deleteVersion.mutate(v.id)}
                           >
@@ -1671,7 +1671,7 @@ export default function ProjectSettingsPage({
             {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}
           </div>
         ) : keys.length === 0 && !showAddKey ? (
-          <div className="rounded-xl border border-dashed border-zinc-300 py-10 text-center text-sm text-muted-foreground/70">
+          <div className="rounded-xl border border-dashed border-[var(--border-default)] py-10 text-center text-sm text-muted-foreground/70">
             No keys stored yet
           </div>
         ) : (
@@ -1700,7 +1700,7 @@ export default function ProjectSettingsPage({
                   <button
                     onClick={() => deleteKey.mutate(k.id)}
                     disabled={deleteKey.isPending}
-                    className="ml-2 text-muted-foreground/50 hover:text-red-400"
+                    className="ml-2 text-muted-foreground/50 hover:text-[var(--status-error)]"
                     title="Delete key"
                   >
                     <Trash2 size={14} />
@@ -1724,14 +1724,14 @@ export default function ProjectSettingsPage({
         <Card>
           <CardContent className="pt-4 space-y-4">
             <div className="flex items-center gap-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-50 shrink-0">
-                <Box size={16} className="text-cyan-600" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent-agent-bg)] shrink-0">
+                <Box size={16} className="text-[var(--accent-agent)]" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Provider</p>
                 <p className="text-xs text-muted-foreground/70">
                   Configure the E2B API key in{' '}
-                  <Link href={`/${locale}/workspaces/${slug}/settings`} className="text-violet-400 hover:underline">
+                  <Link href={`/${locale}/workspaces/${slug}/settings`} className="text-[var(--accent-workspace)] hover:underline">
                     workspace settings
                   </Link>
                 </p>
@@ -1747,12 +1747,12 @@ export default function ProjectSettingsPage({
               </select>
             </div>
             {project?.sandboxProvider === 'e2b' && (
-              <p className="text-xs text-muted-foreground/70 bg-cyan-50 rounded-lg px-3 py-2">
+              <p className="text-xs text-muted-foreground/70 bg-[var(--accent-agent-bg)] border border-[var(--accent-agent-border)] rounded-lg px-3 py-2">
                 Agents will run in isolated E2B Ubuntu sandboxes with access to shell, git, build tools, and file I/O.
               </p>
             )}
             {!project?.sandboxProvider && (
-              <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+              <p className="text-xs text-[var(--accent-skill)] bg-[var(--accent-skill-bg)] border border-[var(--accent-skill-border)] rounded-lg px-3 py-2">
                 Sandbox disabled — agents can only use HTTP requests and task tools. No code execution.
               </p>
             )}

@@ -128,7 +128,7 @@ export function Sidebar() {
                 <span className="truncate flex-1">{ws.name}</span>
                 {(ws._count?.projects ?? 0) > 0 && (
                   <span className="rounded px-1.5 py-0.5 text-[9px] font-medium bg-[var(--bg-elevated)] text-[var(--text-muted)]">
-                    {ws._count.projects}
+                    {ws._count?.projects}
                   </span>
                 )}
               </Link>
