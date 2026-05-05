@@ -295,13 +295,13 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
             required
             minLength={2}
             maxLength={80}
-            className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50 font-mono"
+            className="bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)] font-mono"
           />
         </div>
         <div className="space-y-1.5">
           <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('transportLabel')}</Label>
           <Select value={transport} onValueChange={(v) => setTransport((v ?? 'SSE') as 'SSE' | 'HTTP' | 'STDIO')}>
-            <SelectTrigger className="w-full bg-[#0f0f1a] border-[#1e1e3a] text-white focus:border-violet-500/50"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full bg-[var(--bg-surface)] border-[var(--border-default)] text-white focus:border-[var(--accent-workspace-border)]"><SelectValue /></SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
               <SelectItem value="SSE">{t('sseTransport')}</SelectItem>
               <SelectItem value="HTTP">{t('httpTransport')}</SelectItem>
@@ -320,13 +320,13 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
           required
           minLength={5}
           maxLength={500}
-          className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+          className="bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
         />
       </div>
 
       {transport !== 'STDIO' && (
-        <div className="space-y-3 rounded-xl border border-[#1e1e3a] bg-card/[0.03] p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">{t('connectionSection')}</p>
+        <div className="space-y-3 rounded-xl border border-[var(--border-default)] bg-card/[0.03] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--accent-mcp)]">{t('connectionSection')}</p>
           <div className="space-y-1.5">
             <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('serverUrlLabel')}</Label>
             <Input
@@ -335,7 +335,7 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
               placeholder={transport === 'SSE' ? 'https://mcp.example.com/sse' : 'https://mcp.example.com/mcp'}
               type="url"
               required
-              className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50 font-mono text-sm"
+              className="bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)] font-mono text-sm"
             />
           </div>
           <div className="space-y-1.5">
@@ -344,15 +344,15 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
               value={headers}
               onChange={(e) => setHeaders(e.target.value)}
               placeholder='{"Authorization": "Bearer sk-..."}'
-              className="font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+              className="font-mono text-sm bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
             />
           </div>
         </div>
       )}
 
       {transport === 'STDIO' && (
-        <div className="space-y-3 rounded-xl border border-[#1e1e3a] bg-card/[0.03] p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">{t('processSection')}</p>
+        <div className="space-y-3 rounded-xl border border-[var(--border-default)] bg-card/[0.03] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--accent-mcp)]">{t('processSection')}</p>
           <div className="space-y-1.5">
             <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('commandLabel')}</Label>
             <Input
@@ -360,7 +360,7 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
               onChange={(e) => setCommand(e.target.value)}
               placeholder="npx"
               required
-              className="font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+              className="font-mono text-sm bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
             />
           </div>
           <div className="space-y-1.5">
@@ -369,13 +369,13 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
               value={args}
               onChange={(e) => setArgs(e.target.value)}
               placeholder="-y, @modelcontextprotocol/server-filesystem, /path/to/dir"
-              className="font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+              className="font-mono text-sm bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
             />
           </div>
         </div>
       )}
 
-      {error && <p className="text-sm text-red-400 font-mono">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>}
+      {error && <p className="text-sm text-[var(--status-error)] font-mono">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>}
 
       <div className="flex justify-end gap-2 pt-2">
         <button
@@ -388,7 +388,7 @@ function McpForm({ initial, preset, onClose, onSuccess }: {
         <button
           type="submit"
           disabled={isPending}
-          className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-[var(--accent-workspace)] hover:brightness-110 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? t('savingBtn') : initial ? t('saveChanges') : t('createMcpBtn')}
         </button>
@@ -426,14 +426,14 @@ function AssignAgentsPanel({ mcp }: { mcp: Mcp }) {
   return (
     <div className="space-y-2">
       {agentMcps.map(({ agent, assigned }: { agent: Agent; assigned: boolean }) => (
-        <div key={agent.id} className="flex items-center justify-between rounded-xl border border-[#1e1e3a] bg-card/[0.03] px-3 py-2">
+        <div key={agent.id} className="flex items-center justify-between rounded-xl border border-[var(--border-default)] bg-card/[0.03] px-3 py-2">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500">
               <Bot size={11} className="text-white" />
             </div>
-            <span className="text-sm font-medium text-zinc-200">{agent.name}</span>
+            <span className="text-sm font-medium text-[var(--text-primary)]">{agent.name}</span>
             {agent.modelName && (
-              <span className="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-mono bg-violet-900/200/10 text-violet-400 border border-violet-500/20">
+              <span className="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-mono bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border border-[var(--accent-workspace-border)]">
                 {agent.modelName}
               </span>
             )}
@@ -443,8 +443,8 @@ function AssignAgentsPanel({ mcp }: { mcp: Mcp }) {
             disabled={assign.isPending || remove.isPending}
             className={`h-7 px-3 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1 disabled:opacity-50 ${
               assigned
-                ? 'bg-card/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 text-muted-foreground/70 hover:text-red-400'
-                : 'bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-300'
+                ? 'bg-card/5 hover:bg-[var(--status-error)]/10 border border-white/10 hover:border-[var(--status-error)]/25 text-muted-foreground/70 hover:text-[var(--status-error)]'
+                : 'bg-[var(--accent-workspace-bg)] hover:bg-[var(--accent-workspace-bg)]/80 border border-[var(--accent-workspace-border)] text-[var(--accent-workspace)]'
             }`}
           >
             {assigned ? <><X size={11} />{t('removeBtn')}</> : <><Check size={11} />{t('assignBtn')}</>}
@@ -458,9 +458,9 @@ function AssignAgentsPanel({ mcp }: { mcp: Mcp }) {
 // ─── MCP Card ─────────────────────────────────────────────────────────────────
 
 const TRANSPORT_META = {
-  SSE: { label: 'SSE', icon: Wifi, color: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20', gradient: 'from-indigo-500 to-violet-600' },
-  HTTP: { label: 'HTTP', icon: Globe, color: 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20', gradient: 'from-sky-500 to-blue-600' },
-  STDIO: { label: 'STDIO', icon: Terminal, color: 'bg-emerald-950/500/10 text-emerald-400 border border-emerald-500/20', gradient: 'from-emerald-500 to-teal-600' },
+  SSE: { label: 'SSE', icon: Wifi, color: 'bg-[var(--accent-agent-bg)] text-[var(--accent-agent)] border border-[var(--accent-agent-border)]', gradient: 'from-indigo-500 to-violet-600' },
+  HTTP: { label: 'HTTP', icon: Globe, color: 'bg-[var(--accent-mcp-bg)] text-[var(--accent-mcp)] border border-[var(--accent-mcp-border)]', gradient: 'from-sky-500 to-blue-600' },
+  STDIO: { label: 'STDIO', icon: Terminal, color: 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)] border border-[var(--accent-mcp-border)]', gradient: 'from-emerald-500 to-teal-600' },
 };
 
 function McpCard({ mcp }: { mcp: Mcp }) {
@@ -479,7 +479,7 @@ function McpCard({ mcp }: { mcp: Mcp }) {
 
   if (editing) {
     return (
-      <div className="rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] p-5">
+      <div className="rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] p-5">
         <h3 className="text-base font-semibold text-white mb-4">{t('editMcp')}</h3>
         <McpForm initial={mcp} onClose={() => setEditing(false)} onSuccess={() => setEditing(false)} />
       </div>
@@ -490,9 +490,9 @@ function McpCard({ mcp }: { mcp: Mcp }) {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
-      className="group relative overflow-hidden rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] hover:border-violet-500/30 p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
+      className="group relative overflow-hidden rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] hover:border-[var(--accent-workspace-border)] p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
     >
-      <div className="absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-cyan-500/5 blur-2xl group-hover:bg-cyan-500/10 transition-opacity" />
+      <div className="absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-cyan-500/5 blur-2xl group-hover:bg-[var(--accent-mcp-bg)] transition-opacity" />
       <div className="flex items-start gap-4">
         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${meta.gradient} shadow-sm text-white`}>
           <TransportIcon size={18} />
@@ -517,7 +517,7 @@ function McpCard({ mcp }: { mcp: Mcp }) {
             onClick={() => setShowAgents((v) => !v)}
             className={`h-8 px-3 rounded-lg text-xs font-medium transition-all duration-200 border ${
               showAgents
-                ? 'bg-violet-600/20 text-violet-300 border-violet-500/30'
+                ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border-[var(--accent-workspace-border)]'
                 : 'bg-card/5 hover:bg-card/10 border-white/10 text-muted-foreground/70 hover:text-muted-foreground/50'
             }`}
           >
@@ -532,14 +532,14 @@ function McpCard({ mcp }: { mcp: Mcp }) {
           <button
             onClick={() => { if (confirm(`Delete "${mcp.name}"?`)) deleteMutation.mutate(); }}
             disabled={deleteMutation.isPending}
-            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-50"
+            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-[var(--status-error)] hover:bg-[var(--status-error)]/10 transition-all duration-200 disabled:opacity-50"
           >
             <Trash2 size={13} />
           </button>
         </div>
       </div>
       {showAgents && (
-        <div className="mt-4 border-t border-[#1e1e3a] pt-4">
+        <div className="mt-4 border-t border-[var(--border-default)] pt-4">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('agentsSection')}</p>
           <AssignAgentsPanel mcp={mcp} />
         </div>
@@ -561,7 +561,7 @@ function HubMcpCard({ item, installed, onInstall, installing }: {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
-      className="group relative overflow-hidden rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] hover:border-violet-500/30 p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
+      className="group relative overflow-hidden rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] hover:border-[var(--accent-workspace-border)] p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
     >
       <div className="flex items-start gap-4">
         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${item.gradient} shadow-sm text-white`}>
@@ -571,7 +571,7 @@ function HubMcpCard({ item, installed, onInstall, installing }: {
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-white">{item.name}</h3>
             <span className="rounded-full bg-card/[0.04] border border-white/[0.08] px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{item.category}</span>
-            <span className="rounded-full bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 text-[11px] font-medium text-cyan-400 font-mono">{(item.preset.transport ?? 'STDIO')}</span>
+            <span className="rounded-full bg-[var(--accent-mcp-bg)] border border-[var(--accent-mcp-border)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent-mcp)] font-mono">{(item.preset.transport ?? 'STDIO')}</span>
           </div>
           <p className="mt-0.5 text-sm text-muted-foreground/70">{item.description}</p>
           {(item.preset as any).command && (
@@ -588,10 +588,10 @@ function HubMcpCard({ item, installed, onInstall, installing }: {
           onClick={onInstall}
           className={`shrink-0 h-8 px-3 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1 border disabled:cursor-not-allowed ${
             installed
-              ? 'bg-emerald-950/500/10 text-emerald-400 border-emerald-500/20 cursor-default'
+              ? 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)] border-[var(--accent-mcp-border)] cursor-default'
               : installing
                 ? 'bg-card/5 text-muted-foreground border-white/10 opacity-60'
-                : 'bg-violet-600 hover:bg-violet-900/200 text-white border-transparent'
+                : 'bg-[var(--accent-workspace)] hover:brightness-110 text-white border-transparent'
           }`}
         >
           {installed ? <><Check size={11} />{t('installed')}</> : installing ? t('installingBtn') : <><Download size={11} />{t('install')}</>}
@@ -633,7 +633,7 @@ export default function McpPage() {
   });
 
   return (
-    <div className="min-h-full p-8 bg-[#080810] bg-[linear-gradient(rgba(255,255,255,.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.015)_1px,transparent_1px)] bg-[size:64px_64px]">
+    <div className="min-h-full p-8">
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -641,13 +641,13 @@ export default function McpPage() {
         className="mb-6 flex items-end justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">{t('title')}</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">{t('title')}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         {pageTab === 'mine' && !creating && (
           <button
             onClick={() => setCreating(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--accent-workspace)] hover:brightness-110 text-white transition-all duration-200"
           >
             <Plus size={14} />{t('newMcp')}
           </button>
@@ -655,14 +655,14 @@ export default function McpPage() {
       </motion.div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 rounded-xl bg-[#0f0f1a] border border-[#1e1e3a] p-1 w-fit">
+      <div className="mb-6 flex gap-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-default)] p-1 w-fit">
         {(['mine', 'hub'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => { setPageTab(tab); setCreating(false); }}
             className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
               pageTab === tab
-                ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30'
+                ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border border-[var(--accent-workspace-border)]'
                 : 'text-muted-foreground hover:text-muted-foreground/50'
             }`}
           >
@@ -682,7 +682,7 @@ export default function McpPage() {
         <>
           {creating && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-              <div className="rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] p-5">
+              <div className="rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] p-5">
                 <h3 className="text-base font-semibold text-white mb-4">{t('createMcpServer')}</h3>
                 <McpForm onClose={() => setCreating(false)} onSuccess={() => setCreating(false)} />
               </div>
@@ -694,7 +694,7 @@ export default function McpPage() {
               {[1, 2, 3].map((i) => <div key={i} className="h-24 animate-pulse bg-card/5 rounded-2xl" />)}
             </div>
           ) : mcps.length === 0 && !creating ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#1e1e3a] bg-card/[0.02] py-24 text-center">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-default)] bg-card/[0.02] py-24 text-center">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500">
                 <Server size={26} className="text-white" />
               </div>
@@ -703,7 +703,7 @@ export default function McpPage() {
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => setCreating(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--accent-workspace)] hover:brightness-110 text-white transition-all duration-200"
                 >
                   <Plus size={14} />{t('newMcp')}
                 </button>
@@ -737,7 +737,7 @@ export default function McpPage() {
                 value={hubSearch}
                 onChange={(e) => setHubSearch(e.target.value)}
                 placeholder={t('searchPlaceholder')}
-                className="pl-9 bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+                className="pl-9 bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
               />
             </div>
             <div className="flex gap-1.5 flex-wrap">
@@ -747,7 +747,7 @@ export default function McpPage() {
                   onClick={() => setHubCategory(cat)}
                   className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 border ${
                     hubCategory === cat
-                      ? 'bg-violet-900/200/20 text-violet-300 border-violet-500/30'
+                      ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border-[var(--accent-workspace-border)]'
                       : 'bg-card/[0.03] text-muted-foreground border-white/[0.06] hover:border-white/20 hover:text-muted-foreground/50'
                   }`}
                 >

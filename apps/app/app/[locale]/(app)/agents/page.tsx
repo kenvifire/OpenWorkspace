@@ -19,9 +19,9 @@ import { Bot, Plus, Pencil, Trash2, Eye, EyeOff, ChevronRight, Cpu, Layers, GitB
 import { useLocale, useTranslations } from 'next-intl';
 
 const LLM_PROVIDERS = [
-  { value: 'anthropic', label: 'Anthropic', color: 'bg-orange-100 text-orange-700' },
-  { value: 'openai', label: 'OpenAI', color: 'bg-green-900/40 text-green-400' },
-  { value: 'gemini', label: 'Google Gemini', color: 'bg-blue-900/40 text-blue-300' },
+  { value: 'anthropic', label: 'Anthropic', color: 'bg-[var(--accent-skill-bg)] text-[var(--accent-skill)]' },
+  { value: 'openai', label: 'OpenAI', color: 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)]' },
+  { value: 'gemini', label: 'Google Gemini', color: 'bg-[var(--accent-agent-bg)] text-[var(--accent-agent)]' },
   { value: 'custom', label: 'Custom', color: 'bg-muted text-muted-foreground' },
 ];
 
@@ -182,7 +182,7 @@ function AgentForm({
       </div>
 
       {error && (
-        <p className="text-sm text-red-400">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>
+        <p className="text-sm text-[var(--status-error)]">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>
       )}
 
       <div className="flex justify-end gap-2 pt-2">
@@ -234,8 +234,8 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
     return (
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">{t('agentAdded')}</p>
-        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-          <code className="flex-1 break-all font-mono text-xs text-amber-900">{rawKey}</code>
+        <div className="flex items-center gap-2 rounded-lg border border-[var(--accent-skill-border)] bg-[var(--accent-skill-bg)] p-3">
+          <code className="flex-1 break-all font-mono text-xs text-[var(--accent-skill)]">{rawKey}</code>
           <Button size="sm" variant="outline" onClick={copy}>{copied ? t('copied') : t('copy')}</Button>
         </div>
         <div className="flex justify-end gap-2">
@@ -281,7 +281,7 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
           </Select>
         </div>
       )}
-      {hire.error && <p className="text-sm text-red-400">{(hire.error as any)?.response?.data?.message ?? t('failedToAdd')}</p>}
+      {hire.error && <p className="text-sm text-[var(--status-error)]">{(hire.error as any)?.response?.data?.message ?? t('failedToAdd')}</p>}
       <div className="flex justify-end gap-2">
         <Button variant="outline" onClick={onClose}>{t('cancel')}</Button>
         <Button onClick={() => hire.mutate()} disabled={!projectId || hire.isPending}>
@@ -295,9 +295,9 @@ function AddToProjectDialog({ agent, onClose }: { agent: Agent; onClose: () => v
 // ─── Agent Card ───────────────────────────────────────────────────────────────
 
 const PROVIDER_COLORS: Record<string, string> = {
-  anthropic: 'bg-orange-100 text-orange-700',
-  openai: 'bg-green-900/40 text-green-400',
-  gemini: 'bg-blue-900/40 text-blue-300',
+  anthropic: 'bg-[var(--accent-skill-bg)] text-[var(--accent-skill)]',
+  openai: 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)]',
+  gemini: 'bg-[var(--accent-agent-bg)] text-[var(--accent-agent)]',
 };
 
 function AgentVersionsPanel({ agent }: { agent: Agent }) {
@@ -356,7 +356,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
       </div>
 
       {publishVersion.isError && (
-        <p className="text-xs text-red-400">{(publishVersion.error as any)?.response?.data?.message ?? t('failedToPublish')}</p>
+        <p className="text-xs text-[var(--status-error)]">{(publishVersion.error as any)?.response?.data?.message ?? t('failedToPublish')}</p>
       )}
 
       {versions.length === 0 ? (
@@ -368,9 +368,9 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
             return (
               <div
                 key={v.id}
-                className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 ${isActive ? 'border-sky-200 bg-sky-50' : 'border-border/50 bg-card'}`}
+                className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 ${isActive ? 'border-[var(--accent-agent-border)] bg-[var(--accent-agent-bg)]' : 'border-border/50 bg-card'}`}
               >
-                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-bold ${isActive ? 'bg-sky-600 text-white' : 'bg-muted text-muted-foreground'}`}>
+                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-bold ${isActive ? 'bg-[var(--accent-agent)] text-white' : 'bg-muted text-muted-foreground'}`}>
                   v{v.versionNumber}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -378,7 +378,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
                   <p className="text-[10px] text-muted-foreground/70">{new Date(v.publishedAt).toLocaleDateString()}</p>
                 </div>
                 {isActive && (
-                  <span className="rounded-full bg-sky-900/40 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300">{t('activeVersionBadge')}</span>
+                  <span className="rounded-full bg-[var(--accent-agent-bg)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--accent-agent)]">{t('activeVersionBadge')}</span>
                 )}
                 <div className="flex items-center gap-1 shrink-0">
                   {isActive ? (
@@ -393,7 +393,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
                     <button
                       onClick={() => activateVersion.mutate(v.id)}
                       disabled={activateVersion.isPending}
-                      className="flex items-center gap-1 rounded-md bg-sky-600 px-2 py-0.5 text-[10px] font-medium text-white hover:bg-sky-700 transition-colors"
+                      className="flex items-center gap-1 rounded-md bg-[var(--accent-agent)] px-2 py-0.5 text-[10px] font-medium text-white hover:opacity-90 transition-colors"
                     >
                       {t('activateBtn')}
                     </button>
@@ -401,7 +401,7 @@ function AgentVersionsPanel({ agent }: { agent: Agent }) {
                   <button
                     onClick={() => deleteVersion.mutate(v.id)}
                     disabled={deleteVersion.isPending}
-                    className="rounded p-0.5 text-muted-foreground/50 hover:text-red-400 transition-colors"
+                    className="rounded p-0.5 text-[var(--text-muted)] hover:text-[var(--status-error)] transition-colors"
                   >
                     <Trash2 size={11} />
                   </button>
@@ -503,7 +503,7 @@ function AgentCapabilitiesPanel({ agent }: { agent: Agent }) {
               return (
                 <div key={skill.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-white ${skill.type === 'WEBHOOK' ? 'bg-emerald-950/500' : 'bg-amber-500'}`}>
+                    <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${skill.type === 'WEBHOOK' ? 'bg-[var(--accent-mcp-bg)] text-[var(--accent-mcp)]' : 'bg-[var(--accent-skill-bg)] text-[var(--accent-skill)]'}`}>
                       {skill.type === 'WEBHOOK' ? <Globe size={11} /> : <Zap size={11} />}
                     </div>
                     <span className="text-sm font-medium text-foreground truncate">{skill.name}</span>
@@ -536,13 +536,13 @@ function AgentCapabilitiesPanel({ agent }: { agent: Agent }) {
               return (
                 <div key={mcp.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-violet-900/200 text-white">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)]">
                       <Globe size={11} />
                     </div>
                     <span className="text-sm font-medium text-foreground truncate">{mcp.name}</span>
                     <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-                      mcp.transport === 'SSE' ? 'bg-blue-900/40 text-blue-300' :
-                      mcp.transport === 'HTTP' ? 'bg-green-900/40 text-green-400' :
+                      mcp.transport === 'SSE' ? 'bg-[var(--accent-agent-bg)] text-[var(--accent-agent)]' :
+                      mcp.transport === 'HTTP' ? 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)]' :
                       'bg-muted text-muted-foreground'
                     }`}>{mcp.transport}</span>
                   </div>
@@ -627,7 +627,7 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
               </span>
             )}
             {activeVersionId && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-sky-900/40 px-2 py-0.5 text-[11px] font-medium text-sky-300">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--accent-agent-bg)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent-agent)]">
                 <GitBranch size={9} />
                 {versions.find((v) => v.id === activeVersionId)?.label ?? `v${versions.find((v) => v.id === activeVersionId)?.versionNumber}`}
               </span>
@@ -673,7 +673,7 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-red-400 hover:text-red-400 hover:bg-red-50"
+            className="h-8 w-8 text-[var(--status-error)] hover:text-[var(--status-error)] hover:bg-[var(--status-error)]/10"
             onClick={() => { if (confirm(`Delete "${agent.name}"?`)) deleteMutation.mutate(); }}
             disabled={deleteMutation.isPending}
           >
@@ -766,7 +766,7 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-foreground">Planning Agent</h3>
-            <span className="rounded-full bg-violet-900/40 px-2 py-0.5 text-[11px] font-medium text-violet-300">Built-in</span>
+            <span className="rounded-full bg-[var(--accent-workspace-bg)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent-workspace)]">Built-in</span>
           </div>
           <p className="mt-0.5 text-sm text-muted-foreground">Default AI planner for your projects. Set a user-level prompt that applies across all projects.</p>
           <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground/70">
@@ -828,7 +828,7 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
                   <label className="text-xs font-medium text-foreground/80">
                     API Key
                     {config.hasApiKey && (
-                      <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-900/40 px-1.5 py-0.5 text-[10px] font-medium text-green-400">
+                      <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-[var(--accent-mcp-bg)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--status-running)]">
                         <KeyRound size={9} /> Saved
                       </span>
                     )}
@@ -868,9 +868,9 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
                 <div className="flex items-center gap-2 text-[11px] text-muted-foreground/70">
                   <span className="rounded bg-muted px-1.5 py-0.5 font-mono">Base</span>
                   <span>+</span>
-                  <span className="rounded bg-violet-900/40 px-1.5 py-0.5 font-mono text-violet-400">User (this)</span>
+                  <span className="rounded bg-[var(--accent-workspace-bg)] px-1.5 py-0.5 font-mono text-[var(--accent-workspace)]">User (this)</span>
                   <span>+</span>
-                  <span className="rounded bg-sky-900/40 px-1.5 py-0.5 font-mono text-sky-600">Project (per-project settings)</span>
+                  <span className="rounded bg-[var(--accent-agent-bg)] px-1.5 py-0.5 font-mono text-[var(--accent-agent)]">Project (per-project settings)</span>
                 </div>
 
                 {/* Base prompt */}
@@ -902,7 +902,7 @@ function PlanningAgentCard({ config }: { config: PlanningAgentConfig }) {
                     </Button>
                   </div>
                   {updateConfig.isError && (
-                    <p className="text-xs text-red-400">{(updateConfig.error as any)?.response?.data?.message ?? 'Failed to save'}</p>
+                    <p className="text-xs text-[var(--status-error)]">{(updateConfig.error as any)?.response?.data?.message ?? 'Failed to save'}</p>
                   )}
                 </div>
               </div>

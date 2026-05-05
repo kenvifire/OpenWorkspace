@@ -78,7 +78,7 @@ export default function BillingPage() {
           <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Select value={selectedWorkspaceId} onValueChange={(v) => setSelectedWorkspaceId(v ?? '')}>
-          <SelectTrigger className="w-48 bg-card">
+          <SelectTrigger className="w-48 bg-[var(--bg-surface)] border-[var(--border-default)] text-[var(--text-primary)]">
             <SelectValue placeholder={t('selectWorkspace')} />
           </SelectTrigger>
           <SelectContent alignItemWithTrigger={false}>
@@ -116,8 +116,8 @@ export default function BillingPage() {
               </p>
             </div>
             <div className="flex flex-col rounded-2xl bg-card p-5 shadow-sm ring-1 ring-border">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-900/40">
-                <DollarSign size={18} className="text-violet-400" />
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-workspace-bg)]">
+                <DollarSign size={18} className="text-[var(--accent-workspace)]" />
               </div>
               <p className="text-sm font-medium text-foreground/80">{t('payThisCycle')}</p>
               <p className="mt-0.5 text-xs text-muted-foreground/70">{t('viaStripe')}</p>
@@ -150,7 +150,7 @@ export default function BillingPage() {
                   <div key={p.projectId}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-violet-900/200" />
+                        <div className="h-2 w-2 rounded-full bg-[var(--accent-workspace)]" />
                         <span className="font-semibold text-foreground">{p.projectName}</span>
                       </div>
                       <span className="font-bold text-foreground">{p.totalFormatted}</span>

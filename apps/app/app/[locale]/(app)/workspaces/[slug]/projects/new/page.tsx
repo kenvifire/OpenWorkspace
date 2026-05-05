@@ -137,7 +137,7 @@ function DetailsStep({
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="proj-name">
-          Project name <span className="text-red-400">*</span>
+          Project name <span className="text-[var(--status-error)]">*</span>
         </Label>
         <Input
           id="proj-name"
@@ -496,7 +496,7 @@ function ResourceKeysStep({
               </button>
             </div>
           </div>
-          {addError && <p className="text-xs text-red-400">{addError}</p>}
+          {addError && <p className="text-xs text-[var(--status-error)]">{addError}</p>}
           <Button variant="outline" size="sm" className="w-full" onClick={addKey}>
             <Plus className="w-3.5 h-3.5 mr-1" /> Add key
           </Button>
@@ -711,7 +711,7 @@ function ReviewStep({
       </div>
 
       {creationError && (
-        <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+        <div className="flex items-start gap-2 p-3 bg-[var(--status-error)]/10 border border-[var(--status-error)]/25 rounded-lg text-sm text-[var(--status-error)]">
           <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{creationError}</span>
         </div>

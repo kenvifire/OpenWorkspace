@@ -62,7 +62,7 @@ export default function NewWorkspacePage() {
             <p className="text-xs text-muted-foreground">{t('slugHint')}</p>
           </div>
           {error && (
-            <p className="text-sm text-red-400">
+            <p className="text-sm text-[var(--status-error)]">
               {(() => {
                 const msg = (error as any)?.response?.data?.message;
                 if (typeof msg === 'string') return msg;

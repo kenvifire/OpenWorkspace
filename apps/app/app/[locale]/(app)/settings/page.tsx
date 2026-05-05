@@ -179,7 +179,7 @@ function ProfileTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
             {saving ? (
               <Loader2 size={14} className="animate-spin mr-1.5" />
             ) : saveSuccess ? (
-              <Check size={14} className="mr-1.5 text-green-400" />
+              <Check size={14} className="mr-1.5 text-[var(--status-running)]" />
             ) : null}
             {saveSuccess ? t('saved') : t('saveChanges')}
           </Button>
@@ -473,7 +473,7 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
                 {pwSaving ? (
                   <Loader2 size={14} className="animate-spin mr-1.5" />
                 ) : pwSuccess ? (
-                  <Check size={14} className="mr-1.5 text-green-400" />
+                  <Check size={14} className="mr-1.5 text-[var(--status-running)]" />
                 ) : null}
                 {pwSuccess ? t('updated') : t('updatePassword')}
               </Button>
@@ -563,7 +563,7 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
               value={tfaToken}
               onChange={(e) => setTfaToken(e.target.value.replace(/\D/g, ''))}
             />
-            {tfaError && <p className="text-xs text-red-400">{tfaError}</p>}
+            {tfaError && <p className="text-xs text-[var(--status-error)]">{tfaError}</p>}
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => { setTfaStep('idle'); setTfaToken(''); setTfaError(''); }}>{tc('cancel')}</Button>
               <Button size="sm" disabled={tfaToken.length !== 6 || tfaSaving} onClick={handleEnableTfa}>
@@ -585,7 +585,7 @@ function AccountTab({ user }: { user: NonNullable<ReturnType<typeof useAuth>['us
               value={tfaToken}
               onChange={(e) => setTfaToken(e.target.value.replace(/\D/g, ''))}
             />
-            {tfaError && <p className="text-xs text-red-400">{tfaError}</p>}
+            {tfaError && <p className="text-xs text-[var(--status-error)]">{tfaError}</p>}
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => { setTfaStep('idle'); setTfaToken(''); setTfaError(''); }}>{tc('cancel')}</Button>
               <Button variant="destructive" size="sm" disabled={tfaToken.length !== 6 || tfaSaving} onClick={handleDisableTfa}>
@@ -679,7 +679,7 @@ function BillingTab() {
 
       {/* Payment methods card */}
       <div className="rounded-xl border border-border bg-card p-5 flex items-start gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-skill-bg)]">
           <Shield size={18} className="text-amber-400" />
         </div>
         <div className="flex-1 min-w-0">

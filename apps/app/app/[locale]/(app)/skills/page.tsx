@@ -477,13 +477,13 @@ function SkillForm({
             required
             minLength={2}
             maxLength={80}
-            className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50 font-mono"
+            className="bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)] font-mono"
           />
         </div>
         <div className="space-y-1.5">
           <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('typeLabel')}</Label>
           <Select value={type} onValueChange={(v) => setType((v ?? 'PROMPT') as 'PROMPT' | 'WEBHOOK')}>
-            <SelectTrigger className="w-full bg-[#0f0f1a] border-[#1e1e3a] text-white focus:border-violet-500/50"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full bg-[var(--bg-surface)] border-[var(--border-default)] text-white focus:border-[var(--accent-workspace-border)]"><SelectValue /></SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
               <SelectItem value="PROMPT">{t('typePrompt')}</SelectItem>
               <SelectItem value="WEBHOOK">{t('typeWebhook')}</SelectItem>
@@ -501,7 +501,7 @@ function SkillForm({
           required
           minLength={5}
           maxLength={500}
-          className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+          className="bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
         />
       </div>
 
@@ -513,15 +513,15 @@ function SkillForm({
           placeholder={type === 'PROMPT' ? t('instructionsPromptPlaceholder') : t('instructionsWebhookPlaceholder')}
           rows={6}
           maxLength={8000}
-          className="resize-none font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+          className="resize-none font-mono text-sm bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
           required
         />
         <p className="text-xs text-muted-foreground font-mono">{instructions.length}/8000</p>
       </div>
 
       {type === 'WEBHOOK' && (
-        <div className="space-y-3 rounded-xl border border-[#1e1e3a] bg-card/[0.03] p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-violet-400">{t('webhookConfigSection')}</p>
+        <div className="space-y-3 rounded-xl border border-[var(--border-default)] bg-card/[0.03] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--accent-workspace)]">{t('webhookConfigSection')}</p>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="sm:col-span-2 space-y-1.5">
               <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('urlLabel')}</Label>
@@ -530,13 +530,13 @@ function SkillForm({
                 onChange={(e) => setWebhookUrl(e.target.value)}
                 placeholder="https://api.example.com/endpoint"
                 type="url"
-                className="bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50 font-mono text-sm"
+                className="bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)] font-mono text-sm"
               />
             </div>
             <div className="space-y-1.5">
               <Label className="text-muted-foreground/50 text-xs font-medium uppercase tracking-wide">{t('methodLabel')}</Label>
               <Select value={webhookMethod} onValueChange={(v) => setWebhookMethod(v ?? 'POST')}>
-                <SelectTrigger className="bg-[#0f0f1a] border-[#1e1e3a] text-white focus:border-violet-500/50"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border-default)] text-white focus:border-[var(--accent-workspace-border)]"><SelectValue /></SelectTrigger>
                 <SelectContent alignItemWithTrigger={false}>
                   {['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
                     <SelectItem key={m} value={m}>{m}</SelectItem>
@@ -551,13 +551,13 @@ function SkillForm({
               value={webhookHeaders}
               onChange={(e) => setWebhookHeaders(e.target.value)}
               placeholder='{"Authorization": "Bearer sk-..."}'
-              className="font-mono text-sm bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+              className="font-mono text-sm bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
             />
           </div>
         </div>
       )}
 
-      {error && <p className="text-sm text-red-400 font-mono">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>}
+      {error && <p className="text-sm text-[var(--status-error)] font-mono">{(error as any)?.response?.data?.message ?? t('errorFallback')}</p>}
 
       <div className="flex justify-end gap-2 pt-2">
         <button
@@ -570,7 +570,7 @@ function SkillForm({
         <button
           type="submit"
           disabled={isPending}
-          className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-[var(--accent-workspace)] hover:brightness-110 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? t('savingBtn') : initial ? t('saveChanges') : t('createSkillBtn')}
         </button>
@@ -608,14 +608,14 @@ function AssignAgentsPanel({ skill }: { skill: Skill }) {
   return (
     <div className="space-y-2">
       {agentSkills.map(({ agent, assigned }: { agent: Agent; assigned: boolean }) => (
-        <div key={agent.id} className="flex items-center justify-between rounded-xl border border-[#1e1e3a] bg-card/[0.03] px-3 py-2">
+        <div key={agent.id} className="flex items-center justify-between rounded-xl border border-[var(--border-default)] bg-card/[0.03] px-3 py-2">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500">
               <Bot size={11} className="text-white" />
             </div>
-            <span className="text-sm font-medium text-zinc-200">{agent.name}</span>
+            <span className="text-sm font-medium text-[var(--text-primary)]">{agent.name}</span>
             {agent.modelName && (
-              <span className="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-mono bg-violet-900/200/10 text-violet-400 border border-violet-500/20">
+              <span className="inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-mono bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border border-[var(--accent-workspace-border)]">
                 {agent.modelName}
               </span>
             )}
@@ -625,8 +625,8 @@ function AssignAgentsPanel({ skill }: { skill: Skill }) {
             disabled={assign.isPending || remove.isPending}
             className={`h-7 px-3 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1 disabled:opacity-50 ${
               assigned
-                ? 'bg-card/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 text-muted-foreground/70 hover:text-red-400'
-                : 'bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-300'
+                ? 'bg-card/5 hover:bg-[var(--status-error)]/10 border border-white/10 hover:border-[var(--status-error)]/25 text-muted-foreground/70 hover:text-[var(--status-error)]'
+                : 'bg-[var(--accent-workspace-bg)] hover:bg-[var(--accent-workspace-bg)]/80 border border-[var(--accent-workspace-border)] text-[var(--accent-workspace)]'
             }`}
           >
             {assigned ? <><X size={11} />{t('remove')}</> : <><Check size={11} />{t('assign')}</>}
@@ -652,7 +652,7 @@ function SkillCard({ skill }: { skill: Skill }) {
 
   if (editing) {
     return (
-      <div className="rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] p-5">
+      <div className="rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] p-5">
         <h3 className="text-base font-semibold text-white mb-4">{t('editSkillTitle')}</h3>
         <SkillForm initial={skill} onClose={() => setEditing(false)} onSuccess={() => setEditing(false)} />
       </div>
@@ -666,9 +666,9 @@ function SkillCard({ skill }: { skill: Skill }) {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
-      className="group relative overflow-hidden rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] hover:border-violet-500/30 p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
+      className="group relative overflow-hidden rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] hover:border-[var(--accent-workspace-border)] p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
     >
-      <div className="absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-violet-900/200/5 blur-2xl group-hover:bg-violet-900/200/10 transition-opacity" />
+      <div className="absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-[var(--accent-workspace-bg)]/30 blur-2xl group-hover:bg-[var(--accent-workspace-bg)] transition-opacity" />
       <div className="flex items-start gap-4">
         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl shadow-sm text-white ${isWebhook ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-violet-500 to-purple-600'}`}>
           {isWebhook ? <Globe size={18} /> : <Zap size={18} />}
@@ -676,7 +676,7 @@ function SkillCard({ skill }: { skill: Skill }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-white">{skill.name}</h3>
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${isWebhook ? 'bg-emerald-950/500/10 text-emerald-400 border-emerald-500/20' : 'bg-violet-900/200/10 text-violet-400 border-violet-500/20'}`}>
+            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${isWebhook ? 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)] border-[var(--accent-mcp-border)]' : 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border-[var(--accent-workspace-border)]'}`}>
               {isWebhook ? <Globe size={10} className="mr-1" /> : <MessageSquare size={10} className="mr-1" />}
               {skill.type}
             </span>
@@ -689,7 +689,7 @@ function SkillCard({ skill }: { skill: Skill }) {
             onClick={() => setShowAgents((v) => !v)}
             className={`h-8 px-3 rounded-lg text-xs font-medium transition-all duration-200 border ${
               showAgents
-                ? 'bg-violet-600/20 text-violet-300 border-violet-500/30'
+                ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border-[var(--accent-workspace-border)]'
                 : 'bg-card/5 hover:bg-card/10 border-white/10 text-muted-foreground/70 hover:text-muted-foreground/50'
             }`}
           >
@@ -704,7 +704,7 @@ function SkillCard({ skill }: { skill: Skill }) {
           <button
             onClick={() => { if (confirm(`Delete "${skill.name}"?`)) deleteMutation.mutate(); }}
             disabled={deleteMutation.isPending}
-            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-50"
+            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-[var(--status-error)] hover:bg-[var(--status-error)]/10 transition-all duration-200 disabled:opacity-50"
           >
             <Trash2 size={13} />
           </button>
@@ -716,7 +716,7 @@ function SkillCard({ skill }: { skill: Skill }) {
         </div>
       )}
       {showAgents && (
-        <div className="mt-4 border-t border-[#1e1e3a] pt-4">
+        <div className="mt-4 border-t border-[var(--border-default)] pt-4">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('agentsSection')}</p>
           <AssignAgentsPanel skill={skill} />
         </div>
@@ -738,7 +738,7 @@ function HubSkillCard({ item, installed, onInstall, installing }: {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
-      className="group relative overflow-hidden rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] hover:border-violet-500/30 p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
+      className="group relative overflow-hidden rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] hover:border-[var(--accent-workspace-border)] p-5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]"
     >
       <div className="flex items-start gap-4">
         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${item.gradient} shadow-sm text-white`}>
@@ -748,7 +748,7 @@ function HubSkillCard({ item, installed, onInstall, installing }: {
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-white">{item.name}</h3>
             <span className="rounded-full bg-card/[0.04] border border-white/[0.08] px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{item.category}</span>
-            <span className="rounded-full bg-violet-900/200/10 border border-violet-500/20 px-2 py-0.5 text-[11px] font-medium text-violet-400">{item.preset.type ?? 'PROMPT'}</span>
+            <span className="rounded-full bg-[var(--accent-workspace-bg)] border border-[var(--accent-workspace-border)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent-workspace)]">{item.preset.type ?? 'PROMPT'}</span>
           </div>
           <p className="mt-0.5 text-sm text-muted-foreground/70">{item.description}</p>
         </div>
@@ -757,10 +757,10 @@ function HubSkillCard({ item, installed, onInstall, installing }: {
           onClick={onInstall}
           className={`shrink-0 h-8 px-3 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1 border disabled:cursor-not-allowed ${
             installed
-              ? 'bg-emerald-950/500/10 text-emerald-400 border-emerald-500/20 cursor-default'
+              ? 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)] border-[var(--accent-mcp-border)] cursor-default'
               : installing
                 ? 'bg-card/5 text-muted-foreground border-white/10 opacity-60'
-                : 'bg-violet-600 hover:bg-violet-900/200 text-white border-transparent'
+                : 'bg-[var(--accent-workspace)] hover:brightness-110 text-white border-transparent'
           }`}
         >
           {installed ? <><Check size={11} />{t('installed')}</> : installing ? t('installingBtn') : <><Download size={11} />{t('install')}</>}
@@ -806,7 +806,7 @@ export default function SkillsPage() {
   const closeForm = () => { setCreating(false); setActivePreset(undefined); };
 
   return (
-    <div className="min-h-full p-8 bg-[#080810] bg-[linear-gradient(rgba(255,255,255,.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.015)_1px,transparent_1px)] bg-[size:64px_64px]">
+    <div className="min-h-full p-8">
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -814,13 +814,13 @@ export default function SkillsPage() {
         className="mb-6 flex items-end justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">{t('title')}</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">{t('title')}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         {pageTab === 'mine' && !creating && (
           <button
             onClick={openBlank}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--accent-workspace)] hover:brightness-110 text-white transition-all duration-200"
           >
             <Plus size={14} />{t('newSkill')}
           </button>
@@ -828,14 +828,14 @@ export default function SkillsPage() {
       </motion.div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 rounded-xl bg-[#0f0f1a] border border-[#1e1e3a] p-1 w-fit">
+      <div className="mb-6 flex gap-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-default)] p-1 w-fit">
         {(['mine', 'hub'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => { setPageTab(tab); setCreating(false); }}
             className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
               pageTab === tab
-                ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30'
+                ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border border-[var(--accent-workspace-border)]'
                 : 'text-muted-foreground hover:text-muted-foreground/50'
             }`}
           >
@@ -855,7 +855,7 @@ export default function SkillsPage() {
         <>
           {creating && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-              <div className="rounded-2xl bg-[#0f0f1a] border border-[#1e1e3a] p-5">
+              <div className="rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] p-5">
                 <h3 className="text-base font-semibold text-white mb-4">
                   {activePreset ? t('createSkillFromHub') : t('createSkill')}
                 </h3>
@@ -869,7 +869,7 @@ export default function SkillsPage() {
               {[1, 2, 3].map((i) => <div key={i} className="h-24 animate-pulse bg-card/5 rounded-2xl" />)}
             </div>
           ) : skills.length === 0 && !creating ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#1e1e3a] bg-card/[0.02] py-24 text-center">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-default)] bg-card/[0.02] py-24 text-center">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600">
                 <Zap size={26} className="text-white" />
               </div>
@@ -878,7 +878,7 @@ export default function SkillsPage() {
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={openBlank}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 hover:bg-violet-900/200 text-white transition-all duration-200"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--accent-workspace)] hover:brightness-110 text-white transition-all duration-200"
                 >
                   <Plus size={14} />{t('newSkill')}
                 </button>
@@ -913,7 +913,7 @@ export default function SkillsPage() {
                 value={hubSearch}
                 onChange={(e) => setHubSearch(e.target.value)}
                 placeholder={t('searchPlaceholder')}
-                className="pl-9 bg-[#0f0f1a] border-[#1e1e3a] text-white placeholder:text-muted-foreground focus:border-violet-500/50"
+                className="pl-9 bg-[var(--bg-surface)] border-[var(--border-default)] text-white placeholder:text-muted-foreground focus:border-[var(--accent-workspace-border)]"
               />
             </div>
             <div className="flex gap-1.5 flex-wrap">
@@ -923,7 +923,7 @@ export default function SkillsPage() {
                   onClick={() => setHubCategory(cat)}
                   className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 border ${
                     hubCategory === cat
-                      ? 'bg-violet-900/200/20 text-violet-300 border-violet-500/30'
+                      ? 'bg-[var(--accent-workspace-bg)] text-[var(--accent-workspace)] border-[var(--accent-workspace-border)]'
                       : 'bg-card/[0.03] text-muted-foreground border-white/[0.06] hover:border-white/20 hover:text-muted-foreground/50'
                   }`}
                 >

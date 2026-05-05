@@ -192,7 +192,7 @@ function AgentForm({ onClose, onSuccess }: { onClose: () => void; onSuccess: () 
         )}
 
         {createAgent.isError && (
-          <p className="text-xs text-red-400">
+          <p className="text-xs text-[var(--status-error)]">
             {(() => {
               const msg = (createAgent.error as any)?.response?.data?.message;
               if (typeof msg === 'string') return msg;
@@ -336,9 +336,9 @@ export default function ProvidersPage() {
         transition={{ duration: 0.3, delay: 0.05 }}
         className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2"
       >
-        <div className={`flex items-center gap-3 rounded-2xl border p-4 ${hasDpa ? 'border-emerald-800 bg-emerald-950/50' : 'border-amber-200 bg-amber-50'}`}>
+        <div className={`flex items-center gap-3 rounded-2xl border p-4 ${hasDpa ? 'border-[var(--accent-mcp-border)] bg-[var(--accent-mcp-bg)]' : 'border-[var(--accent-skill-border)] bg-[var(--accent-skill-bg)]'}`}>
           <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${hasDpa ? 'bg-emerald-100' : 'bg-amber-900/40'}`}>
-            <ShieldCheck size={18} className={hasDpa ? 'text-emerald-600' : 'text-amber-600'} />
+            <ShieldCheck size={18} className={hasDpa ? 'text-[var(--status-running)]' : 'text-[var(--accent-skill)]'} />
           </div>
           <div className="flex-1">
             <p className="text-sm font-semibold text-foreground">Data Processing Agreement</p>

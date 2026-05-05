@@ -15,10 +15,10 @@ import { ArrowLeft, Plus, Trash2, Eye, EyeOff, KeyRound, ShieldCheck, Box } from
 import { motion } from 'framer-motion';
 
 const PROVIDERS = [
-  { value: 'openai', label: 'OpenAI', color: 'bg-green-900/40 text-green-400' },
-  { value: 'anthropic', label: 'Anthropic', color: 'bg-orange-100 text-orange-700' },
-  { value: 'gemini', label: 'Google Gemini', color: 'bg-blue-900/40 text-blue-300' },
-  { value: 'custom', label: 'Custom', color: 'bg-muted text-muted-foreground' },
+  { value: 'openai', label: 'OpenAI', color: 'bg-[var(--accent-mcp-bg)] text-[var(--status-running)]' },
+  { value: 'anthropic', label: 'Anthropic', color: 'bg-[var(--accent-skill-bg)] text-[var(--accent-skill)]' },
+  { value: 'gemini', label: 'Google Gemini', color: 'bg-[var(--accent-agent-bg)] text-[var(--accent-agent)]' },
+  { value: 'custom', label: 'Custom', color: 'bg-[var(--bg-elevated)] text-[var(--text-muted)]' },
 ];
 
 export default function WorkspaceSettingsPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -76,7 +76,7 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
     onSuccess: () => qc.invalidateQueries({ queryKey: ['workspace-provider-keys', workspace?.id] }),
   });
 
-  const providerMeta = (p: string) => PROVIDERS.find((pr) => pr.value === p) ?? { label: p, color: 'bg-muted text-muted-foreground' };
+  const providerMeta = (p: string) => PROVIDERS.find((pr) => pr.value === p) ?? { label: p, color: 'bg-[var(--bg-elevated)] text-[var(--text-muted)]' };
 
   return (
     <div className="min-h-full p-8">
@@ -105,8 +105,8 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
         {/* Section header */}
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-900/40">
-              <KeyRound size={16} className="text-violet-400" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent-workspace-bg)]">
+              <KeyRound size={16} className="text-[var(--accent-workspace)]" />
             </div>
             <div>
               <h2 className="font-semibold text-foreground">LLM Provider API Keys</h2>
@@ -161,7 +161,7 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
               </div>
             </div>
             {upsertKey.isError && (
-              <p className="text-xs text-red-400">{(upsertKey.error as any)?.response?.data?.message ?? 'Failed to save key'}</p>
+              <p className="text-xs text-[var(--status-error)]">{(upsertKey.error as any)?.response?.data?.message ?? 'Failed to save key'}</p>
             )}
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => { setShowForm(false); setApiKey(''); setLabel(''); }}>Cancel</Button>
@@ -212,7 +212,7 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
                   <button
                     onClick={() => deleteKey.mutate(k.provider)}
                     disabled={deleteKey.isPending}
-                    className="shrink-0 rounded-lg p-1.5 text-muted-foreground/50 hover:bg-red-50 hover:text-red-400 transition-colors"
+                    className="shrink-0 rounded-lg p-1.5 text-muted-foreground/50 hover:bg-red-50 hover:text-[var(--status-error)] transition-colors"
                     title="Remove key"
                   >
                     <Trash2 size={13} />
@@ -232,8 +232,8 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
         className="max-w-2xl mt-10"
       >
         <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100">
-            <Box size={16} className="text-cyan-600" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent-agent-bg)]">
+            <Box size={16} className="text-[var(--accent-agent)]" />
           </div>
           <div>
             <h2 className="font-semibold text-foreground">Sandbox</h2>
@@ -247,18 +247,18 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
               <p className="text-sm font-medium text-foreground">E2B</p>
               <p className="text-xs text-muted-foreground/70 mt-0.5">
                 Isolated Ubuntu sandboxes for agents — run shell commands, write files, build & push code.{' '}
-                <a href="https://e2b.dev" target="_blank" rel="noreferrer" className="text-cyan-600 hover:underline">
+                <a href="https://e2b.dev" target="_blank" rel="noreferrer" className="text-[var(--accent-agent)] hover:underline">
                   Get API key →
                 </a>
               </p>
             </div>
             {e2bKey ? (
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-green-900/40 px-2 py-0.5 text-[11px] font-semibold text-green-400">Configured</span>
+                <span className="rounded-full bg-[var(--accent-mcp-bg)] border border-[var(--accent-mcp-border)] px-2 py-0.5 text-[11px] font-semibold text-[var(--status-running)]">Configured</span>
                 <button
                   onClick={() => deleteSandboxKey.mutate()}
                   disabled={deleteSandboxKey.isPending}
-                  className="rounded-lg p-1.5 text-muted-foreground/50 hover:bg-red-50 hover:text-red-400 transition-colors"
+                  className="rounded-lg p-1.5 text-muted-foreground/50 hover:bg-red-50 hover:text-[var(--status-error)] transition-colors"
                   title="Remove key"
                 >
                   <Trash2 size={13} />
@@ -294,7 +294,7 @@ export default function WorkspaceSettingsPage({ params }: { params: Promise<{ sl
             </Button>
           </div>
           {saveSandboxKey.isError && (
-            <p className="text-xs text-red-400">{(saveSandboxKey.error as any)?.response?.data?.message ?? 'Failed to save key'}</p>
+            <p className="text-xs text-[var(--status-error)]">{(saveSandboxKey.error as any)?.response?.data?.message ?? 'Failed to save key'}</p>
           )}
         </div>
       </motion.div>
