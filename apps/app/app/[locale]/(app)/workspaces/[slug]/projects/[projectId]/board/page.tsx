@@ -102,18 +102,18 @@ export default function BoardPage({ params }: { params: Promise<{ slug: string; 
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center gap-4 border-b border-[oklch(0.22_0.02_265)] bg-[oklch(0.085_0.012_265)] px-6 py-3">
-        <Link href={`/${locale}/workspaces/${slug}`} className="text-[oklch(0.55_0.02_265)] hover:text-zinc-300 transition-colors">
+      <div className="flex items-center gap-4 border-b border-[var(--border-default)] bg-[var(--bg-base)] px-6 py-3">
+        <Link href={`/${locale}/workspaces/${slug}`} className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
           <ArrowLeft size={16} />
         </Link>
-        <div className="flex items-center gap-2 text-xs text-[oklch(0.55_0.02_265)]">
-          <Link href={`/${locale}/workspaces/${slug}`} className="hover:text-zinc-300 transition-colors truncate max-w-32">{slug}</Link>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Link href={`/${locale}/workspaces/${slug}`} className="hover:text-[var(--text-secondary)] transition-colors truncate max-w-32">{slug}</Link>
           <ChevronRight size={12} />
-          <span className="text-zinc-200 font-medium" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>{project?.name ?? '…'}</span>
+          <span className="text-[var(--text-primary)] font-medium" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>{project?.name ?? '…'}</span>
         </div>
         <div className="flex-1" />
         {blockedCount > 0 && (
-          <div className="flex items-center gap-1.5 rounded-lg bg-red-500/15 border border-red-500/25 px-3 py-1.5 text-sm text-red-400">
+          <div className="flex items-center gap-1.5 rounded-lg bg-[var(--status-error)]/10 border border-[var(--status-error)]/25 px-3 py-1.5 text-sm text-[var(--status-error)]">
             <AlertTriangle size={14} />
             {blockedCount} blocked task{blockedCount > 1 ? 's' : ''}
           </div>
@@ -137,10 +137,10 @@ export default function BoardPage({ params }: { params: Promise<{ slug: string; 
             {COLUMNS.map((col) => (
               <div key={col.id} className="flex w-64 shrink-0 flex-col">
                 {/* Column header */}
-                <div className={`mb-3 rounded-t-xl border-t-2 ${col.topColor} border-x border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] px-3 py-2.5 flex items-center gap-2`}>
+                <div className={`mb-3 rounded-t-xl border-t-2 ${col.topColor} border-x border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5 flex items-center gap-2`}>
                   <span className={`h-2 w-2 rounded-full ${col.dotColor}`} />
-                  <span className="text-sm font-semibold text-zinc-200" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>{col.label}</span>
-                  <span className="ml-auto rounded-full bg-[oklch(0.22_0.02_265)] px-1.5 py-0.5 text-[11px] font-medium text-[oklch(0.55_0.02_265)]">
+                  <span className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>{col.label}</span>
+                  <span className="ml-auto rounded-full bg-[var(--border-default)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--text-muted)]">
                     {tasksByStatus[col.id].length}
                   </span>
                 </div>
@@ -151,10 +151,10 @@ export default function BoardPage({ params }: { params: Promise<{ slug: string; 
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`flex flex-1 flex-col gap-2 rounded-b-xl border-x border-b border-[oklch(0.22_0.02_265)] p-2 transition-colors min-h-[100px] ${
+                      className={`flex flex-1 flex-col gap-2 rounded-b-xl border-x border-b border-[var(--border-default)] p-2 transition-colors min-h-[100px] ${
                         snapshot.isDraggingOver
-                          ? 'bg-violet-500/5 border-violet-500/30'
-                          : 'bg-[oklch(0.10_0.013_265)]'
+                          ? 'bg-[var(--accent-workspace-bg)] border-[var(--accent-workspace-border)]'
+                          : 'bg-[var(--bg-surface)]'
                       }`}
                     >
                       {tasksByStatus[col.id].map((task, i) => (
@@ -168,7 +168,7 @@ export default function BoardPage({ params }: { params: Promise<{ slug: string; 
                           <Input
                             autoFocus
                             placeholder="Task title…"
-                            className="h-8 text-sm bg-[oklch(0.12_0.014_265)] border-[oklch(0.22_0.02_265)] text-zinc-200 placeholder:text-[oklch(0.55_0.02_265)]"
+                            className="h-8 text-sm bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
                             value={newTaskTitle}
                             onChange={(e) => setNewTaskTitle(e.target.value)}
                             onKeyDown={(e) => {
@@ -188,7 +188,7 @@ export default function BoardPage({ params }: { params: Promise<{ slug: string; 
                       ) : (
                         <button
                           onClick={() => setAddingToColumn(col.id)}
-                          className="mt-1 flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-[oklch(0.55_0.02_265)] hover:bg-white/5 hover:text-zinc-300 transition-colors"
+                          className="mt-1 flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-secondary)] transition-colors"
                         >
                           <Plus size={12} /> Add task
                         </button>
