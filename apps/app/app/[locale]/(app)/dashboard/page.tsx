@@ -52,11 +52,11 @@ export default function DashboardPage() {
         className="mb-10 flex items-end justify-between"
       >
         <div>
-          <p className="text-sm font-medium text-[oklch(0.55_0.02_265)] mb-1">{greeting}</p>
+          <p className="text-sm font-medium text-[var(--text-muted)] mb-1">{greeting}</p>
           <h1 className="text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>
             {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'Welcome'}
           </h1>
-          <p className="mt-2 text-sm text-[oklch(0.55_0.02_265)]">
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
             {workspaces.length > 0
               ? tw('projects', { count: workspaces.length })
               : t('getStarted')}
@@ -74,7 +74,7 @@ export default function DashboardPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-44 animate-pulse rounded-2xl bg-[oklch(0.12_0.014_265)]" />
+            <div key={i} className="h-44 animate-pulse rounded-2xl bg-[var(--bg-surface)]" />
           ))}
         </div>
       ) : workspaces.length === 0 ? (
@@ -82,7 +82,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
-          className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[oklch(0.22_0.02_265)] bg-[oklch(0.12_0.014_265)] py-28 text-center"
+          className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-default)] bg-[var(--bg-surface)] py-28 text-center"
         >
           <div className="mb-6 relative flex h-20 w-20 items-center justify-center">
             <div className="absolute inset-0 rounded-2xl bg-violet-500/10 border border-violet-500/20" />
@@ -91,7 +91,7 @@ export default function DashboardPage() {
             <FolderKanban size={28} className="text-violet-400 relative z-10" />
           </div>
           <p className="font-semibold text-zinc-200 text-lg" style={{ fontFamily: 'var(--font-syne), system-ui, sans-serif' }}>{t('noWorkspaces')}</p>
-          <p className="mt-2 text-sm text-[oklch(0.55_0.02_265)] max-w-xs">{t('noWorkspacesDesc')}</p>
+          <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-xs">{t('noWorkspacesDesc')}</p>
           <Link
             href={`/${locale}/workspaces/new`}
             className={buttonVariants({ className: 'mt-7 shadow-[0_0_20px_oklch(0.68_0.18_285/0.4)] hover:shadow-[0_0_28px_oklch(0.68_0.18_285/0.6)] transition-shadow' })}

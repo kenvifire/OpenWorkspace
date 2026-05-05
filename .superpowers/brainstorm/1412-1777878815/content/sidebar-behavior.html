@@ -1,0 +1,186 @@
+<h2>How should the sidebar behave?</h2>
+<p class="subtitle">Option C had a full-label sidebar — should it stay that way, or keep the collapsible toggle?</p>
+
+<div class="cards">
+
+  <!-- Option A: Always expanded -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#09090f;padding:0;overflow:hidden;border-radius:6px 6px 0 0;">
+      <div style="display:flex;height:180px;font-family:system-ui,sans-serif;">
+        <div style="width:180px;background:#0c0c18;border-right:1px solid #1a1a2e;display:flex;flex-direction:column;padding:12px 8px;">
+          <!-- brand -->
+          <div style="display:flex;align-items:center;gap:7px;padding:4px 6px;margin-bottom:10px;">
+            <div style="width:24px;height:24px;border-radius:7px;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;">OW</div>
+            <span style="font-size:10px;font-weight:700;color:#e8e8f8;letter-spacing:-.01em;">OpenWorkspace</span>
+          </div>
+          <!-- nav -->
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <div style="display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;background:#7c3aed18;border-left:2px solid #7c3aed;">
+              <div style="width:13px;height:13px;border-radius:3px;background:#7c3aed;flex-shrink:0;"></div>
+              <span style="font-size:9px;font-weight:600;color:#a78bfa;">Dashboard</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;">
+              <div style="width:13px;height:13px;border-radius:3px;border:1.5px solid #252540;flex-shrink:0;"></div>
+              <span style="font-size:9px;color:#44445a;">Marketplace</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;">
+              <div style="width:13px;height:13px;border-radius:3px;border:1.5px solid #252540;flex-shrink:0;"></div>
+              <span style="font-size:9px;color:#44445a;">Billing</span>
+            </div>
+          </div>
+          <div style="margin-top:8px;padding:4px 8px 3px;font-size:7px;font-weight:700;color:#2e2e48;text-transform:uppercase;letter-spacing:.1em;">Workspaces</div>
+          <div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;">
+            <div style="width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg,#f59e0b,#ef4444);font-size:7px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">A</div>
+            <span style="font-size:9px;color:#66667a;">Alpha</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;">
+            <div style="width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg,#06b6d4,#3b82f6);font-size:7px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">B</div>
+            <span style="font-size:9px;color:#66667a;">Beta Labs</span>
+          </div>
+          <!-- lock indicator -->
+          <div style="margin-top:auto;padding:5px 8px;font-size:7px;color:#2e2e48;text-align:center;">Fixed width · always expanded</div>
+        </div>
+        <!-- main -->
+        <div style="flex:1;padding:14px;background:#09090f;">
+          <div style="font-size:14px;font-weight:700;color:#e8e8f8;margin-bottom:4px;">Dashboard</div>
+          <div style="font-size:8px;color:#333350;">Good morning, Kenvi</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:10px;">
+            <div style="background:#0f0f1e;border:1px solid #1e1e35;border-radius:8px;padding:8px;">
+              <div style="font-size:14px;font-weight:800;color:#a78bfa;">4</div>
+              <div style="font-size:7px;color:#333350;margin-top:1px;">Workspaces</div>
+            </div>
+            <div style="background:#0f0f1e;border:1px solid #1e1e35;border-radius:8px;padding:8px;">
+              <div style="font-size:14px;font-weight:800;color:#67e8f9;">12</div>
+              <div style="font-size:7px;color:#333350;margin-top:1px;">Agents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Always Expanded</h3>
+      <p>Fixed 200px sidebar, always visible labels. Maximum readability, no toggling. Best for desktop-first SaaS tools.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Keep collapsible -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#09090f;padding:0;overflow:hidden;border-radius:6px 6px 0 0;">
+      <div style="display:flex;height:180px;font-family:system-ui,sans-serif;">
+        <!-- expanded state shown -->
+        <div style="width:170px;background:#0c0c18;border-right:1px solid #1a1a2e;display:flex;flex-direction:column;padding:12px 8px;position:relative;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;gap:7px;">
+              <div style="width:24px;height:24px;border-radius:7px;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;">OW</div>
+              <span style="font-size:10px;font-weight:700;color:#e8e8f8;">OpenWorkspace</span>
+            </div>
+            <!-- toggle button -->
+            <div style="width:18px;height:18px;border-radius:5px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;">
+              <div style="width:8px;height:6px;border-left:1.5px solid #44445a;border-top:1.5px solid #44445a;border-bottom:1.5px solid #44445a;border-radius:1px;"></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <div style="display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;background:#7c3aed18;border-left:2px solid #7c3aed;">
+              <div style="width:12px;height:12px;border-radius:3px;background:#7c3aed;flex-shrink:0;"></div>
+              <span style="font-size:9px;font-weight:600;color:#a78bfa;">Dashboard</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:7px;">
+              <div style="width:12px;height:12px;border-radius:3px;border:1.5px solid #252540;flex-shrink:0;"></div>
+              <span style="font-size:9px;color:#44445a;">Marketplace</span>
+            </div>
+          </div>
+          <div style="margin-top:8px;padding:4px 8px 3px;font-size:7px;font-weight:700;color:#2e2e48;text-transform:uppercase;letter-spacing:.1em;">Workspaces</div>
+          <div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;">
+            <div style="width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg,#f59e0b,#ef4444);font-size:7px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">A</div>
+            <span style="font-size:9px;color:#66667a;">Alpha</span>
+          </div>
+          <!-- collapsed ghost preview -->
+          <div style="position:absolute;right:-38px;top:0;bottom:0;width:36px;background:#080b14;border-right:1px solid #1a1a2e;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:8px;opacity:.5;">
+            <div style="width:22px;height:22px;border-radius:6px;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;">OW</div>
+            <div style="width:22px;height:22px;border-radius:6px;background:#7c3aed18;"></div>
+            <div style="width:22px;height:22px;border-radius:6px;background:#1a1a2e;"></div>
+          </div>
+        </div>
+        <!-- main -->
+        <div style="flex:1;padding:14px;background:#09090f;margin-left:36px;">
+          <div style="font-size:13px;font-weight:700;color:#e8e8f8;margin-bottom:8px;">Dashboard</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <div style="background:#0f0f1e;border:1px solid #1e1e35;border-radius:8px;padding:8px;">
+              <div style="font-size:14px;font-weight:800;color:#a78bfa;">4</div>
+              <div style="font-size:7px;color:#333350;margin-top:1px;">Workspaces</div>
+            </div>
+            <div style="background:#0f0f1e;border:1px solid #1e1e35;border-radius:8px;padding:8px;">
+              <div style="font-size:14px;font-weight:800;color:#67e8f9;">12</div>
+              <div style="font-size:7px;color:#333350;margin-top:1px;">Agents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Keep Collapsible</h3>
+      <p>Expanded by default, but users can collapse to icon-only rail. Best for power users who want more canvas space on the Kanban board.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Top nav + slim sidebar -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#09090f;padding:0;overflow:hidden;border-radius:6px 6px 0 0;">
+      <div style="display:flex;flex-direction:column;height:180px;font-family:system-ui,sans-serif;">
+        <!-- top nav -->
+        <div style="height:38px;background:#0c0c18;border-bottom:1px solid #1a1a2e;display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;">
+          <div style="width:22px;height:22px;border-radius:6px;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;">OW</div>
+          <span style="font-size:10px;font-weight:700;color:#e8e8f8;">OpenWorkspace</span>
+          <div style="margin-left:16px;display:flex;gap:2px;">
+            <div style="padding:4px 8px;border-radius:5px;background:#7c3aed18;font-size:8px;font-weight:600;color:#a78bfa;">Dashboard</div>
+            <div style="padding:4px 8px;border-radius:5px;font-size:8px;color:#44445a;">Marketplace</div>
+            <div style="padding:4px 8px;border-radius:5px;font-size:8px;color:#44445a;">Billing</div>
+          </div>
+          <div style="margin-left:auto;width:22px;height:22px;border-radius:50%;background:#7c3aed30;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#a78bfa;">K</div>
+        </div>
+        <!-- body with slim sidebar -->
+        <div style="display:flex;flex:1;overflow:hidden;">
+          <div style="width:130px;background:#0a0a16;border-right:1px solid #1a1a2e;padding:10px 6px;display:flex;flex-direction:column;gap:1px;">
+            <div style="font-size:7px;font-weight:700;color:#2e2e48;text-transform:uppercase;letter-spacing:.1em;padding:2px 6px 4px;">Workspaces</div>
+            <div style="display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;background:#7c3aed14;border-left:2px solid #7c3aed;">
+              <div style="width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,#f59e0b,#ef4444);font-size:6px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">A</div>
+              <span style="font-size:8px;font-weight:600;color:#a78bfa;">Alpha</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;">
+              <div style="width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,#06b6d4,#3b82f6);font-size:6px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">B</div>
+              <span style="font-size:8px;color:#44445a;">Beta Labs</span>
+            </div>
+            <div style="margin-top:6px;font-size:7px;font-weight:700;color:#2e2e48;text-transform:uppercase;letter-spacing:.1em;padding:2px 6px 4px;">Agents</div>
+            <div style="display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;">
+              <div style="width:14px;height:14px;border-radius:4px;background:#06b6d420;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <div style="width:6px;height:6px;border-radius:50%;background:#06b6d4;"></div>
+              </div>
+              <span style="font-size:8px;color:#44445a;">Planner</span>
+            </div>
+          </div>
+          <!-- main -->
+          <div style="flex:1;padding:12px;background:#09090f;">
+            <div style="font-size:13px;font-weight:700;color:#e8e8f8;margin-bottom:8px;">Dashboard</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+              <div style="background:#0f0f1e;border:1px solid #1e1e35;border-radius:8px;padding:8px;">
+                <div style="font-size:14px;font-weight:800;color:#a78bfa;">4</div>
+                <div style="font-size:7px;color:#333350;margin-top:1px;">Workspaces</div>
+              </div>
+              <div style="background:#0f0f1e;border:1px solid #1e1e35;border-radius:8px;padding:8px;">
+                <div style="font-size:14px;font-weight:800;color:#67e8f9;">12</div>
+                <div style="font-size:7px;color:#333350;margin-top:1px;">Agents</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Top Nav + Context Sidebar</h3>
+      <p>Global nav moves to a top bar (Dashboard, Marketplace, Billing). Left sidebar shows only context-sensitive content — workspaces for the current section, agents for board view, etc.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Click to select, then confirm in the terminal.</p>

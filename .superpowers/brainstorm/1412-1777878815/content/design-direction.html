@@ -1,0 +1,170 @@
+<h2>Which design direction feels right?</h2>
+<p class="subtitle">Each preserves the dark theme but takes the visual identity in a different direction</p>
+
+<div class="cards">
+
+  <!-- Option A: Elevated Premium -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#080c14;padding:0;overflow:hidden;border-radius:6px 6px 0 0;">
+      <div style="display:flex;height:160px;font-family:system-ui,sans-serif;">
+        <!-- mini sidebar -->
+        <div style="width:52px;background:#0a0e1a;border-right:1px solid #1a2035;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:10px;">
+          <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 0 14px #6366f180;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;">OW</div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#6366f120;display:flex;align-items:center;justify-content:center;">
+            <div style="width:12px;height:2px;background:#6366f1;border-radius:2px;box-shadow:0 3px 0 #6366f1,0 6px 0 #6366f180;"></div>
+          </div>
+          <div style="width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:12px;height:12px;border-radius:3px;border:1.5px solid #2a3050;"></div>
+          </div>
+          <div style="width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:12px;height:12px;border-radius:50%;border:1.5px solid #2a3050;"></div>
+          </div>
+        </div>
+        <!-- main content -->
+        <div style="flex:1;padding:12px;background:#080c14;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div>
+              <div style="font-size:8px;color:#4a5580;margin-bottom:2px;letter-spacing:.05em;text-transform:uppercase;">Good morning</div>
+              <div style="font-size:14px;font-weight:700;color:#e8eaf6;letter-spacing:-.02em;">Dashboard</div>
+            </div>
+            <div style="padding:4px 10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:6px;font-size:8px;font-weight:600;color:#fff;box-shadow:0 0 12px #6366f160;">+ New</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:#0e1428;border:1px solid #1a2035;border-radius:8px;padding:8px;">
+              <div style="font-size:7px;color:#4a5580;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Workspaces</div>
+              <div style="font-size:16px;font-weight:700;color:#6366f1;">4</div>
+            </div>
+            <div style="background:#0e1428;border:1px solid #1a2035;border-radius:8px;padding:8px;">
+              <div style="font-size:7px;color:#4a5580;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Active Agents</div>
+              <div style="font-size:16px;font-weight:700;color:#8b5cf6;">12</div>
+            </div>
+          </div>
+          <div style="margin-top:6px;background:#0e1428;border:1px solid #1a2035;border-radius:8px;padding:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:20px;height:20px;border-radius:5px;background:linear-gradient(135deg,#6366f1,#8b5cf6);"></div>
+                <div style="font-size:9px;font-weight:600;color:#c8caf0;">Alpha Workspace</div>
+              </div>
+              <div style="font-size:7px;color:#4a5580;">3 projects</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Elevated Premium</h3>
+      <p>Higher contrast, tighter type, indigo/violet gradient system. Think Linear or Vercel — every element has weight and purpose. Icons-only collapsed sidebar.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Glassmorphism / Layered Depth -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0d0d18;padding:0;overflow:hidden;border-radius:6px 6px 0 0;">
+      <div style="display:flex;height:160px;font-family:system-ui,sans-serif;position:relative;">
+        <!-- background glow blobs -->
+        <div style="position:absolute;width:80px;height:80px;background:#7c3aed40;border-radius:50%;filter:blur(30px);top:10px;left:60px;pointer-events:none;"></div>
+        <div style="position:absolute;width:60px;height:60px;background:#0ea5e940;border-radius:50%;filter:blur(25px);top:60px;left:120px;pointer-events:none;"></div>
+        <!-- mini sidebar -->
+        <div style="width:56px;background:rgba(255,255,255,0.03);border-right:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(12px);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:10px;position:relative;z-index:1;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,58,237,0.9);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;">OW</div>
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,58,237,0.25);border:1px solid rgba(124,58,237,0.4);display:flex;align-items:center;justify-content:center;">
+            <div style="width:11px;height:8px;border-radius:2px;border:1.5px solid #a78bfa;"></div>
+          </div>
+          <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:11px;height:11px;border-radius:3px;border:1.5px solid rgba(255,255,255,0.15);"></div>
+          </div>
+        </div>
+        <!-- main -->
+        <div style="flex:1;padding:12px;position:relative;z-index:1;">
+          <div style="font-size:13px;font-weight:700;color:#f0f0ff;margin-bottom:8px;letter-spacing:-.02em;">Dashboard</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px;">
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px;backdrop-filter:blur(8px);">
+              <div style="font-size:7px;color:rgba(255,255,255,0.4);margin-bottom:3px;">Workspaces</div>
+              <div style="font-size:15px;font-weight:700;color:#a78bfa;">4</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px;backdrop-filter:blur(8px);">
+              <div style="font-size:7px;color:rgba(255,255,255,0.4);margin-bottom:3px;">Agents</div>
+              <div style="font-size:15px;font-weight:700;color:#38bdf8;">12</div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px;backdrop-filter:blur(8px);">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:18px;height:18px;border-radius:5px;background:rgba(124,58,237,0.6);border:1px solid rgba(124,58,237,0.8);"></div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.7);">Alpha Workspace</div>
+              <div style="margin-left:auto;width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 6px #34d399;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Glass & Depth</h3>
+      <p>Frosted glass surfaces, ambient glow blobs, translucent panels layered over gradient backgrounds. More atmospheric — like Raycast or macOS. Heavier GPU cost.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Bold Accent / Expressive -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#09090f;padding:0;overflow:hidden;border-radius:6px 6px 0 0;">
+      <div style="display:flex;height:160px;font-family:system-ui,sans-serif;">
+        <!-- sidebar -->
+        <div style="width:130px;background:#0c0c18;border-right:1px solid #1e1e30;display:flex;flex-direction:column;padding:10px 8px;gap:2px;">
+          <div style="display:flex;align-items:center;gap:6px;padding:4px;margin-bottom:6px;">
+            <div style="width:22px;height:22px;border-radius:6px;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;">OW</div>
+            <span style="font-size:9px;font-weight:700;color:#fff;letter-spacing:.01em;">OpenWorkspace</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;padding:5px 6px;border-radius:6px;background:#7c3aed18;border-left:2px solid #7c3aed;">
+            <div style="width:9px;height:9px;border-radius:2px;background:#7c3aed;"></div>
+            <span style="font-size:8px;font-weight:600;color:#a78bfa;">Dashboard</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;padding:5px 6px;border-radius:6px;">
+            <div style="width:9px;height:9px;border-radius:2px;border:1px solid #2e2e45;"></div>
+            <span style="font-size:8px;color:#555570;">Marketplace</span>
+          </div>
+          <div style="margin-top:6px;padding:4px 6px 2px;font-size:7px;font-weight:700;color:#333355;text-transform:uppercase;letter-spacing:.1em;">Workspaces</div>
+          <div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;">
+            <div style="width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,#f59e0b,#ef4444);font-size:6px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;">A</div>
+            <span style="font-size:8px;color:#777790;">Alpha</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;">
+            <div style="width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,#06b6d4,#3b82f6);font-size:6px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;">B</div>
+            <span style="font-size:8px;color:#777790;">Beta</span>
+          </div>
+        </div>
+        <!-- main -->
+        <div style="flex:1;padding:12px;background:#09090f;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#e8e8f8;letter-spacing:-.02em;">Dashboard</div>
+              <div style="font-size:7px;color:#44445a;margin-top:1px;">4 workspaces · 12 agents</div>
+            </div>
+            <div style="background:#7c3aed;border-radius:5px;padding:4px 8px;font-size:7px;font-weight:700;color:#fff;">+ New</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <div style="background:#0f0f1e;border:1px solid #1e1e35;border-radius:8px;padding:8px;">
+              <div style="width:16px;height:16px;border-radius:4px;background:#7c3aed20;margin-bottom:5px;display:flex;align-items:center;justify-content:center;">
+                <div style="width:8px;height:8px;border-radius:2px;background:#7c3aed;"></div>
+              </div>
+              <div style="font-size:14px;font-weight:800;color:#c4b5fd;">4</div>
+              <div style="font-size:7px;color:#44445a;margin-top:1px;">Workspaces</div>
+            </div>
+            <div style="background:#0f0f1e;border:1px solid #1e1e35;border-radius:8px;padding:8px;">
+              <div style="width:16px;height:16px;border-radius:4px;background:#06b6d420;margin-bottom:5px;display:flex;align-items:center;justify-content:center;">
+                <div style="width:8px;height:8px;border-radius:50%;background:#06b6d4;"></div>
+              </div>
+              <div style="font-size:14px;font-weight:800;color:#67e8f9;">12</div>
+              <div style="font-size:7px;color:#44445a;margin-top:1px;">Active Agents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Bold & Structured</h3>
+      <p>Expanded sidebar with full labels, colorful workspace avatars, distinct accent-per-category system (violet = workspaces, cyan = agents, amber = skills). More information-dense, like Notion or Jira dark mode.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Click a card to select, then tell me in the terminal. You can also describe what you like from multiple options.</p>

@@ -1,18 +1,16 @@
 'use client';
 
 import { Draggable } from '@hello-pangea/dnd';
-import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Task } from '@openworkspace/api-types';
 
-const priorityColor: Record<string, string> = {
-  URGENT: 'bg-red-100 text-red-700',
-  HIGH: 'bg-orange-100 text-orange-700',
-  MEDIUM: 'bg-yellow-100 text-yellow-700',
-  LOW: 'bg-zinc-100 text-zinc-500',
+const priorityStyles: Record<string, string> = {
+  URGENT: 'bg-[var(--status-error)]/10 border-[var(--status-error)]/30 text-[var(--status-error)]',
+  HIGH:   'bg-[var(--accent-skill-bg)] border-[var(--accent-skill-border)] text-[var(--accent-skill)]',
+  MEDIUM: 'bg-[var(--accent-workspace-bg)] border-[var(--accent-workspace-border)] text-[var(--accent-workspace)]',
+  LOW:    'bg-[var(--bg-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)]',
 };
-
 
 interface TaskCardProps {
   task: Task;
@@ -21,6 +19,8 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, index, onClick }: TaskCardProps) {
+  const isRunning = (task as any).latestRunStatus === 'RUNNING';
+
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided, snapshot) => (
@@ -30,27 +30,43 @@ export function TaskCard({ task, index, onClick }: TaskCardProps) {
           {...provided.dragHandleProps}
           onClick={() => onClick(task)}
           className={cn(
-            'rounded-lg border bg-white p-3 cursor-pointer select-none transition-shadow',
-            snapshot.isDragging ? 'shadow-lg rotate-1' : 'shadow-sm hover:shadow-md',
+            'rounded-lg border bg-[var(--bg-surface)] p-3 cursor-pointer select-none transition-all',
+            isRunning
+              ? 'border-[var(--accent-agent-border)] shadow-sm'
+              : 'border-[var(--border-default)] hover:border-[var(--border-strong)]',
+            snapshot.isDragging && 'rotate-1 shadow-xl shadow-black/40',
           )}
         >
           <div className="mb-2 flex items-start justify-between gap-2">
-            <p className="text-sm font-medium leading-snug text-zinc-900 line-clamp-2">{task.title}</p>
-            <span className={cn('shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold', priorityColor[task.priority])}>
-              {task.priority}
-            </span>
+            <p className="text-sm font-medium leading-snug text-[var(--text-primary)] line-clamp-2">
+              {task.title}
+            </p>
+            {task.priority && (
+              <span className={cn(
+                'shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-semibold',
+                priorityStyles[task.priority] ?? priorityStyles.LOW,
+              )}>
+                {task.priority}
+              </span>
+            )}
           </div>
 
           {task.assignee && (
             <div className="mb-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] text-zinc-600">
+              <span className={cn(
+                'inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]',
+                'bg-[var(--accent-agent-bg)] border-[var(--accent-agent-border)] text-[var(--accent-agent)]',
+              )}>
                 {task.assignee.agent?.type === 'AI' ? '🤖' : '👤'}
                 {task.assignee.agent?.name}
+                {isRunning && (
+                  <span className="ml-1 h-1.5 w-1.5 rounded-full bg-[var(--status-running)] shadow-sm" />
+                )}
               </span>
             </div>
           )}
 
-          <div className="flex items-center gap-3 text-[11px] text-zinc-400">
+          <div className="flex items-center gap-3 text-[11px] text-[var(--text-muted)]">
             {task.dueDate && (
               <span className="flex items-center gap-1">
                 <CalendarDays size={11} />
