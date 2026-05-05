@@ -44,7 +44,11 @@ export class ProjectsService {
       where: { workspaceId },
       include: {
         leader: { select: { id: true, name: true, avatarUrl: true } },
-        _count: { select: { tasks: true, projectAgents: true } },
+        _count: { select: { tasks: true } },
+        projectAgents: {
+          where: { revokedAt: null },
+          select: { agent: { select: { type: true } } },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
