@@ -8,4 +8,11 @@ export class AuthService {
   async getUserByFirebaseUid(firebaseUid: string) {
     return this.prisma.user.findUnique({ where: { firebaseUid } });
   }
+
+  async updateTheme(userId: string, theme: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { theme },
+    });
+  }
 }
