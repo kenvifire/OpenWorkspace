@@ -9,7 +9,7 @@ import type { WorkspaceMemberRole } from '@openworkspace/api-types';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, FolderKanban, Users, Trash2, UserPlus, Settings, ArrowRight, Bot, ChevronRight } from 'lucide-react';
+import { Plus, FolderKanban, Users, Trash2, UserPlus, Settings, ArrowRight, Bot, User, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function WorkspacePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -126,7 +126,10 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
             </div>
           ) : (
             <div className="space-y-3">
-              {projects.map((p, i) => (
+              {projects.map((p, i) => {
+                const aiCount = p.projectAgents?.filter(pa => pa.agent.type === 'AI').length ?? 0;
+                const humanCount = p.projectAgents?.filter(pa => pa.agent.type === 'HUMAN').length ?? 0;
+                return (
                 <motion.div
                   key={p.id}
                   initial={{ opacity: 0, y: 10 }}
@@ -145,21 +148,26 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
                           <p className="mt-0.5 text-sm text-[var(--text-muted)] line-clamp-1">{p.description}</p>
                         )}
                       </div>
-                      <div className="flex shrink-0 items-center gap-4 text-xs text-[var(--text-muted)]">
+                      <div className="flex shrink-0 items-center gap-3 text-xs text-[var(--text-muted)]">
                         <span className="flex items-center gap-1">
                           <FolderKanban size={11} />
                           {t('tasks', { count: p._count?.tasks ?? 0 })}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Bot size={11} />
-                          {t('members', { count: p._count?.projectAgents ?? 0 })}
+                          <Bot size={11} className="text-[var(--accent-agent)]" />
+                          {aiCount}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <User size={11} />
+                          {humanCount}
                         </span>
                         <ArrowRight size={14} className="text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors" />
                       </div>
                     </div>
                   </Link>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           )}
         </motion.div>
