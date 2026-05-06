@@ -189,8 +189,10 @@ export const twoFactorApi = {
 };
 
 export const usersApi = {
-  me: (): Promise<{ id: string; email: string; name: string; totpEnabled: boolean }> =>
+  me: (): Promise<{ id: string; email: string; name: string; totpEnabled: boolean; theme: string }> =>
     api.get('/api/auth/me').then((r) => r.data),
+  updateTheme: (theme: string): Promise<void> =>
+    api.patch('/api/auth/me', { theme }).then((r) => r.data),
 };
 
 // ─── Agent Runs ───────────────────────────────────────────────────────────────

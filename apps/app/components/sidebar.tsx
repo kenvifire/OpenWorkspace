@@ -13,6 +13,7 @@ import { workspacesApi, myAgentsApi, skillsApi, mcpsApi, type Skill, type Mcp } 
 import type { Workspace, Agent } from '@openworkspace/api-types';
 import { useRef, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth';
+import { useTheme } from '@/contexts/theme';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WORKSPACE_COLORS = [
@@ -31,6 +32,14 @@ export function Sidebar() {
   const t = useTranslations('nav');
   const tb = useTranslations('board');
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
+
+  const THEMES: { id: string; label: string; color: string; border?: boolean }[] = [
+    { id: 'dark-purple', label: 'Dark Purple', color: 'oklch(0.55 0.20 285)' },
+    { id: 'light',       label: 'Light',       color: 'oklch(0.93 0.005 265)', border: true },
+    { id: 'dark-ocean',  label: 'Dark Ocean',  color: 'oklch(0.35 0.18 220)' },
+    { id: 'midnight',    label: 'Midnight',    color: 'oklch(0.25 0.002 265)', border: true },
+  ];
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -237,6 +246,27 @@ export function Sidebar() {
                 >
                   <Settings size={13} className="text-[var(--text-muted)]" />{t('settings')}
                 </Link>
+                <div className="mx-3 border-t border-[var(--border-subtle)]" />
+                <div className="px-3 py-2">
+                  <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Theme</p>
+                  <div className="flex gap-2">
+                    {THEMES.map((th) => (
+                      <button
+                        key={th.id}
+                        title={th.label}
+                        onClick={() => setTheme(th.id)}
+                        style={{ background: th.color }}
+                        className={cn(
+                          'h-4 w-4 rounded-full transition-all',
+                          th.border && 'ring-1 ring-[var(--border-default)]',
+                          theme === th.id
+                            ? 'outline outline-2 outline-offset-2 outline-[var(--text-primary)]/70'
+                            : 'opacity-70 hover:opacity-100',
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
                 <div className="mx-3 border-t border-[var(--border-subtle)]" />
                 <button
                   onClick={handleSignOut}

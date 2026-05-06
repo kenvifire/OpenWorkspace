@@ -21,6 +21,7 @@ model User {
   planningAgentProvider        String?
   planningAgentModel           String?
   planningAgentEncryptedApiKey String?
+  theme                        String   @default("dark-purple")
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @updatedAt
 
