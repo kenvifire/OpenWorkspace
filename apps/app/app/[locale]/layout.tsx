@@ -1,4 +1,5 @@
 import { getMessages } from 'next-intl/server';
+import { cookies } from 'next/headers';
 import { Providers } from '@/components/providers';
 import { locales } from '@/i18n';
 import type { Locale } from '@/i18n';
@@ -19,10 +20,19 @@ export default async function LocaleLayout({
   if (!locales.includes(locale as Locale)) notFound();
 
   const messages = await getMessages({ locale });
+  const cookieStore = await cookies();
+  const initialTheme = cookieStore.get('theme')?.value ?? 'dark-purple';
 
   return (
-    <Providers locale={locale} messages={messages} lang={locale}>
-      {children}
-    </Providers>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.dataset.theme=document.cookie.match(/(?:^|; )theme=([^;]+)/)?.[1]??'dark-purple'`,
+        }}
+      />
+      <Providers locale={locale} messages={messages} lang={locale} initialTheme={initialTheme}>
+        {children}
+      </Providers>
+    </>
   );
 }
