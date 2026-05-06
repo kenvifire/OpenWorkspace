@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { workspacesApi, myAgentsApi, skillsApi, mcpsApi } from '@/lib/api';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
+import { useTheme } from '@/contexts/theme';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WORKSPACE_COLORS = [
@@ -30,6 +31,14 @@ export function Sidebar() {
   const t = useTranslations('nav');
   const tb = useTranslations('board');
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
+
+  const THEMES: { id: string; label: string; color: string; border?: boolean }[] = [
+    { id: 'dark-purple', label: 'Dark Purple', color: 'oklch(0.55 0.20 285)' },
+    { id: 'light',       label: 'Light',       color: 'oklch(0.93 0.005 265)', border: true },
+    { id: 'dark-ocean',  label: 'Dark Ocean',  color: 'oklch(0.35 0.18 220)' },
+    { id: 'midnight',    label: 'Midnight',    color: 'oklch(0.25 0.002 265)', border: true },
+  ];
 
   // Collapse state — persisted
   const [collapsed, setCollapsed] = useState(() => {
@@ -298,6 +307,27 @@ export function Sidebar() {
                 <Link href={`/${locale}/settings`} onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors">
                   <Settings size={14} className="text-zinc-500" />{t('settings')}
                 </Link>
+                <div className={cn('mx-3 border-t', BORDER)} />
+                <div className="px-3 py-2">
+                  <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-zinc-500">Theme</p>
+                  <div className="flex gap-2">
+                    {THEMES.map((th) => (
+                      <button
+                        key={th.id}
+                        title={th.label}
+                        onClick={() => setTheme(th.id)}
+                        style={{ background: th.color }}
+                        className={cn(
+                          'h-4 w-4 rounded-full transition-all',
+                          th.border && 'ring-1 ring-zinc-600',
+                          theme === th.id
+                            ? 'outline outline-2 outline-offset-2 outline-white/70'
+                            : 'opacity-70 hover:opacity-100',
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
                 <div className={cn('mx-3 border-t', BORDER)} />
                 <button onClick={handleSignOut} className="flex w-full items-center gap-2.5 px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/5 hover:text-red-400 transition-colors">
                   <LogOut size={14} className="text-zinc-500" />{t('signOut')}
