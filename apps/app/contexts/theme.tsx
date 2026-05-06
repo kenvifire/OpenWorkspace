@@ -22,7 +22,7 @@ export function ThemeProvider({ children, initialTheme }: { children: ReactNode;
   const setTheme = (t: string) => {
     document.documentElement.dataset.theme = t;
     // Sync cookie so flash-prevention script picks it up on next hard refresh
-    document.cookie = `theme=${t}; path=/; SameSite=Lax`;
+    document.cookie = `theme=${t}; path=/; SameSite=Lax; Max-Age=31536000`;
     setThemeState(t);
     getTokenRef.current().then((token) => {
       if (!token) return;
