@@ -434,8 +434,12 @@ async def _process_job(job: dict) -> None:
                 )
                 if updated:
                     await events.publish("task:updated", {"projectId": project_id, "task": {"id": task_id, "status": "DONE"}})
-            elif final_status == "STOPPED":
-                # Revert IN_PROGRESS back to TODO so it can be picked up again
+            elif final_status in ("STOPPED", "FAILED", "MAX_ITERATIONS"):
+                # Revert IN_PROGRESS back to TODO so the task can be retried.
+                # STOPPED: user explicitly halted the run.
+                # FAILED/MAX_ITERATIONS: unexpected error or iteration cap — task needs a retry.
+                # Note: if block_task was called, the task is already BLOCKED (not IN_PROGRESS),
+                # so the WHERE clause won't match and the task stays BLOCKED correctly.
                 updated = await pool.fetchrow(
                     """
                     UPDATE "Task" SET status = 'TODO'::"TaskStatus", "updatedAt" = NOW()

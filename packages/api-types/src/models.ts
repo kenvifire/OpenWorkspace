@@ -84,8 +84,8 @@ export interface Project {
   updatedAt: string
   _count?: {
     tasks: number
-    projectAgents: number
   }
+  projectAgents?: Array<{ agent: { type: 'AI' | 'HUMAN' } }>
 }
 
 export interface ResourceKey {
