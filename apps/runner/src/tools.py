@@ -81,23 +81,32 @@ ALL_TOOLS: list[dict] = [
     {
         "name": "request_human_input",
         "description": (
-            "Use this when you cannot complete the current task without input, a decision, "
-            "or action from a human team member. It creates a new TODO task assigned to the "
-            "specified human, posts a comment on the current task explaining why it is blocked, "
+            "Use this whenever you are blocked by something only a human can provide. "
+            "This includes (but is not limited to): requirements or decisions, "
+            "access credentials (SSH keys, API tokens, passwords), "
+            "infrastructure provisioning (servers, VMs, cloud accounts), "
+            "physical resources (machines, devices, lab access), "
+            "approvals or sign-offs, and any external action you cannot take yourself. "
+            "It creates a new TODO task assigned to the specified human with a clear description "
+            "of what is needed, posts a comment on the current task explaining the block, "
             "and marks the current task as BLOCKED. "
             "Call get_project_info first — use project_agent_id for human agents already in the "
-            "project, or user_id from workspace_members for other humans."
+            "project, or user_id from workspace_members for other workspace members."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
                 "title": {
                     "type": "string",
-                    "description": "Short title for the human task, e.g. 'Provide API credentials for payment gateway'.",
+                    "description": "Short actionable title, e.g. 'Provide SSH access to dev server' or 'Set up PostgreSQL instance'.",
                 },
                 "description": {
                     "type": "string",
-                    "description": "Full description of what the human needs to provide or decide.",
+                    "description": (
+                        "Full description of what the human needs to provide, set up, or decide. "
+                        "Be specific: include exactly what is needed, why, and any relevant context "
+                        "so the human can act without asking follow-up questions."
+                    ),
                 },
                 "assignee_project_agent_id": {
                     "type": "string",

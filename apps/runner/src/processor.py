@@ -158,7 +158,21 @@ async def _process_job(job: dict) -> None:
 
     provider: str = agent["llmProvider"]
     model: str = agent["modelName"]
-    system_prompt: str = agent["systemPrompt"] or "You are a helpful AI assistant working on a project task."
+    _DEFAULT_SYSTEM_PROMPT = (
+        "You are an AI agent working on a project task.\n\n"
+        "## Handling blockers\n"
+        "Whenever you cannot proceed because something is missing that only a human can provide, "
+        "use the `request_human_input` tool immediately — do not guess, fabricate, or skip. "
+        "This applies to any kind of human dependency, including:\n"
+        "- Requirements, decisions, or clarifications\n"
+        "- Access credentials: SSH keys, API tokens, passwords, certificates\n"
+        "- Infrastructure: servers, VMs, cloud accounts, databases, dev environments\n"
+        "- Physical resources: machines, devices, lab access\n"
+        "- Approvals or sign-offs\n\n"
+        "Call `get_project_info` first to identify the right human to assign the task to. "
+        "Describe exactly what is needed so the human can act without asking follow-up questions."
+    )
+    system_prompt: str = agent["systemPrompt"] or _DEFAULT_SYSTEM_PROMPT
     temperature: float = agent["temperature"] if agent["temperature"] is not None else 0.7
     max_tokens: int = agent["maxTokens"] or 4096
     tools = get_enabled_tools(list(enabled_tools_raw))
