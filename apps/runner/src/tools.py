@@ -84,8 +84,9 @@ ALL_TOOLS: list[dict] = [
             "Use this when you cannot complete the current task without input, a decision, "
             "or action from a human team member. It creates a new TODO task assigned to the "
             "specified human, posts a comment on the current task explaining why it is blocked, "
-            "and marks the current task as BLOCKED. Always call get_project_info first to find "
-            "the human agent's project_agent_id."
+            "and marks the current task as BLOCKED. "
+            "Call get_project_info first — use project_agent_id for human agents already in the "
+            "project, or user_id from workspace_members for other humans."
         ),
         "input_schema": {
             "type": "object",
@@ -100,7 +101,11 @@ ALL_TOOLS: list[dict] = [
                 },
                 "assignee_project_agent_id": {
                     "type": "string",
-                    "description": "ProjectAgent ID of the human to assign the task to. Use get_project_info to find human agent IDs.",
+                    "description": "ProjectAgent ID of the human to assign the task to (from get_project_info agents list where is_human=true).",
+                },
+                "assignee_user_id": {
+                    "type": "string",
+                    "description": "User ID of a workspace member to assign to (from get_project_info workspace_members list). Use when no human ProjectAgent exists.",
                 },
                 "priority": {
                     "type": "string",
@@ -108,7 +113,7 @@ ALL_TOOLS: list[dict] = [
                     "default": "MEDIUM",
                 },
             },
-            "required": ["title", "description", "assignee_project_agent_id"],
+            "required": ["title", "description"],
         },
     },
     {
@@ -457,7 +462,7 @@ async def _get_project_info(ctx: ToolContext) -> str:
     pool = await get_pool()
 
     project = await pool.fetchrow(
-        'SELECT id, name, description FROM "Project" WHERE id = $1',
+        'SELECT id, name, description, "workspaceId" FROM "Project" WHERE id = $1',
         ctx.project_id,
     )
     if not project:
@@ -472,6 +477,18 @@ async def _get_project_info(ctx: ToolContext) -> str:
         ORDER BY pa."hiredAt" ASC
         """,
         ctx.project_id,
+    )
+
+    workspace_members = await pool.fetch(
+        """
+        SELECT u.id AS user_id, u.name, u.email, wm.role
+        FROM "WorkspaceMember" wm
+        JOIN "User" u ON u.id = wm."userId"
+        WHERE wm."workspaceId" = $1
+        ORDER BY
+            CASE wm.role WHEN 'OWNER' THEN 0 WHEN 'ADMIN' THEN 1 ELSE 2 END
+        """,
+        project["workspaceId"],
     )
 
     task_counts = await pool.fetch(
@@ -496,6 +513,15 @@ async def _get_project_info(ctx: ToolContext) -> str:
                 "role": r["customRole"] if r["role"] == "CUSTOM" else r["role"],
             }
             for r in agents
+        ],
+        "workspace_members": [
+            {
+                "user_id": r["user_id"],
+                "name": r["name"],
+                "email": r["email"],
+                "role": r["role"],
+            }
+            for r in workspace_members
         ],
         "task_summary": {r["status"]: r["count"] for r in task_counts},
     })
@@ -658,29 +684,112 @@ async def _block_task(reason: str, ctx: ToolContext) -> str:
     return "STOP"
 
 
+async def _ensure_human_project_agent(user_id: str, project_id: str, pool) -> tuple[str, str]:
+    """Find or create a human Agent + ProjectAgent for a workspace member. Returns (pa_id, name)."""
+    # Get user info
+    user = await pool.fetchrow('SELECT name FROM "User" WHERE id = $1', user_id)
+    if not user:
+        raise ValueError(f"User {user_id} not found.")
+
+    # Find or create a HUMAN Agent owned by this user
+    agent = await pool.fetchrow(
+        'SELECT id FROM "Agent" WHERE "userId" = $1 AND type = \'HUMAN\'::"AgentType"',
+        user_id,
+    )
+    if not agent:
+        agent_id = _new_id()
+        agent = await pool.fetchrow(
+            """
+            INSERT INTO "Agent" (id, "userId", name, description, type, "createdAt", "updatedAt")
+            VALUES ($1, $2, $3, 'Human workspace member', 'HUMAN'::"AgentType", NOW(), NOW())
+            RETURNING id
+            """,
+            agent_id,
+            user_id,
+            user["name"],
+        )
+
+    # Find or create a ProjectAgent entry
+    pa = await pool.fetchrow(
+        'SELECT id FROM "ProjectAgent" WHERE "agentId" = $1 AND "projectId" = $2',
+        agent["id"],
+        project_id,
+    )
+    if not pa:
+        pa_id = _new_id()
+        project_key = _new_id() + _new_id()  # unique but unused for humans
+        pa = await pool.fetchrow(
+            """
+            INSERT INTO "ProjectAgent" (id, "projectId", "agentId", role, "projectKey",
+                                        "hiredById", "hiredAt")
+            VALUES ($1, $2, $3, 'LEADER'::"ProjectRole", $4, $5, NOW())
+            RETURNING id
+            """,
+            pa_id,
+            project_id,
+            agent["id"],
+            project_key,
+            user_id,
+        )
+
+    return pa["id"], user["name"]
+
+
 async def _request_human_input(args: dict, ctx: ToolContext) -> str:
     title = args["title"]
     description = args["description"]
-    assignee_id = args["assignee_project_agent_id"]
     priority = args.get("priority", "MEDIUM")
 
     pool = await get_pool()
 
-    # Verify assignee exists and is human
-    agent_row = await pool.fetchrow(
-        """
-        SELECT pa.id, a.name, a.type
-        FROM "ProjectAgent" pa
-        JOIN "Agent" a ON a.id = pa."agentId"
-        WHERE pa.id = $1 AND pa."projectId" = $2
-        """,
-        assignee_id,
-        ctx.project_id,
-    )
-    if not agent_row:
-        return f"ProjectAgent {assignee_id} not found in this project."
-    if agent_row["type"] != "HUMAN":
-        return f"Agent '{agent_row['name']}' is not a human agent. Use request_human_input only for human team members."
+    # Resolve assignee: prefer project_agent_id, fall back to user_id, then workspace owner
+    assignee_pa_id: str | None = None
+    assignee_name: str = "human"
+
+    pa_id_arg = args.get("assignee_project_agent_id")
+    user_id_arg = args.get("assignee_user_id")
+
+    if pa_id_arg:
+        row = await pool.fetchrow(
+            """
+            SELECT pa.id, a.name, a.type
+            FROM "ProjectAgent" pa
+            JOIN "Agent" a ON a.id = pa."agentId"
+            WHERE pa.id = $1 AND pa."projectId" = $2
+            """,
+            pa_id_arg,
+            ctx.project_id,
+        )
+        if row and row["type"] == "HUMAN":
+            assignee_pa_id = row["id"]
+            assignee_name = row["name"]
+
+    if assignee_pa_id is None and user_id_arg:
+        try:
+            assignee_pa_id, assignee_name = await _ensure_human_project_agent(
+                user_id_arg, ctx.project_id, pool
+            )
+        except ValueError as e:
+            return str(e)
+
+    if assignee_pa_id is None:
+        # Fall back to the first workspace owner / admin
+        owner = await pool.fetchrow(
+            """
+            SELECT u.id AS user_id
+            FROM "WorkspaceMember" wm
+            JOIN "User" u ON u.id = wm."userId"
+            WHERE wm."workspaceId" = (SELECT "workspaceId" FROM "Project" WHERE id = $1)
+            ORDER BY CASE wm.role WHEN 'OWNER' THEN 0 WHEN 'ADMIN' THEN 1 ELSE 2 END
+            LIMIT 1
+            """,
+            ctx.project_id,
+        )
+        if not owner:
+            return "No human assignee could be determined. Please provide assignee_project_agent_id or assignee_user_id."
+        assignee_pa_id, assignee_name = await _ensure_human_project_agent(
+            owner["user_id"], ctx.project_id, pool
+        )
 
     # Create a new TODO task assigned to the human
     new_task_id = _new_id()
@@ -698,31 +807,30 @@ async def _request_human_input(args: dict, ctx: ToolContext) -> str:
         description,
         priority,
         ctx.project_agent_id,
-        assignee_id,
+        assignee_pa_id,
     )
     await events.publish("task:created", {"projectId": ctx.project_id, "task": dict(new_task)})
 
     # Post a comment on the current task explaining the block
     await _add_comment(
         ctx.task_id,
-        f"**Waiting for human input.**\n\nCreated task for {agent_row['name']}: **{title}**\n\n{description}",
+        f"**Waiting for human input.**\n\nCreated task for {assignee_name}: **{title}**\n\n{description}",
         ctx,
     )
 
     # Block the current task
-    await pool.execute(
+    blocked = await pool.fetchrow(
         """
         UPDATE "Task"
         SET status = 'BLOCKED'::"TaskStatus", "updatedAt" = NOW()
         WHERE id = $1 AND "projectId" = $2
+        RETURNING id, status
         """,
         ctx.task_id,
         ctx.project_id,
     )
-    await events.publish("task:updated", {
-        "projectId": ctx.project_id,
-        "task": {"id": ctx.task_id, "status": "BLOCKED"},
-    })
+    if blocked:
+        await events.publish("task:updated", {"projectId": ctx.project_id, "task": dict(blocked)})
 
     return "STOP"
 
