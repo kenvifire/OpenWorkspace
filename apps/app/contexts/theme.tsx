@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { usersApi } from '@/lib/api';
 
@@ -17,7 +17,9 @@ export function ThemeProvider({ children, initialTheme }: { children: ReactNode;
   const [theme, setThemeState] = useState(initialTheme);
   const { getToken } = useAuth();
   const getTokenRef = useRef(getToken);
-  getTokenRef.current = getToken;
+  useLayoutEffect(() => {
+    getTokenRef.current = getToken;
+  });
 
   const setTheme = (t: string) => {
     document.documentElement.dataset.theme = t;
