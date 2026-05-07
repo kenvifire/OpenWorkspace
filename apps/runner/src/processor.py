@@ -86,7 +86,7 @@ async def _read_loop(client: aioredis.Redis) -> None:
 
 
 async def _claim_loop(client: aioredis.Redis) -> None:
-    """Periodically claim idle pending messages from crashed consumers."""
+    """Periodically claim and process idle pending messages from crashed consumers."""
     await asyncio.sleep(CLAIM_INTERVAL_S)
     while True:
         try:
@@ -101,7 +101,15 @@ async def _claim_loop(client: aioredis.Redis) -> None:
                         STREAM_NAME, CONSUMER_GROUP, CONSUMER_NAME, CLAIM_IDLE_MS, [msg_id]
                     )
                     if claimed:
-                        log.info("Claimed idle message %s", msg_id)
+                        log.info("Claimed idle message %s — processing now", msg_id)
+                        for _msg_id, fields in claimed:
+                            job = {k.decode(): v.decode() for k, v in fields.items()}
+                            try:
+                                await _process_job(job)
+                                await client.xack(STREAM_NAME, CONSUMER_GROUP, _msg_id)
+                                log.info("ACKed claimed message %s", _msg_id.decode())
+                            except Exception:
+                                log.exception("Claimed job %s failed — will retry", _msg_id.decode())
         except Exception:
             log.exception("Error in claim loop")
         await asyncio.sleep(CLAIM_INTERVAL_S)
