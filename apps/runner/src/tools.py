@@ -494,8 +494,7 @@ async def _get_project_info(ctx: ToolContext) -> str:
         FROM "WorkspaceMember" wm
         JOIN "User" u ON u.id = wm."userId"
         WHERE wm."workspaceId" = $1
-        ORDER BY
-            CASE wm.role WHEN 'OWNER' THEN 0 WHEN 'ADMIN' THEN 1 ELSE 2 END
+        ORDER BY CASE wm.role WHEN 'OWNER' THEN 0 ELSE 1 END
         """,
         project["workspaceId"],
     )
@@ -789,7 +788,7 @@ async def _request_human_input(args: dict, ctx: ToolContext) -> str:
             FROM "WorkspaceMember" wm
             JOIN "User" u ON u.id = wm."userId"
             WHERE wm."workspaceId" = (SELECT "workspaceId" FROM "Project" WHERE id = $1)
-            ORDER BY CASE wm.role WHEN 'OWNER' THEN 0 WHEN 'ADMIN' THEN 1 ELSE 2 END
+            ORDER BY CASE wm.role WHEN 'OWNER' THEN 0 ELSE 1 END
             LIMIT 1
             """,
             ctx.project_id,
