@@ -492,7 +492,7 @@ async def _get_project_info(ctx: ToolContext) -> str:
             {
                 "project_agent_id": r["id"],
                 "name": r["name"],
-                "is_human": r["type"] == "human",
+                "is_human": r["type"] == "HUMAN",
                 "role": r["customRole"] if r["role"] == "CUSTOM" else r["role"],
             }
             for r in agents
@@ -679,7 +679,7 @@ async def _request_human_input(args: dict, ctx: ToolContext) -> str:
     )
     if not agent_row:
         return f"ProjectAgent {assignee_id} not found in this project."
-    if agent_row["type"] != "human":
+    if agent_row["type"] != "HUMAN":
         return f"Agent '{agent_row['name']}' is not a human agent. Use request_human_input only for human team members."
 
     # Create a new TODO task assigned to the human
