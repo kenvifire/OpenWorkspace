@@ -179,6 +179,37 @@
   --sidebar-accent-foreground: oklch(0.15 0.015 265);
   --sidebar-border: oklch(0.84 0.012 265);
   --sidebar-ring: oklch(0.52 0.22 285);
+
+  --text-primary: oklch(0.15 0.015 265);
+  --text-secondary: oklch(0.40 0.020 265);
+  --text-muted: oklch(0.55 0.018 265);
+
+  --bg-base: oklch(0.93 0.006 265);
+  --bg-surface: oklch(0.97 0.005 265);
+  --bg-elevated: oklch(1.00 0.000 0);
+  --bg-overlay: oklch(0.95 0.006 265);
+
+  --border-subtle: oklch(0.88 0.010 265);
+  --border-default: oklch(0.84 0.012 265);
+  --border-strong: oklch(0.76 0.015 265);
+
+  --accent-workspace: oklch(0.52 0.22 285);
+  --accent-workspace-bg: oklch(0.52 0.22 285 / 0.10);
+  --accent-workspace-border: oklch(0.52 0.22 285 / 0.25);
+  --accent-workspace-glow: oklch(0.52 0.22 285 / 0.25);
+  --accent-workspace-glow-hover: oklch(0.52 0.22 285 / 0.40);
+  --accent-agent: oklch(0.52 0.14 210);
+  --accent-agent-bg: oklch(0.52 0.14 210 / 0.10);
+  --accent-agent-border: oklch(0.52 0.14 210 / 0.25);
+  --accent-skill: oklch(0.58 0.16 55);
+  --accent-skill-bg: oklch(0.58 0.16 55 / 0.10);
+  --accent-skill-border: oklch(0.58 0.16 55 / 0.25);
+  --accent-mcp: oklch(0.52 0.14 150);
+  --accent-mcp-bg: oklch(0.52 0.14 150 / 0.10);
+  --accent-mcp-border: oklch(0.52 0.14 150 / 0.25);
+
+  --status-running: oklch(0.52 0.14 150);
+  --status-error: oklch(0.52 0.22 25);
 }
 
 /* ─── Dark Ocean theme ─────────────────────────────────────────────────────── */
@@ -206,7 +237,7 @@
   --chart-3: oklch(0.72 0.16 150);
   --chart-4: oklch(0.75 0.18 55);
   --chart-5: oklch(0.65 0.20 25);
-  --sidebar: oklch(0.085 0.015 220);
+  --sidebar: oklch(0.07 0.015 220);
   --sidebar-foreground: oklch(0.95 0.010 220);
   --sidebar-primary: oklch(0.62 0.18 220);
   --sidebar-primary-foreground: oklch(0.98 0.005 220);
@@ -214,39 +245,101 @@
   --sidebar-accent-foreground: oklch(0.95 0.010 220);
   --sidebar-border: oklch(0.22 0.022 220);
   --sidebar-ring: oklch(0.62 0.18 220);
+
+  --text-primary: oklch(0.95 0.010 220);
+  --text-secondary: oklch(0.65 0.015 220);
+  --text-muted: oklch(0.45 0.015 220);
+
+  --bg-base: oklch(0.06 0.015 220);
+  --bg-surface: oklch(0.10 0.016 220);
+  --bg-elevated: oklch(0.14 0.018 220);
+  --bg-overlay: oklch(0.18 0.018 220);
+
+  --border-subtle: oklch(0.16 0.018 220);
+  --border-default: oklch(0.22 0.022 220);
+  --border-strong: oklch(0.30 0.028 220);
+
+  --accent-workspace: oklch(0.62 0.18 220);
+  --accent-workspace-bg: oklch(0.62 0.18 220 / 0.12);
+  --accent-workspace-border: oklch(0.62 0.18 220 / 0.30);
+  --accent-workspace-glow: oklch(0.62 0.18 220 / 0.35);
+  --accent-workspace-glow-hover: oklch(0.62 0.18 220 / 0.50);
+  --accent-agent: oklch(0.72 0.14 190);
+  --accent-agent-bg: oklch(0.72 0.14 190 / 0.12);
+  --accent-agent-border: oklch(0.72 0.14 190 / 0.30);
+  --accent-skill: oklch(0.75 0.18 55);
+  --accent-skill-bg: oklch(0.75 0.18 55 / 0.12);
+  --accent-skill-border: oklch(0.75 0.18 55 / 0.30);
+  --accent-mcp: oklch(0.72 0.16 150);
+  --accent-mcp-bg: oklch(0.72 0.16 150 / 0.12);
+  --accent-mcp-border: oklch(0.72 0.16 150 / 0.30);
+
+  --status-running: oklch(0.72 0.16 150);
+  --status-error: oklch(0.58 0.22 25);
 }
 
 /* ─── Midnight theme ───────────────────────────────────────────────────────── */
 [data-theme="midnight"] {
-  --background: oklch(0.09 0.002 265);
+  --background: oklch(0.07 0.002 265);
   --foreground: oklch(0.92 0.005 265);
-  --card: oklch(0.12 0.003 265);
+  --card: oklch(0.10 0.003 265);
   --card-foreground: oklch(0.92 0.005 265);
-  --popover: oklch(0.12 0.003 265);
+  --popover: oklch(0.10 0.003 265);
   --popover-foreground: oklch(0.92 0.005 265);
   --primary: oklch(0.58 0.10 285);
   --primary-foreground: oklch(0.98 0.005 285);
-  --secondary: oklch(0.15 0.003 265);
+  --secondary: oklch(0.13 0.003 265);
   --secondary-foreground: oklch(0.92 0.005 265);
-  --muted: oklch(0.15 0.003 265);
+  --muted: oklch(0.13 0.003 265);
   --muted-foreground: oklch(0.52 0.008 265);
   --accent: oklch(0.65 0.08 200);
-  --accent-foreground: oklch(0.09 0.002 265);
+  --accent-foreground: oklch(0.07 0.002 265);
   --destructive: oklch(0.55 0.20 25);
-  --border: oklch(0.20 0.004 265);
-  --input: oklch(0.20 0.004 265);
+  --border: oklch(0.18 0.004 265);
+  --input: oklch(0.18 0.004 265);
   --ring: oklch(0.58 0.10 285);
   --chart-1: oklch(0.58 0.10 285);
   --chart-2: oklch(0.65 0.08 200);
   --chart-3: oklch(0.65 0.10 150);
   --chart-4: oklch(0.68 0.12 55);
   --chart-5: oklch(0.58 0.16 25);
-  --sidebar: oklch(0.085 0.002 265);
+  --sidebar: oklch(0.055 0.002 265);
   --sidebar-foreground: oklch(0.92 0.005 265);
   --sidebar-primary: oklch(0.58 0.10 285);
   --sidebar-primary-foreground: oklch(0.98 0.005 285);
-  --sidebar-accent: oklch(0.15 0.003 265);
+  --sidebar-accent: oklch(0.13 0.003 265);
   --sidebar-accent-foreground: oklch(0.92 0.005 265);
-  --sidebar-border: oklch(0.20 0.004 265);
+  --sidebar-border: oklch(0.18 0.004 265);
   --sidebar-ring: oklch(0.58 0.10 285);
+
+  --text-primary: oklch(0.92 0.005 265);
+  --text-secondary: oklch(0.62 0.008 265);
+  --text-muted: oklch(0.42 0.008 265);
+
+  --bg-base: oklch(0.04 0.002 265);
+  --bg-surface: oklch(0.07 0.002 265);
+  --bg-elevated: oklch(0.11 0.003 265);
+  --bg-overlay: oklch(0.15 0.003 265);
+
+  --border-subtle: oklch(0.12 0.003 265);
+  --border-default: oklch(0.18 0.004 265);
+  --border-strong: oklch(0.25 0.005 265);
+
+  --accent-workspace: oklch(0.58 0.10 285);
+  --accent-workspace-bg: oklch(0.58 0.10 285 / 0.12);
+  --accent-workspace-border: oklch(0.58 0.10 285 / 0.30);
+  --accent-workspace-glow: oklch(0.58 0.10 285 / 0.35);
+  --accent-workspace-glow-hover: oklch(0.58 0.10 285 / 0.50);
+  --accent-agent: oklch(0.65 0.08 200);
+  --accent-agent-bg: oklch(0.65 0.08 200 / 0.12);
+  --accent-agent-border: oklch(0.65 0.08 200 / 0.30);
+  --accent-skill: oklch(0.68 0.12 55);
+  --accent-skill-bg: oklch(0.68 0.12 55 / 0.12);
+  --accent-skill-border: oklch(0.68 0.12 55 / 0.30);
+  --accent-mcp: oklch(0.65 0.10 150);
+  --accent-mcp-bg: oklch(0.65 0.10 150 / 0.12);
+  --accent-mcp-border: oklch(0.65 0.10 150 / 0.30);
+
+  --status-running: oklch(0.65 0.10 150);
+  --status-error: oklch(0.55 0.20 25);
 }
