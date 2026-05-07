@@ -54,7 +54,7 @@ ALL_TOOLS: list[dict] = [
     },
     {
         "name": "create_task",
-        "description": "Create a new task in the project.",
+        "description": "Create a new task in the project. To assign to a human, pass their project_agent_id from get_project_info.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -70,8 +70,45 @@ ALL_TOOLS: list[dict] = [
                     "enum": ["LOW", "MEDIUM", "HIGH", "URGENT"],
                     "default": "MEDIUM",
                 },
+                "assignee_project_agent_id": {
+                    "type": "string",
+                    "description": "ProjectAgent ID to assign this task to. Use get_project_info to find human agent IDs.",
+                },
             },
             "required": ["title"],
+        },
+    },
+    {
+        "name": "request_human_input",
+        "description": (
+            "Use this when you cannot complete the current task without input, a decision, "
+            "or action from a human team member. It creates a new TODO task assigned to the "
+            "specified human, posts a comment on the current task explaining why it is blocked, "
+            "and marks the current task as BLOCKED. Always call get_project_info first to find "
+            "the human agent's project_agent_id."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "Short title for the human task, e.g. 'Provide API credentials for payment gateway'.",
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Full description of what the human needs to provide or decide.",
+                },
+                "assignee_project_agent_id": {
+                    "type": "string",
+                    "description": "ProjectAgent ID of the human to assign the task to. Use get_project_info to find human agent IDs.",
+                },
+                "priority": {
+                    "type": "string",
+                    "enum": ["LOW", "MEDIUM", "HIGH", "URGENT"],
+                    "default": "MEDIUM",
+                },
+            },
+            "required": ["title", "description", "assignee_project_agent_id"],
         },
     },
     {
@@ -295,6 +332,8 @@ async def execute_tool(name: str, args: dict, ctx: ToolContext, tool_def: dict |
         return await _complete_task(args["summary"], ctx)
     elif name == "block_task":
         return await _block_task(args["reason"], ctx)
+    elif name == "request_human_input":
+        return await _request_human_input(args, ctx)
     elif name == "http_request":
         return await _http_request(args)
     elif name == "run_shell":
@@ -373,23 +412,43 @@ async def _create_task(args: dict, ctx: ToolContext) -> str:
     new_id = _new_id()
     status = args.get("status", "BACKLOG")
     priority = args.get("priority", "MEDIUM")
+    assignee_id = args.get("assignee_project_agent_id")
 
-    row = await pool.fetchrow(
-        """
-        INSERT INTO "Task" (id, "projectId", title, description, status, priority,
-                            "reporterId", "reporterType", "createdAt", "updatedAt")
-        VALUES ($1, $2, $3, $4, $5::"TaskStatus", $6::"TaskPriority",
-                $7, 'agent', NOW(), NOW())
-        RETURNING id, title, status, priority
-        """,
-        new_id,
-        ctx.project_id,
-        args["title"],
-        args.get("description", ""),
-        status,
-        priority,
-        ctx.project_agent_id,
-    )
+    if assignee_id:
+        row = await pool.fetchrow(
+            """
+            INSERT INTO "Task" (id, "projectId", title, description, status, priority,
+                                "reporterId", "reporterType", "assigneeId", "createdAt", "updatedAt")
+            VALUES ($1, $2, $3, $4, $5::"TaskStatus", $6::"TaskPriority",
+                    $7, 'agent', $8, NOW(), NOW())
+            RETURNING id, title, status, priority
+            """,
+            new_id,
+            ctx.project_id,
+            args["title"],
+            args.get("description", ""),
+            status,
+            priority,
+            ctx.project_agent_id,
+            assignee_id,
+        )
+    else:
+        row = await pool.fetchrow(
+            """
+            INSERT INTO "Task" (id, "projectId", title, description, status, priority,
+                                "reporterId", "reporterType", "createdAt", "updatedAt")
+            VALUES ($1, $2, $3, $4, $5::"TaskStatus", $6::"TaskPriority",
+                    $7, 'agent', NOW(), NOW())
+            RETURNING id, title, status, priority
+            """,
+            new_id,
+            ctx.project_id,
+            args["title"],
+            args.get("description", ""),
+            status,
+            priority,
+            ctx.project_agent_id,
+        )
     await events.publish("task:created", {"projectId": ctx.project_id, "task": dict(row)})
     return json.dumps(dict(row))
 
@@ -431,9 +490,9 @@ async def _get_project_info(ctx: ToolContext) -> str:
         "description": project["description"],
         "agents": [
             {
-                "id": r["id"],
+                "project_agent_id": r["id"],
                 "name": r["name"],
-                "type": r["type"],
+                "is_human": r["type"] == "human",
                 "role": r["customRole"] if r["role"] == "CUSTOM" else r["role"],
             }
             for r in agents
@@ -596,6 +655,75 @@ async def _block_task(reason: str, ctx: ToolContext) -> str:
 
     await _add_comment(ctx.task_id, f"**Task blocked.**\n\n{reason}", ctx)
     await events.publish("task:updated", {"projectId": ctx.project_id, "task": dict(row)})
+    return "STOP"
+
+
+async def _request_human_input(args: dict, ctx: ToolContext) -> str:
+    title = args["title"]
+    description = args["description"]
+    assignee_id = args["assignee_project_agent_id"]
+    priority = args.get("priority", "MEDIUM")
+
+    pool = await get_pool()
+
+    # Verify assignee exists and is human
+    agent_row = await pool.fetchrow(
+        """
+        SELECT pa.id, a.name, a.type
+        FROM "ProjectAgent" pa
+        JOIN "Agent" a ON a.id = pa."agentId"
+        WHERE pa.id = $1 AND pa."projectId" = $2
+        """,
+        assignee_id,
+        ctx.project_id,
+    )
+    if not agent_row:
+        return f"ProjectAgent {assignee_id} not found in this project."
+    if agent_row["type"] != "human":
+        return f"Agent '{agent_row['name']}' is not a human agent. Use request_human_input only for human team members."
+
+    # Create a new TODO task assigned to the human
+    new_task_id = _new_id()
+    new_task = await pool.fetchrow(
+        """
+        INSERT INTO "Task" (id, "projectId", title, description, status, priority,
+                            "reporterId", "reporterType", "assigneeId", "createdAt", "updatedAt")
+        VALUES ($1, $2, $3, $4, 'TODO'::"TaskStatus", $5::"TaskPriority",
+                $6, 'agent', $7, NOW(), NOW())
+        RETURNING id, title, status, priority
+        """,
+        new_task_id,
+        ctx.project_id,
+        title,
+        description,
+        priority,
+        ctx.project_agent_id,
+        assignee_id,
+    )
+    await events.publish("task:created", {"projectId": ctx.project_id, "task": dict(new_task)})
+
+    # Post a comment on the current task explaining the block
+    await _add_comment(
+        ctx.task_id,
+        f"**Waiting for human input.**\n\nCreated task for {agent_row['name']}: **{title}**\n\n{description}",
+        ctx,
+    )
+
+    # Block the current task
+    await pool.execute(
+        """
+        UPDATE "Task"
+        SET status = 'BLOCKED'::"TaskStatus", "updatedAt" = NOW()
+        WHERE id = $1 AND "projectId" = $2
+        """,
+        ctx.task_id,
+        ctx.project_id,
+    )
+    await events.publish("task:updated", {
+        "projectId": ctx.project_id,
+        "task": {"id": ctx.task_id, "status": "BLOCKED"},
+    })
+
     return "STOP"
 
 
