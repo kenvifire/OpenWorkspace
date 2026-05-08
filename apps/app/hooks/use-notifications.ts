@@ -50,7 +50,7 @@ export function useNotifications(userId: string | undefined) {
         s.off('notification:created', onNotification);
         joinedRef.current = false;
       };
-    });
+    }).catch(() => {});
 
     return () => cleanup?.();
   }, [userId, refreshUnread]);
