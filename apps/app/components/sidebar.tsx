@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   LayoutDashboard, Store, CreditCard, Settings, Plus,
-  LogOut, Bot, Zap, Server, Brain,
+  LogOut, Bot, Zap, Server, Brain, CheckSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { useTheme } from '@/contexts/theme';
 import { motion, AnimatePresence } from 'framer-motion';
+import { NotificationBell } from '@/components/notification-bell';
 
 const WORKSPACE_COLORS = [
   'from-violet-500 to-purple-600',
@@ -59,6 +60,7 @@ export function Sidebar() {
 
   const navItems = [
     { label: t('dashboard'), href: `/${locale}/dashboard`, icon: LayoutDashboard },
+    { label: 'My Tasks', href: `/${locale}/my-tasks`, icon: CheckSquare },
     { label: t('marketplace'), href: `/${locale}/marketplace`, icon: Store },
     { label: t('billing'), href: `/${locale}/billing`, icon: CreditCard },
   ];
@@ -78,6 +80,9 @@ export function Sidebar() {
         <span className="text-sm font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-syne)' }}>
           OpenWorkspace
         </span>
+        <div className="ml-auto">
+          <NotificationBell userId={user?.uid} />
+        </div>
       </div>
 
       {/* Scrollable body */}
