@@ -16,6 +16,7 @@ import type {
   BillingCycleSummary,
   ProviderEarnings,
   PlannerRunLog,
+  Notification,
   Paginated,
 } from '@openworkspace/api-types';
 import type {
@@ -416,4 +417,20 @@ export const mcpsApi = {
     api.post(`/api/projects/${projectId}/agents/${projectAgentId}/mcps/${mcpId}`).then((r) => r.data),
   removeFromProjectAgent: (projectId: string, projectAgentId: string, mcpId: string): Promise<void> =>
     api.delete(`/api/projects/${projectId}/agents/${projectAgentId}/mcps/${mcpId}`),
+};
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+export const notificationsApi = {
+  list: (): Promise<Notification[]> =>
+    api.get('/api/notifications').then((r) => r.data),
+  markRead: (id: string): Promise<void> =>
+    api.patch(`/api/notifications/${id}/read`).then((r) => r.data),
+  markAllRead: (): Promise<void> =>
+    api.patch('/api/notifications/read-all').then((r) => r.data),
+};
+
+// ─── My Tasks ─────────────────────────────────────────────────────────────────
+export const myTasksApi = {
+  list: (): Promise<Array<Task & { project: { id: string; name: string; workspace: { slug: string } } }>> =>
+    api.get('/api/my-tasks').then((r) => r.data),
 };
