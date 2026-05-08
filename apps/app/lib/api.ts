@@ -176,6 +176,14 @@ export const plannerApi = {
     api.get(`/api/projects/${projectId}/planner/runs`).then((r) => r.data),
 };
 
+// ─── Coordinator ──────────────────────────────────────────────────────────────
+export const coordinatorApi = {
+  setCoordinator: (projectId: string, data: { projectAgentId: string }): Promise<{ id: string; coordinatorProjectAgentId: string | null }> =>
+    api.post(`/api/projects/${projectId}/coordinator/set`, data).then((r) => r.data),
+  unsetCoordinator: (projectId: string): Promise<{ id: string; coordinatorProjectAgentId: string | null }> =>
+    api.delete(`/api/projects/${projectId}/coordinator/set`).then((r) => r.data),
+};
+
 // ─── Two-Factor Auth ──────────────────────────────────────────────────────────
 export const twoFactorApi = {
   setup: (): Promise<{ secret: string; otpauthUrl: string }> =>

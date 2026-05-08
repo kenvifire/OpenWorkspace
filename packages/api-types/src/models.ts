@@ -79,6 +79,7 @@ export interface Project {
   description: string
   leaderId: string
   plannerProjectAgentId: string | null
+  coordinatorProjectAgentId: string | null
   sandboxProvider: string | null
   createdAt: string
   updatedAt: string

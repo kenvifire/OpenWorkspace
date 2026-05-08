@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import { projectsApi, keysApi, marketplaceApi, plannerApi, planningAgentApi, agentRunsApi, skillsApi, mcpsApi, tasksApi, myAgentsApi } from '@/lib/api';
+import { projectsApi, keysApi, marketplaceApi, plannerApi, coordinatorApi, planningAgentApi, agentRunsApi, skillsApi, mcpsApi, tasksApi, myAgentsApi } from '@/lib/api';
 import type { UpdatePersonalAgentDto } from '@/lib/api';
 import type { ProjectPlanningAgent, PlanningAgentVersion, Skill, Mcp } from '@/lib/api';
 import type { ProjectAgent, ResourceKey, AgentRunLog, AgentRunStep, PlannerRunLog } from '@openworkspace/api-types';
@@ -762,6 +762,19 @@ export default function ProjectSettingsPage({
   const [draftPrompt, setDraftPrompt] = useState('');
   const [publishLabel, setPublishLabel] = useState('');
 
+  // Coordinator state
+  const [coordinatorAgentId, setCoordinatorAgentId] = useState<string>('');
+
+  const setCoordinatorMutation = useMutation({
+    mutationFn: (paId: string) => coordinatorApi.setCoordinator(projectId, { projectAgentId: paId }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['project', projectId] }),
+  });
+
+  const unsetCoordinatorMutation = useMutation({
+    mutationFn: () => coordinatorApi.unsetCoordinator(projectId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['project', projectId] }),
+  });
+
   const { data: project } = useQuery({
     queryKey: ['project', projectId],
     queryFn: () => projectsApi.get(projectId),
@@ -1423,6 +1436,61 @@ export default function ProjectSettingsPage({
             </div>
           </div>
         )}
+      </section>
+
+      <Separator className="mb-10" />
+
+      {/* ── Coordinator ──────────────────────────────────────────────────── */}
+      <section className="mb-10">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-foreground">Coordinator Agent</h2>
+          <p className="text-sm text-muted-foreground/70">
+            Assign an AI agent to gate task execution — it decides what to start, hold, escalate, or abort after every significant board event.
+          </p>
+        </div>
+
+        <Card className="mb-4">
+          <CardContent className="pt-4 space-y-3">
+            <div className="flex items-center gap-3">
+              <select
+                className="flex-1 rounded-md border border-border px-3 py-2 text-sm bg-card"
+                value={coordinatorAgentId || project?.coordinatorProjectAgentId || ''}
+                onChange={(e) => setCoordinatorAgentId(e.target.value)}
+              >
+                <option value="">— Select a hired AI agent —</option>
+                {activeAgents
+                  .filter((a) => a.agent?.type === 'AI')
+                  .map((pa) => (
+                    <option key={pa.id} value={pa.id}>{pa.agent!.name} ({pa.role})</option>
+                  ))}
+              </select>
+              <Button
+                size="sm"
+                disabled={!coordinatorAgentId || setCoordinatorMutation.isPending}
+                onClick={() => setCoordinatorMutation.mutate(coordinatorAgentId)}
+              >
+                {setCoordinatorMutation.isPending ? 'Saving…' : 'Set coordinator'}
+              </Button>
+            </div>
+            {project?.coordinatorProjectAgentId && (() => {
+              const coordinatorPa = activeAgents.find((a) => a.id === project.coordinatorProjectAgentId);
+              return (
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-[var(--status-running)] flex items-center gap-1">
+                    <CheckCheck size={12} /> Coordinator assigned
+                    {coordinatorPa && <span className="text-muted-foreground ml-1">— {coordinatorPa.agent?.name}</span>}
+                  </p>
+                  <button
+                    onClick={() => unsetCoordinatorMutation.mutate()}
+                    className="text-xs text-[var(--status-error)] hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
       </section>
 
       <Separator className="mb-10" />
