@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { KanbanGateway } from '../../gateway/kanban.gateway';
 import { AgentRunnerService } from '../agent-runner/agent-runner.service';
 import { PlannerService } from '../planner/planner.service';
+import { CoordinatorService } from '../coordinator/coordinator.service';
 import { CreateTaskDto, UpdateTaskDto, AddCommentDto } from './dto/task.dto';
 import { TaskStatus, User, ProjectAgent } from '@prisma/client';
 
@@ -22,6 +23,7 @@ export class TasksService {
     private readonly gateway: KanbanGateway,
     private readonly agentRunner: AgentRunnerService,
     private readonly plannerService: PlannerService,
+    private readonly coordinator: CoordinatorService,
   ) {}
 
   async findAll(projectId: string, actor: Actor) {
@@ -138,12 +140,25 @@ export class TasksService {
 
     this.gateway.emit('task:updated', { projectId, data: updated as any });
 
-    // Auto-trigger agent when task becomes TODO and has an AI assignee
-    await this.maybeEnqueueAgent(updated);
+    if (dto.status && dto.status !== prevStatus) {
+      const relevantEvents: Record<string, 'TASK_DONE' | 'TASK_BLOCKED' | 'TASK_FAILED'> = {
+        DONE: 'TASK_DONE',
+        BLOCKED: 'TASK_BLOCKED',
+        FAILED: 'TASK_FAILED',
+      };
+      const coordinatorEvent = relevantEvents[dto.status];
+      const hasCoordinator = coordinatorEvent
+        ? await this.maybeNotifyCoordinator(projectId, taskId, coordinatorEvent)
+        : false;
 
-    // When a task moves to DONE, unblock any dependents that are now clear
-    if (dto.status === TaskStatus.DONE && prevStatus !== TaskStatus.DONE) {
-      await this.maybeUnblockDependents(taskId, projectId);
+      if (!hasCoordinator) {
+        await this.maybeEnqueueAgent(updated);
+        if (dto.status === TaskStatus.DONE) {
+          await this.maybeUnblockDependents(taskId, projectId);
+        }
+      }
+    } else {
+      await this.maybeEnqueueAgent(updated);
     }
 
     return updated;
@@ -204,6 +219,20 @@ export class TasksService {
     }
   }
 
+  private async maybeNotifyCoordinator(
+    projectId: string,
+    taskId: string,
+    event: 'TASK_DONE' | 'TASK_BLOCKED' | 'TASK_FAILED' | 'HUMAN_DONE',
+  ): Promise<boolean> {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      select: { coordinatorProjectAgentId: true },
+    });
+    if (!project?.coordinatorProjectAgentId) return false;
+    await this.coordinator.publish(projectId, taskId, event, project.coordinatorProjectAgentId);
+    return true;
+  }
+
   async addComment(projectId: string, taskId: string, dto: AddCommentDto, actor: Actor) {
     await this.assertProjectAccess(projectId, actor);
 
@@ -229,8 +258,13 @@ export class TasksService {
           include: { agent: { select: { type: true } } },
         });
         if (pa?.agent.type === 'AI') {
-          await this.agentRunner.stop(taskId);
-          await this.agentRunner.enqueue(taskId, task.assigneeId);
+          const hasCoordinator = task.status === 'BLOCKED'
+            ? await this.maybeNotifyCoordinator(task.projectId, task.id, 'HUMAN_DONE')
+            : false;
+          if (!hasCoordinator) {
+            await this.agentRunner.stop(taskId);
+            await this.agentRunner.enqueue(taskId, task.assigneeId);
+          }
         }
       } catch (e) {
         // Non-fatal — comment was saved, agent re-trigger failed silently
