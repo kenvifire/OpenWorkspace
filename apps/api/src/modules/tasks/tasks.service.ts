@@ -9,12 +9,16 @@ import { KanbanGateway } from '../../gateway/kanban.gateway';
 import { AgentRunnerService } from '../agent-runner/agent-runner.service';
 import { PlannerService } from '../planner/planner.service';
 import { CoordinatorService } from '../coordinator/coordinator.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateTaskDto, UpdateTaskDto, AddCommentDto } from './dto/task.dto';
-import { TaskStatus, User, ProjectAgent } from '@prisma/client';
+import { TaskStatus, NotificationType, User, ProjectAgent } from '@prisma/client';
 
 type Actor =
   | { type: 'user'; entity: User }
-  | { type: 'agent'; entity: ProjectAgent & { project: { workspaceId: string } } };
+  | {
+      type: 'agent';
+      entity: ProjectAgent & { project: { workspaceId: string } };
+    };
 
 @Injectable()
 export class TasksService {
@@ -24,6 +28,7 @@ export class TasksService {
     private readonly agentRunner: AgentRunnerService,
     private readonly plannerService: PlannerService,
     private readonly coordinator: CoordinatorService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async findAll(projectId: string, actor: Actor) {
@@ -32,7 +37,9 @@ export class TasksService {
     return this.prisma.task.findMany({
       where: { projectId, deletedAt: null },
       include: {
-        assignee: { include: { agent: { select: { id: true, name: true, type: true } } } },
+        assignee: {
+          include: { agent: { select: { id: true, name: true, type: true } } },
+        },
         _count: { select: { comments: true } },
       },
       orderBy: [{ status: 'asc' }, { priority: 'desc' }, { createdAt: 'asc' }],
@@ -45,7 +52,9 @@ export class TasksService {
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
       include: {
-        assignee: { include: { agent: { select: { id: true, name: true, type: true } } } },
+        assignee: {
+          include: { agent: { select: { id: true, name: true, type: true } } },
+        },
         comments: { orderBy: { createdAt: 'asc' } },
         activities: { orderBy: { createdAt: 'asc' } },
         blockedBy: {
@@ -56,7 +65,8 @@ export class TasksService {
       },
     });
 
-    if (!task || task.projectId !== projectId || task.deletedAt) throw new NotFoundException('Task not found');
+    if (!task || task.projectId !== projectId || task.deletedAt)
+      throw new NotFoundException('Task not found');
     return task;
   }
 
@@ -81,6 +91,12 @@ export class TasksService {
 
     this.gateway.emit('task:created', { projectId, data: task as any });
 
+    // Notify human assignee if applicable
+    if (dto.assigneeId) {
+      const actorName = actor.type === 'user' ? actor.entity.name : 'An agent';
+      await this.maybeNotifyHumanAssignee(task, NotificationType.TASK_ASSIGNED, actorName).catch(() => {});
+    }
+
     if (actor.type === 'agent' && !dto.assigneeId) {
       // Fire-and-forget: planner auto-assigns the task in the background
       this.plannerService.autoAssignNewTask(task.id, projectId).catch(() => {});
@@ -91,18 +107,26 @@ export class TasksService {
     return task;
   }
 
-  async update(projectId: string, taskId: string, dto: UpdateTaskDto, actor: Actor) {
+  async update(
+    projectId: string,
+    taskId: string,
+    dto: UpdateTaskDto,
+    actor: Actor,
+  ) {
     await this.assertProjectAccess(projectId, actor);
 
     const task = await this.prisma.task.findUnique({ where: { id: taskId } });
-    if (!task || task.projectId !== projectId) throw new NotFoundException('Task not found');
+    if (!task || task.projectId !== projectId)
+      throw new NotFoundException('Task not found');
 
     // Agents can only update tasks assigned to them (or if coordinator)
     if (actor.type === 'agent') {
       const isAssigned = task.assigneeId === actor.entity.id;
       const isCoordinator = (actor.entity as ProjectAgent).isCoordinator;
       if (!isAssigned && !isCoordinator) {
-        throw new ForbiddenException('Agents can only update tasks assigned to them');
+        throw new ForbiddenException(
+          'Agents can only update tasks assigned to them',
+        );
       }
     }
 
@@ -140,6 +164,27 @@ export class TasksService {
 
     this.gateway.emit('task:updated', { projectId, data: updated as any });
 
+    // Notify human assignee on status change
+    if (dto.status && dto.status !== prevStatus) {
+      const actorName = actor.type === 'user' ? actor.entity.name : 'An agent';
+      await this.maybeNotifyHumanAssignee(
+        updated,
+        NotificationType.TASK_STATUS_CHANGED,
+        actorName,
+        { oldStatus: prevStatus, newStatus: dto.status },
+      ).catch(() => {});
+    }
+
+    // Notify human assignee when assignee changes
+    if (dto.assigneeId && dto.assigneeId !== task.assigneeId) {
+      const actorName = actor.type === 'user' ? actor.entity.name : 'An agent';
+      await this.maybeNotifyHumanAssignee(
+        updated,
+        NotificationType.TASK_ASSIGNED,
+        actorName,
+      ).catch(() => {});
+    }
+
     if (dto.status && dto.status !== prevStatus) {
       const relevantEvents: Record<string, 'TASK_DONE' | 'TASK_BLOCKED'> = {
         DONE: 'TASK_DONE',
@@ -163,7 +208,11 @@ export class TasksService {
     return updated;
   }
 
-  private async maybeEnqueueAgent(task: { id: string; status: string; assigneeId: string | null }) {
+  private async maybeEnqueueAgent(task: {
+    id: string;
+    status: string;
+    assigneeId: string | null;
+  }) {
     if (task.status !== 'TODO' || !task.assigneeId) return;
 
     const projectAgent = await this.prisma.projectAgent.findUnique({
@@ -181,7 +230,10 @@ export class TasksService {
     await this.agentRunner.enqueue(task.id, projectAgent.id);
   }
 
-  private async maybeUnblockDependents(completedTaskId: string, projectId: string) {
+  private async maybeUnblockDependents(
+    completedTaskId: string,
+    projectId: string,
+  ) {
     // Find every task that was blocked by the completed task
     const deps = await this.prisma.taskDependency.findMany({
       where: { blockingTaskId: completedTaskId },
@@ -200,11 +252,15 @@ export class TasksService {
 
       const task = await this.prisma.task.findUnique({
         where: { id: blockedTaskId },
-        include: { assignee: { include: { agent: { select: { type: true } } } } },
+        include: {
+          assignee: { include: { agent: { select: { type: true } } } },
+        },
       });
       if (!task || task.status !== 'BLOCKED') continue;
 
-      const newStatus = task.assigneeId ? TaskStatus.TODO : 'BACKLOG' as TaskStatus;
+      const newStatus = task.assigneeId
+        ? TaskStatus.TODO
+        : ('BACKLOG' as TaskStatus);
       const unblocked = await this.prisma.task.update({
         where: { id: blockedTaskId },
         data: { status: newStatus },
@@ -228,15 +284,26 @@ export class TasksService {
       select: { coordinatorProjectAgentId: true },
     });
     if (!project?.coordinatorProjectAgentId) return false;
-    await this.coordinator.publish(projectId, taskId, event, project.coordinatorProjectAgentId);
+    await this.coordinator.publish(
+      projectId,
+      taskId,
+      event,
+      project.coordinatorProjectAgentId,
+    );
     return true;
   }
 
-  async addComment(projectId: string, taskId: string, dto: AddCommentDto, actor: Actor) {
+  async addComment(
+    projectId: string,
+    taskId: string,
+    dto: AddCommentDto,
+    actor: Actor,
+  ) {
     await this.assertProjectAccess(projectId, actor);
 
     const task = await this.prisma.task.findUnique({ where: { id: taskId } });
-    if (!task || task.projectId !== projectId) throw new NotFoundException('Task not found');
+    if (!task || task.projectId !== projectId)
+      throw new NotFoundException('Task not found');
 
     const comment = await this.prisma.taskComment.create({
       data: {
@@ -247,19 +314,43 @@ export class TasksService {
       },
     });
 
-    this.gateway.emit('comment:created', { projectId, data: { ...comment, taskId } as any });
+    this.gateway.emit('comment:created', {
+      projectId,
+      data: { ...comment, taskId } as any,
+    });
+
+    // Notify human assignee when someone else comments
+    if (actor.type === 'user' && task.assigneeId) {
+      const snippet = dto.content.slice(0, 120);
+      await this.maybeNotifyHumanAssignee(
+        task,
+        NotificationType.TASK_COMMENTED,
+        actor.entity.name,
+        { commentSnippet: snippet },
+        actor.entity.id,
+      ).catch(() => {});
+    }
 
     // If a human commented on a blocked/todo task with an AI assignee, re-trigger the agent
-    if (actor.type === 'user' && task.assigneeId && ['BLOCKED', 'TODO', 'IN_PROGRESS'].includes(task.status)) {
+    if (
+      actor.type === 'user' &&
+      task.assigneeId &&
+      ['BLOCKED', 'TODO', 'IN_PROGRESS'].includes(task.status)
+    ) {
       try {
         const pa = await this.prisma.projectAgent.findUnique({
           where: { id: task.assigneeId },
           include: { agent: { select: { type: true } } },
         });
         if (pa?.agent.type === 'AI') {
-          const hasCoordinator = task.status === 'BLOCKED'
-            ? await this.maybeNotifyCoordinator(task.projectId, task.id, 'HUMAN_DONE')
-            : false;
+          const hasCoordinator =
+            task.status === 'BLOCKED'
+              ? await this.maybeNotifyCoordinator(
+                  task.projectId,
+                  task.id,
+                  'HUMAN_DONE',
+                )
+              : false;
           if (!hasCoordinator) {
             await this.agentRunner.stop(taskId);
             await this.agentRunner.enqueue(taskId, task.assigneeId);
@@ -280,7 +371,8 @@ export class TasksService {
       where: { id: taskId },
       select: { id: true, projectId: true, assigneeId: true, deletedAt: true },
     });
-    if (!task || task.projectId !== projectId || task.deletedAt) throw new NotFoundException('Task not found');
+    if (!task || task.projectId !== projectId || task.deletedAt)
+      throw new NotFoundException('Task not found');
 
     // Stop any active run
     await this.agentRunner.stop(taskId);
@@ -292,7 +384,10 @@ export class TasksService {
       where: { id: taskId },
       data: { deletedAt: new Date(), assigneeId: null },
     });
-    this.gateway.emit('task:deleted', { projectId, data: { id: taskId } as any });
+    this.gateway.emit('task:deleted', {
+      projectId,
+      data: { id: taskId } as any,
+    });
 
     // Enqueue next available TODO task for the same agent
     if (assigneeId) {
@@ -315,7 +410,14 @@ export class TasksService {
     await this.assertProjectAccess(projectId, actor);
     return this.prisma.task.findMany({
       where: { projectId, deletedAt: { not: null } },
-      select: { id: true, title: true, description: true, status: true, priority: true, deletedAt: true },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+        deletedAt: true,
+      },
       orderBy: { deletedAt: 'desc' },
     });
   }
@@ -327,7 +429,8 @@ export class TasksService {
       where: { id: taskId },
       select: { id: true, projectId: true, deletedAt: true },
     });
-    if (!task || task.projectId !== projectId || !task.deletedAt) throw new NotFoundException('Deleted task not found');
+    if (!task || task.projectId !== projectId || !task.deletedAt)
+      throw new NotFoundException('Deleted task not found');
 
     const restored = await this.prisma.task.update({
       where: { id: taskId },
@@ -344,7 +447,8 @@ export class TasksService {
       where: { id: taskId },
       select: { id: true, projectId: true, deletedAt: true },
     });
-    if (!task || task.projectId !== projectId || !task.deletedAt) throw new NotFoundException('Deleted task not found');
+    if (!task || task.projectId !== projectId || !task.deletedAt)
+      throw new NotFoundException('Deleted task not found');
 
     await this.prisma.task.delete({ where: { id: taskId } });
     return { deleted: true };
@@ -359,6 +463,52 @@ export class TasksService {
     return task;
   }
 
+  private async maybeNotifyHumanAssignee(
+    task: { id: string; title: string; assigneeId: string | null },
+    type: NotificationType,
+    actorName: string,
+    extraData?: { oldStatus?: string; newStatus?: string; commentSnippet?: string },
+    actorUserId?: string,
+  ) {
+    if (!task.assigneeId) return;
+
+    const pa = await this.prisma.projectAgent.findUnique({
+      where: { id: task.assigneeId },
+      include: {
+        agent: {
+          select: {
+            type: true,
+            userId: true,
+            owner: { select: { id: true, email: true, name: true } },
+          },
+        },
+        project: {
+          select: { name: true, workspace: { select: { slug: true } } },
+        },
+      },
+    });
+
+    if (pa?.agent.type !== 'HUMAN' || !pa.agent.userId || !pa.agent.owner) return;
+
+    // Don't notify when the actor is the same user as the assignee
+    if (actorUserId && pa.agent.userId === actorUserId) return;
+
+    await this.notifications.create(
+      pa.agent.userId,
+      pa.agent.owner.email,
+      type,
+      {
+        taskTitle: task.title,
+        projectName: pa.project.name,
+        workspaceSlug: pa.project.workspace.slug,
+        actorName,
+        taskId: task.id,
+        projectId: pa.projectId,
+        ...extraData,
+      },
+    );
+  }
+
   private async assertProjectAccess(projectId: string, actor: Actor) {
     if (actor.type === 'agent') {
       if (actor.entity.projectId !== projectId) throw new ForbiddenException();
@@ -366,11 +516,18 @@ export class TasksService {
     }
 
     // For users, verify workspace membership
-    const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
     if (!project) throw new NotFoundException('Project not found');
 
     const member = await this.prisma.workspaceMember.findUnique({
-      where: { workspaceId_userId: { workspaceId: project.workspaceId, userId: actor.entity.id } },
+      where: {
+        workspaceId_userId: {
+          workspaceId: project.workspaceId,
+          userId: actor.entity.id,
+        },
+      },
     });
     if (!member) throw new ForbiddenException();
   }

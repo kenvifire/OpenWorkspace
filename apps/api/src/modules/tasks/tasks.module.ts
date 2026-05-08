@@ -6,9 +6,10 @@ import { GatewayModule } from '../../gateway/gateway.module';
 import { AgentRunnerModule } from '../agent-runner/agent-runner.module';
 import { PlannerModule } from '../planner/planner.module';
 import { CoordinatorModule } from '../coordinator/coordinator.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [GatewayModule, AgentRunnerModule, PlannerModule, CoordinatorModule],
+  imports: [GatewayModule, AgentRunnerModule, PlannerModule, CoordinatorModule, NotificationsModule],
   providers: [TasksService, ProjectKeyGuard],
   controllers: [TasksController],
 })

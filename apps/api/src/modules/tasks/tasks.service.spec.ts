@@ -6,11 +6,15 @@ import { KanbanGateway } from '../../gateway/kanban.gateway';
 import { AgentRunnerService } from '../agent-runner/agent-runner.service';
 import { PlannerService } from '../planner/planner.service';
 import { CoordinatorService } from '../coordinator/coordinator.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { TaskStatus, TaskPriority, User, ProjectAgent } from '@prisma/client';
 
 type Actor =
   | { type: 'user'; entity: User }
-  | { type: 'agent'; entity: ProjectAgent & { project: { workspaceId: string } } };
+  | {
+      type: 'agent';
+      entity: ProjectAgent & { project: { workspaceId: string } };
+    };
 
 // ── Minimal mock factories ───────────────────────────────────────────────────
 
@@ -32,7 +36,9 @@ const makeUser = (overrides: Partial<User> = {}): User => ({
   ...overrides,
 });
 
-const makeProjectAgent = (overrides: Partial<ProjectAgent & { project: { workspaceId: string } }> = {}) => ({
+const makeProjectAgent = (
+  overrides: Partial<ProjectAgent & { project: { workspaceId: string } }> = {},
+) => ({
   id: 'pa-1',
   agentId: 'agent-1',
   projectId: 'proj-1',
@@ -111,6 +117,10 @@ const mockCoordinatorService = {
   publish: jest.fn(),
 };
 
+const mockNotificationService = {
+  create: jest.fn(),
+};
+
 // ── Test suite ────────────────────────────────────────────────────────────────
 
 describe('TasksService', () => {
@@ -118,7 +128,11 @@ describe('TasksService', () => {
 
   const userActor: Actor = {
     type: 'user',
-    entity: makeUser({ id: 'user-1', email: 'test@test.com', name: 'Test User' }),
+    entity: makeUser({
+      id: 'user-1',
+      email: 'test@test.com',
+      name: 'Test User',
+    }),
   };
 
   const projectId = 'proj-1';
@@ -134,13 +148,17 @@ describe('TasksService', () => {
         { provide: AgentRunnerService, useValue: mockAgentRunner },
         { provide: PlannerService, useValue: mockPlannerService },
         { provide: CoordinatorService, useValue: mockCoordinatorService },
+        { provide: NotificationsService, useValue: mockNotificationService },
       ],
     }).compile();
 
     service = module.get<TasksService>(TasksService);
 
     // Default: project exists + user is a workspace member
-    mockPrisma.project.findUnique.mockResolvedValue({ id: projectId, workspaceId: 'ws-1' });
+    mockPrisma.project.findUnique.mockResolvedValue({
+      id: projectId,
+      workspaceId: 'ws-1',
+    });
     mockPrisma.workspaceMember.findUnique.mockResolvedValue({ id: 'member-1' });
   });
 
@@ -162,7 +180,9 @@ describe('TasksService', () => {
     it('should throw ForbiddenException if user is not a project member', async () => {
       mockPrisma.workspaceMember.findUnique.mockResolvedValue(null);
 
-      await expect(service.findAll(projectId, userActor)).rejects.toThrow(ForbiddenException);
+      await expect(service.findAll(projectId, userActor)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
@@ -185,7 +205,10 @@ describe('TasksService', () => {
     });
 
     it('should set status to TODO and call agentRunner.enqueue when assignee is an AI agent', async () => {
-      const task = makeTask({ status: 'TODO' as TaskStatus, assigneeId: 'pa-1' });
+      const task = makeTask({
+        status: 'TODO' as TaskStatus,
+        assigneeId: 'pa-1',
+      });
       mockPrisma.task.create.mockResolvedValue(task);
       mockPrisma.projectAgent.findUnique.mockResolvedValue({
         id: 'pa-1',
@@ -196,10 +219,41 @@ describe('TasksService', () => {
       mockPrisma.agentRunLog.findFirst.mockResolvedValue(null);
       mockAgentRunner.enqueue.mockResolvedValue(undefined);
 
-      const dto = { title: 'AI Task', status: TaskStatus.TODO, assigneeId: 'pa-1' };
+      const dto = {
+        title: 'AI Task',
+        status: TaskStatus.TODO,
+        assigneeId: 'pa-1',
+      };
       await service.create(projectId, dto, userActor);
 
       expect(mockAgentRunner.enqueue).toHaveBeenCalledWith('task-1', 'pa-1');
+    });
+
+    it('should call notificationService.create when assignee is a HUMAN agent', async () => {
+      const task = makeTask({ assigneeId: 'pa-1' });
+      mockPrisma.task.create.mockResolvedValue(task);
+      mockPrisma.projectAgent.findUnique.mockResolvedValue({
+        id: 'pa-1',
+        agentId: 'agent-1',
+        projectId,
+        agent: {
+          type: 'HUMAN',
+          userId: 'user-1',
+          owner: { id: 'user-1', email: 'worker@test.com', name: 'Worker' },
+        },
+        project: { name: 'Test Project', workspace: { slug: 'test-ws' } },
+      });
+      mockNotificationService.create.mockResolvedValue(undefined);
+
+      const dto = { title: 'Human Task', assigneeId: 'pa-1' };
+      await service.create(projectId, dto, userActor);
+
+      expect(mockNotificationService.create).toHaveBeenCalledWith(
+        'user-1',
+        'worker@test.com',
+        'TASK_ASSIGNED',
+        expect.objectContaining({ taskTitle: 'Test Task', projectName: 'Test Project' }),
+      );
     });
 
     it('should auto-assign via planner when actor is agent and no assigneeId', async () => {
@@ -209,13 +263,18 @@ describe('TasksService', () => {
 
       const agentActor: Actor = {
         type: 'agent',
-        entity: makeProjectAgent() as ProjectAgent & { project: { workspaceId: string } },
+        entity: makeProjectAgent() as ProjectAgent & {
+          project: { workspaceId: string };
+        },
       };
 
       const dto = { title: 'Planner Task' };
       await service.create(projectId, dto, agentActor);
 
-      expect(mockPlannerService.autoAssignNewTask).toHaveBeenCalledWith('task-1', projectId);
+      expect(mockPlannerService.autoAssignNewTask).toHaveBeenCalledWith(
+        'task-1',
+        projectId,
+      );
     });
   });
 
@@ -227,24 +286,87 @@ describe('TasksService', () => {
       const updated = makeTask({ title: 'Updated Title' });
 
       mockPrisma.task.findUnique.mockResolvedValue(existing);
-      mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
-        return fn({
-          ...mockPrisma,
-          task: { ...mockPrisma.task, update: jest.fn().mockResolvedValue(updated) },
-          taskActivity: { create: jest.fn().mockResolvedValue({}) },
-        } as unknown as typeof mockPrisma);
-      });
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+          return fn({
+            ...mockPrisma,
+            task: {
+              ...mockPrisma.task,
+              update: jest.fn().mockResolvedValue(updated),
+            },
+            taskActivity: { create: jest.fn().mockResolvedValue({}) },
+          } as unknown as typeof mockPrisma);
+        },
+      );
       mockPrisma.projectAgent.findUnique.mockResolvedValue(null);
 
-      const result = await service.update(projectId, 'task-1', { title: 'Updated Title' }, userActor);
+      const result = await service.update(
+        projectId,
+        'task-1',
+        { title: 'Updated Title' },
+        userActor,
+      );
 
       expect(result).toEqual(updated);
-      expect(mockGateway.emit).toHaveBeenCalledWith('task:updated', expect.objectContaining({ projectId }));
+      expect(mockGateway.emit).toHaveBeenCalledWith(
+        'task:updated',
+        expect.objectContaining({ projectId }),
+      );
     });
 
     it('should call agentRunner.enqueue when status changes to TODO with AI assignee', async () => {
-      const existing = makeTask({ status: 'BACKLOG' as TaskStatus, assigneeId: 'pa-1' });
-      const updated = makeTask({ status: 'TODO' as TaskStatus, assigneeId: 'pa-1' });
+      const existing = makeTask({
+        status: 'BACKLOG' as TaskStatus,
+        assigneeId: 'pa-1',
+      });
+      const updated = makeTask({
+        status: 'TODO' as TaskStatus,
+        assigneeId: 'pa-1',
+      });
+
+      mockPrisma.task.findUnique.mockResolvedValue(existing);
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+          return fn({
+            ...mockPrisma,
+            task: {
+              ...mockPrisma.task,
+              update: jest.fn().mockResolvedValue(updated),
+            },
+            taskActivity: { create: jest.fn().mockResolvedValue({}) },
+          } as unknown as typeof mockPrisma);
+        },
+      );
+      mockPrisma.projectAgent.findUnique.mockResolvedValue({
+        id: 'pa-1',
+        agentId: 'agent-1',
+        projectId,
+        agent: { type: 'AI' },
+      });
+      mockPrisma.agentRunLog.findFirst.mockResolvedValue(null);
+      mockAgentRunner.enqueue.mockResolvedValue(undefined);
+
+      await service.update(
+        projectId,
+        'task-1',
+        { status: TaskStatus.TODO },
+        userActor,
+      );
+
+      expect(mockAgentRunner.enqueue).toHaveBeenCalledWith('task-1', 'pa-1');
+    });
+
+    it('should throw NotFoundException when task not found', async () => {
+      mockPrisma.task.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.update(projectId, 'nonexistent', { title: 'X' }, userActor),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should call notificationService.create when status changes with a human assignee', async () => {
+      const existing = makeTask({ status: 'TODO' as TaskStatus, assigneeId: 'pa-1' });
+      const updated = makeTask({ status: 'IN_PROGRESS' as TaskStatus, assigneeId: 'pa-1' });
 
       mockPrisma.task.findUnique.mockResolvedValue(existing);
       mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
@@ -258,22 +380,23 @@ describe('TasksService', () => {
         id: 'pa-1',
         agentId: 'agent-1',
         projectId,
-        agent: { type: 'AI' },
+        agent: {
+          type: 'HUMAN',
+          userId: 'user-1',
+          owner: { id: 'user-1', email: 'worker@test.com', name: 'Worker' },
+        },
+        project: { name: 'Test Project', workspace: { slug: 'test-ws' } },
       });
-      mockPrisma.agentRunLog.findFirst.mockResolvedValue(null);
-      mockAgentRunner.enqueue.mockResolvedValue(undefined);
+      mockNotificationService.create.mockResolvedValue(undefined);
 
-      await service.update(projectId, 'task-1', { status: TaskStatus.TODO }, userActor);
+      await service.update(projectId, 'task-1', { status: TaskStatus.IN_PROGRESS }, userActor);
 
-      expect(mockAgentRunner.enqueue).toHaveBeenCalledWith('task-1', 'pa-1');
-    });
-
-    it('should throw NotFoundException when task not found', async () => {
-      mockPrisma.task.findUnique.mockResolvedValue(null);
-
-      await expect(
-        service.update(projectId, 'nonexistent', { title: 'X' }, userActor),
-      ).rejects.toThrow(NotFoundException);
+      expect(mockNotificationService.create).toHaveBeenCalledWith(
+        'user-1',
+        'worker@test.com',
+        'TASK_STATUS_CHANGED',
+        expect.objectContaining({ oldStatus: 'TODO', newStatus: 'IN_PROGRESS' }),
+      );
     });
   });
 
@@ -294,7 +417,12 @@ describe('TasksService', () => {
       mockPrisma.task.findUnique.mockResolvedValue(task);
       mockPrisma.taskComment.create.mockResolvedValue(comment);
 
-      const result = await service.addComment(projectId, 'task-1', { content: 'Hello' }, userActor);
+      const result = await service.addComment(
+        projectId,
+        'task-1',
+        { content: 'Hello' },
+        userActor,
+      );
 
       expect(result).toEqual(comment);
       expect(mockPrisma.taskComment.create).toHaveBeenCalledWith(
@@ -302,11 +430,46 @@ describe('TasksService', () => {
           data: expect.objectContaining({ content: 'Hello', taskId: 'task-1' }),
         }),
       );
-      expect(mockGateway.emit).toHaveBeenCalledWith('comment:created', expect.objectContaining({ projectId }));
+      expect(mockGateway.emit).toHaveBeenCalledWith(
+        'comment:created',
+        expect.objectContaining({ projectId }),
+      );
+    });
+
+    it('should call notificationService.create when a non-assignee human comments', async () => {
+      const task = makeTask({ assigneeId: 'pa-1' });
+      const comment = { id: 'c1', taskId: 'task-1', authorId: 'user-1', authorType: 'user', content: 'Hey', createdAt: new Date() };
+
+      mockPrisma.task.findUnique.mockResolvedValue(task);
+      mockPrisma.taskComment.create.mockResolvedValue(comment);
+      mockPrisma.projectAgent.findUnique.mockResolvedValue({
+        id: 'pa-1',
+        agentId: 'agent-1',
+        projectId,
+        agent: {
+          type: 'HUMAN',
+          userId: 'user-2',  // different from actor user-1
+          owner: { id: 'user-2', email: 'worker@test.com', name: 'Worker' },
+        },
+        project: { name: 'Test Project', workspace: { slug: 'test-ws' } },
+      });
+      mockNotificationService.create.mockResolvedValue(undefined);
+
+      await service.addComment(projectId, 'task-1', { content: 'Hey' }, userActor);
+
+      expect(mockNotificationService.create).toHaveBeenCalledWith(
+        'user-2',
+        'worker@test.com',
+        'TASK_COMMENTED',
+        expect.objectContaining({ commentSnippet: 'Hey' }),
+      );
     });
 
     it('should re-trigger agent when human comments on BLOCKED task with assignee', async () => {
-      const task = makeTask({ status: 'BLOCKED' as TaskStatus, assigneeId: 'pa-1' });
+      const task = makeTask({
+        status: 'BLOCKED' as TaskStatus,
+        assigneeId: 'pa-1',
+      });
       const comment = {
         id: 'comment-1',
         taskId: 'task-1',
@@ -318,10 +481,24 @@ describe('TasksService', () => {
 
       mockPrisma.task.findUnique.mockResolvedValue(task);
       mockPrisma.taskComment.create.mockResolvedValue(comment);
+      // projectAgent.findUnique is called twice: once for notification (returns AI → skips notify),
+      // and once for the re-trigger path (AI → enqueues)
+      mockPrisma.projectAgent.findUnique.mockResolvedValue({
+        id: 'pa-1',
+        agentId: 'agent-1',
+        projectId,
+        agent: { type: 'AI' },
+      });
+      mockPrisma.project.findUnique.mockResolvedValue({ id: projectId, coordinatorProjectAgentId: null });
       mockAgentRunner.stop.mockResolvedValue(undefined);
       mockAgentRunner.enqueue.mockResolvedValue(undefined);
 
-      await service.addComment(projectId, 'task-1', { content: 'Unblocking you' }, userActor);
+      await service.addComment(
+        projectId,
+        'task-1',
+        { content: 'Unblocking you' },
+        userActor,
+      );
 
       expect(mockAgentRunner.stop).toHaveBeenCalledWith('task-1');
       expect(mockAgentRunner.enqueue).toHaveBeenCalledWith('task-1', 'pa-1');
@@ -334,7 +511,10 @@ describe('TasksService', () => {
     it('should soft-delete by setting deletedAt', async () => {
       const task = makeTask({ assigneeId: null });
       mockPrisma.task.findUnique.mockResolvedValue(task);
-      mockPrisma.task.update.mockResolvedValue({ ...task, deletedAt: new Date() });
+      mockPrisma.task.update.mockResolvedValue({
+        ...task,
+        deletedAt: new Date(),
+      });
       mockAgentRunner.stop.mockResolvedValue(undefined);
 
       const result = await service.deleteTask(projectId, 'task-1', userActor);
@@ -343,16 +523,24 @@ describe('TasksService', () => {
       expect(mockPrisma.task.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 'task-1' },
-          data: expect.objectContaining({ deletedAt: expect.any(Date), assigneeId: null }),
+          data: expect.objectContaining({
+            deletedAt: expect.any(Date),
+            assigneeId: null,
+          }),
         }),
       );
-      expect(mockGateway.emit).toHaveBeenCalledWith('task:deleted', expect.objectContaining({ projectId }));
+      expect(mockGateway.emit).toHaveBeenCalledWith(
+        'task:deleted',
+        expect.objectContaining({ projectId }),
+      );
     });
 
     it('should throw NotFoundException when task does not exist', async () => {
       mockPrisma.task.findUnique.mockResolvedValue(null);
 
-      await expect(service.deleteTask(projectId, 'nonexistent', userActor)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.deleteTask(projectId, 'nonexistent', userActor),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

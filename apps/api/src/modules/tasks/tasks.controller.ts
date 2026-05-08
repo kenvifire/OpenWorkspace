@@ -1,7 +1,21 @@
 import {
-  Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, HttpCode, HttpStatus,
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiSecurity, ApiTags, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiSecurity,
+  ApiTags,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ProjectKeyGuard } from '../../common/guards/project-key.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -38,16 +52,30 @@ export class TasksController {
   @UseGuards(JwtAuthGuard)
   @Get('projects/:projectId/tasks/:taskId')
   @ApiOperation({ summary: 'Get task (human)' })
-  findOne(@Param('projectId') projectId: string, @Param('taskId') taskId: string, @CurrentUser() user: User) {
-    return this.tasksService.findOne(projectId, taskId, { type: 'user', entity: user });
+  findOne(
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.tasksService.findOne(projectId, taskId, {
+      type: 'user',
+      entity: user,
+    });
   }
 
   @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @Post('projects/:projectId/tasks')
   @ApiOperation({ summary: 'Create task (human)' })
-  createByUser(@Param('projectId') projectId: string, @Body() dto: CreateTaskDto, @CurrentUser() user: User) {
-    return this.tasksService.create(projectId, dto, { type: 'user', entity: user });
+  createByUser(
+    @Param('projectId') projectId: string,
+    @Body() dto: CreateTaskDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.tasksService.create(projectId, dto, {
+      type: 'user',
+      entity: user,
+    });
   }
 
   @ApiBearerAuth('jwt')
@@ -60,7 +88,10 @@ export class TasksController {
     @Body() dto: UpdateTaskDto,
     @CurrentUser() user: User,
   ) {
-    return this.tasksService.update(projectId, taskId, dto, { type: 'user', entity: user });
+    return this.tasksService.update(projectId, taskId, dto, {
+      type: 'user',
+      entity: user,
+    });
   }
 
   @ApiBearerAuth('jwt')
@@ -73,23 +104,39 @@ export class TasksController {
     @Param('taskId') taskId: string,
     @CurrentUser() user: User,
   ) {
-    return this.tasksService.deleteTask(projectId, taskId, { type: 'user', entity: user });
+    return this.tasksService.deleteTask(projectId, taskId, {
+      type: 'user',
+      entity: user,
+    });
   }
 
   @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @Get('projects/:projectId/tasks/deleted')
   @ApiOperation({ summary: 'List soft-deleted tasks' })
-  listDeleted(@Param('projectId') projectId: string, @CurrentUser() user: User) {
-    return this.tasksService.listDeleted(projectId, { type: 'user', entity: user });
+  listDeleted(
+    @Param('projectId') projectId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.tasksService.listDeleted(projectId, {
+      type: 'user',
+      entity: user,
+    });
   }
 
   @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @Post('projects/:projectId/tasks/:taskId/restore')
   @ApiOperation({ summary: 'Restore a soft-deleted task' })
-  restoreTask(@Param('projectId') projectId: string, @Param('taskId') taskId: string, @CurrentUser() user: User) {
-    return this.tasksService.restoreTask(projectId, taskId, { type: 'user', entity: user });
+  restoreTask(
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.tasksService.restoreTask(projectId, taskId, {
+      type: 'user',
+      entity: user,
+    });
   }
 
   @ApiBearerAuth('jwt')
@@ -97,8 +144,15 @@ export class TasksController {
   @Delete('projects/:projectId/tasks/:taskId/permanent')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Permanently delete a soft-deleted task' })
-  permanentlyDeleteTask(@Param('projectId') projectId: string, @Param('taskId') taskId: string, @CurrentUser() user: User) {
-    return this.tasksService.permanentlyDeleteTask(projectId, taskId, { type: 'user', entity: user });
+  permanentlyDeleteTask(
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.tasksService.permanentlyDeleteTask(projectId, taskId, {
+      type: 'user',
+      entity: user,
+    });
   }
 
   @ApiBearerAuth('jwt')
@@ -111,7 +165,10 @@ export class TasksController {
     @Body() dto: AddCommentDto,
     @CurrentUser() user: User,
   ) {
-    return this.tasksService.addComment(projectId, taskId, dto, { type: 'user', entity: user });
+    return this.tasksService.addComment(projectId, taskId, dto, {
+      type: 'user',
+      entity: user,
+    });
   }
 
   // ─── Agent run log endpoints (JWT) ────────────────────────────────────────
@@ -127,7 +184,9 @@ export class TasksController {
   @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @Get('projects/:projectId/agents/:projectAgentId/runs')
-  @ApiOperation({ summary: 'List all run logs for a project agent across all tasks' })
+  @ApiOperation({
+    summary: 'List all run logs for a project agent across all tasks',
+  })
   getRunLogsByAgent(@Param('projectAgentId') projectAgentId: string) {
     return this.agentRunner.getRunLogsByProjectAgent(projectAgentId);
   }
@@ -159,7 +218,9 @@ export class TasksController {
   @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   @Post('projects/:projectId/tasks/:taskId/runs/:runLogId/wake')
-  @ApiOperation({ summary: 'Wake (resume) a failed or stopped agent run from its saved state' })
+  @ApiOperation({
+    summary: 'Wake (resume) a failed or stopped agent run from its saved state',
+  })
   wakeRun(@Param('runLogId') runLogId: string) {
     return this.agentRunner.wake(runLogId);
   }
@@ -170,24 +231,44 @@ export class TasksController {
   @UseGuards(ProjectKeyGuard)
   @Get('agent/projects/:projectId/tasks')
   @ApiOperation({ summary: 'List tasks (agent)' })
-  findAllByAgent(@Param('projectId') projectId: string, @CurrentAgent() agent: ProjectAgent) {
-    return this.tasksService.findAll(projectId, { type: 'agent', entity: agent as any });
+  findAllByAgent(
+    @Param('projectId') projectId: string,
+    @CurrentAgent() agent: ProjectAgent,
+  ) {
+    return this.tasksService.findAll(projectId, {
+      type: 'agent',
+      entity: agent as any,
+    });
   }
 
   @ApiSecurity('project-key')
   @UseGuards(ProjectKeyGuard)
   @Get('agent/projects/:projectId/tasks/:taskId')
   @ApiOperation({ summary: 'Get task (agent)' })
-  findOneByAgent(@Param('projectId') projectId: string, @Param('taskId') taskId: string, @CurrentAgent() agent: ProjectAgent) {
-    return this.tasksService.findOne(projectId, taskId, { type: 'agent', entity: agent as any });
+  findOneByAgent(
+    @Param('projectId') projectId: string,
+    @Param('taskId') taskId: string,
+    @CurrentAgent() agent: ProjectAgent,
+  ) {
+    return this.tasksService.findOne(projectId, taskId, {
+      type: 'agent',
+      entity: agent as any,
+    });
   }
 
   @ApiSecurity('project-key')
   @UseGuards(ProjectKeyGuard)
   @Post('agent/projects/:projectId/tasks')
   @ApiOperation({ summary: 'Create task (agent)' })
-  createByAgent(@Param('projectId') projectId: string, @Body() dto: CreateTaskDto, @CurrentAgent() agent: ProjectAgent) {
-    return this.tasksService.create(projectId, dto, { type: 'agent', entity: agent as any });
+  createByAgent(
+    @Param('projectId') projectId: string,
+    @Body() dto: CreateTaskDto,
+    @CurrentAgent() agent: ProjectAgent,
+  ) {
+    return this.tasksService.create(projectId, dto, {
+      type: 'agent',
+      entity: agent as any,
+    });
   }
 
   @ApiSecurity('project-key')
@@ -200,7 +281,10 @@ export class TasksController {
     @Body() dto: UpdateTaskDto,
     @CurrentAgent() agent: ProjectAgent,
   ) {
-    return this.tasksService.update(projectId, taskId, dto, { type: 'agent', entity: agent as any });
+    return this.tasksService.update(projectId, taskId, dto, {
+      type: 'agent',
+      entity: agent as any,
+    });
   }
 
   @ApiSecurity('project-key')
@@ -213,6 +297,9 @@ export class TasksController {
     @Body() dto: AddCommentDto,
     @CurrentAgent() agent: ProjectAgent,
   ) {
-    return this.tasksService.addComment(projectId, taskId, dto, { type: 'agent', entity: agent as any });
+    return this.tasksService.addComment(projectId, taskId, dto, {
+      type: 'agent',
+      entity: agent as any,
+    });
   }
 }
