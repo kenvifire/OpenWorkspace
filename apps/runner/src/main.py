@@ -81,10 +81,7 @@ async def _main() -> None:
     log.info("Stopping runner…")
     consumer_task.cancel()
     coordinator_task.cancel()
-    try:
-        await asyncio.gather(consumer_task, coordinator_task, return_exceptions=True)
-    except asyncio.CancelledError:
-        pass
+    await asyncio.gather(consumer_task, coordinator_task, return_exceptions=True)
 
     await close_pool()
     await events.close()

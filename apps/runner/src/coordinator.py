@@ -175,11 +175,12 @@ async def _process_coordinator_event(event: dict) -> None:
                 tool_results = []
                 for tc in response["tool_calls"]:
                     result = await execute_coordinator_tool(tc["name"], tc.get("arguments", {}), ctx)
-                    tool_results.append({"id": tc["id"], "name": tc["name"], "result": result})
+                    # Don't leak STOP control token into LLM context
+                    llm_result = "Decision recorded." if isinstance(result, str) and result.startswith("STOP") else result
                     if isinstance(result, str) and result.startswith("STOP"):
                         stop = True
-
-                # Append assistant message with tool_use blocks
+                    tool_results.append({"id": tc["id"], "name": tc["name"], "result": llm_result})
+                # Build assistant + tool_result messages
                 assistant_content = []
                 if response.get("content"):
                     assistant_content.append({"type": "text", "text": response["content"]})
@@ -191,8 +192,6 @@ async def _process_coordinator_event(event: dict) -> None:
                         "input": tc.get("arguments", {}),
                     })
                 messages.append({"role": "assistant", "content": assistant_content})
-
-                # Append tool results
                 messages.append({
                     "role": "user",
                     "content": [
@@ -200,6 +199,8 @@ async def _process_coordinator_event(event: dict) -> None:
                         for r in tool_results
                     ],
                 })
+                if stop:
+                    break
             else:
                 # No tool calls — end_turn
                 stop = True

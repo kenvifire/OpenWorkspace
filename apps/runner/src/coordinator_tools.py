@@ -24,7 +24,7 @@ COORDINATOR_TOOLS = [
         "description": (
             "Enqueue the listed AI-assigned tasks for execution. "
             "You must explicitly name which tasks to start — do not assume all ready tasks should run. "
-            "Tasks must be in TODO or BACKLOG status with an AI assignee."
+            "Tasks must have an AI assignee and be in TODO, BACKLOG, or BLOCKED status."
         ),
         "input_schema": {
             "type": "object",
@@ -157,18 +157,31 @@ async def _get_board_state(ctx: CoordinatorContext) -> str:
         )
     )
 
+    task_ids_list = [t["id"] for t in tasks]
     comments_by_task: dict = {}
-    for t in tasks:
-        rows = await pool.fetch(
+    if task_ids_list:
+        all_comments = await pool.fetch(
             """
-            SELECT content, "authorType", "createdAt"
-            FROM "TaskComment"
-            WHERE "taskId" = $1
-            ORDER BY "createdAt" DESC LIMIT 3
+            SELECT "taskId", content, "authorType", "createdAt"
+            FROM (
+                SELECT *,
+                       ROW_NUMBER() OVER (PARTITION BY "taskId" ORDER BY "createdAt" DESC) AS rn
+                FROM "TaskComment"
+                WHERE "taskId" = ANY($1)
+            ) sub
+            WHERE rn <= 3
             """,
-            t["id"],
+            task_ids_list,
         )
-        comments_by_task[t["id"]] = [dict(r) for r in rows]
+        for row in all_comments:
+            tid = row["taskId"]
+            if tid not in comments_by_task:
+                comments_by_task[tid] = []
+            comments_by_task[tid].append({
+                "content": row["content"],
+                "authorType": row["authorType"],
+                "createdAt": row["createdAt"],
+            })
 
     blocked_by: dict[str, list] = {}
     for d in deps:
