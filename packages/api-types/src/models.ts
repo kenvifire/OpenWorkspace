@@ -303,3 +303,28 @@ export interface Paginated<T> {
   limit: number
   totalPages: number
 }
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+export type NotificationType = 'TASK_ASSIGNED' | 'TASK_COMMENTED' | 'TASK_STATUS_CHANGED'
+
+export interface NotificationData {
+  taskTitle: string
+  projectName: string
+  workspaceSlug: string
+  actorName: string
+  oldStatus?: string
+  newStatus?: string
+  commentSnippet?: string
+}
+
+export interface Notification {
+  id: string
+  userId: string
+  type: NotificationType
+  taskId: string | null
+  projectId: string | null
+  read: boolean
+  data: NotificationData
+  createdAt: string
+}
