@@ -7,13 +7,20 @@ import { auth } from '@/lib/firebase';
 import { notificationsApi } from '@/lib/api';
 
 let socket: Socket | null = null;
+let socketUserId: string | null = null;
 
-function getSocket(token?: string | null): Socket {
+function getSocket(userId: string, token?: string | null): Socket {
+  if (socket && socketUserId !== userId) {
+    socket.disconnect();
+    socket = null;
+    socketUserId = null;
+  }
   if (!socket) {
     socket = io(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/kanban`, {
       withCredentials: true,
       auth: token ? { token } : undefined,
     });
+    socketUserId = userId;
   }
   return socket;
 }
@@ -28,11 +35,19 @@ export function useNotifications(userId: string | undefined) {
   }, [queryClient]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      // Sign-out: disconnect and clear the singleton so the next user gets a fresh socket
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+        socketUserId = null;
+      }
+      return;
+    }
     let cleanup: (() => void) | undefined;
 
     (auth.currentUser ? auth.currentUser.getIdToken() : Promise.resolve(null)).then((token) => {
-      const s = getSocket(token);
+      const s = getSocket(userId, token);
 
       if (!joinedRef.current) {
         s.emit('join:user', userId);
