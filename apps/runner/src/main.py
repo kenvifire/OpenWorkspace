@@ -60,6 +60,7 @@ async def _main() -> None:
     from src.database import close_pool
     from src import events
     from src.processor import run_consumer
+    from src.coordinator import run_coordinator_consumer
 
     await _cleanup_stale_runs()
 
@@ -74,12 +75,14 @@ async def _main() -> None:
         loop.add_signal_handler(sig, _handle_signal)
 
     consumer_task = asyncio.create_task(run_consumer())
+    coordinator_task = asyncio.create_task(run_coordinator_consumer())
 
     await stop_event.wait()
     log.info("Stopping runner…")
     consumer_task.cancel()
+    coordinator_task.cancel()
     try:
-        await consumer_task
+        await asyncio.gather(consumer_task, coordinator_task, return_exceptions=True)
     except asyncio.CancelledError:
         pass
 

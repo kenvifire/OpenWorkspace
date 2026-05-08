@@ -15,3 +15,6 @@ CONSUMER_NAME = os.getenv("RUNNER_INSTANCE", "runner-1")
 KANBAN_CHANNEL = "kanban:events"
 
 E2B_API_KEY: str | None = os.getenv("E2B_API_KEY") or None
+
+COORDINATOR_STREAM_NAME = "coordinator-events"
+COORDINATOR_GROUP = "coordinator-group"
