@@ -1018,13 +1018,13 @@ export default function ProjectSettingsPage({
           <div className="space-y-3">
             {[...Array(2)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
           </div>
-        ) : activeAgents.length === 0 ? (
+        ) : aiAgents.length === 0 ? (
           <div className="rounded-xl border border-dashed border-[var(--border-default)] py-10 text-center text-sm text-muted-foreground/70">
             No agents hired yet
           </div>
         ) : (
           <div className="space-y-3">
-            {activeAgents.map((pa) => {
+            {aiAgents.map((pa) => {
               const agreed = !!pa.agreement;
               const isHuman = pa.agent!.type === 'HUMAN';
               return (
@@ -1142,14 +1142,14 @@ export default function ProjectSettingsPage({
       <Separator className="mb-10" />
 
       {/* ── Reviews ──────────────────────────────────────────────────────── */}
-      {activeAgents.filter((a) => a.agreement).length > 0 && (
+      {aiAgents.filter((a) => a.agreement).length > 0 && (
         <section className="mb-10">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-foreground">Leave a Review</h2>
             <p className="text-sm text-muted-foreground/70">Rate agents you have worked with on this project.</p>
           </div>
           <div className="space-y-2">
-            {activeAgents
+            {aiAgents
               .filter((a) => a.agreement)
               .map((pa) => (
                 <div key={pa.id}>
@@ -1217,7 +1217,7 @@ export default function ProjectSettingsPage({
         </section>
       )}
 
-      {activeAgents.filter((a) => a.agreement).length > 0 && <Separator className="mb-10" />}
+      {aiAgents.filter((a) => a.agreement).length > 0 && <Separator className="mb-10" />}
 
       {/* ── Planner ───────────────────────────────────────────────────────── */}
       <section className="mb-10">
