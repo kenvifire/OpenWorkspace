@@ -16,6 +16,7 @@ import { AgentRunnerModule } from './modules/agent-runner/agent-runner.module';
 import { SkillsModule } from './modules/skills/skills.module';
 import { McpsModule } from './modules/mcps/mcps.module';
 import { PlanningAgentModule } from './modules/planning-agent/planning-agent.module';
+import { CoordinatorModule } from './modules/coordinator/coordinator.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { PlanningAgentModule } from './modules/planning-agent/planning-agent.mod
     SkillsModule,
     McpsModule,
     PlanningAgentModule,
+    CoordinatorModule,
   ],
 })
 export class AppModule {}
