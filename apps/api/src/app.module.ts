@@ -17,6 +17,8 @@ import { SkillsModule } from './modules/skills/skills.module';
 import { McpsModule } from './modules/mcps/mcps.module';
 import { PlanningAgentModule } from './modules/planning-agent/planning-agent.module';
 import { CoordinatorModule } from './modules/coordinator/coordinator.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { MyTasksModule } from './modules/my-tasks/my-tasks.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { CoordinatorModule } from './modules/coordinator/coordinator.module';
     McpsModule,
     PlanningAgentModule,
     CoordinatorModule,
+    NotificationsModule,
+    MyTasksModule,
   ],
 })
 export class AppModule {}
