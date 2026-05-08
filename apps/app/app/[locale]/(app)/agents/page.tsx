@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { AgentVersion } from '@openworkspace/api-types';
-import { Bot, Plus, Pencil, Trash2, Eye, EyeOff, ChevronRight, Cpu, Layers, GitBranch, RotateCcw, ChevronDown, Brain, Zap, Globe, Check, X, KeyRound } from 'lucide-react';
+import { Bot, User, Plus, Pencil, Trash2, Eye, EyeOff, ChevronRight, Cpu, Layers, GitBranch, RotateCcw, ChevronDown, Brain, Zap, Globe, Check, X, KeyRound } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 const LLM_PROVIDERS = [
@@ -614,8 +614,8 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
       <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-sky-400/10 blur-2xl group-hover:bg-sky-400/20 transition-opacity" />
 
       <div className="flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sm">
-          <Bot size={20} />
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm ${agent.type === 'HUMAN' ? 'from-emerald-500 to-teal-600' : 'from-sky-500 to-blue-600'}`}>
+          {agent.type === 'HUMAN' ? <User size={20} /> : <Bot size={20} />}
         </div>
 
         <div className="flex-1 min-w-0">

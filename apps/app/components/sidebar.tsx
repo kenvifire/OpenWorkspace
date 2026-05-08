@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   LayoutDashboard, Store, CreditCard, Settings, Plus,
-  LogOut, Bot, Zap, Server, Brain, CheckSquare,
+  LogOut, Bot, User, Zap, Server, Brain, CheckSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -172,7 +172,9 @@ export function Sidebar() {
               href={`/${locale}/agents`}
               className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors"
             >
-              <CategoryChip color="agent"><Bot size={10} /></CategoryChip>
+              <CategoryChip color={agent.type === 'HUMAN' ? 'human' : 'agent'}>
+                {agent.type === 'HUMAN' ? <User size={10} /> : <Bot size={10} />}
+              </CategoryChip>
               <span className="truncate">{agent.name}</span>
             </Link>
           ))}
@@ -296,11 +298,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function CategoryChip({ color, children }: { color: 'agent' | 'skill' | 'mcp'; children: React.ReactNode }) {
+function CategoryChip({ color, children }: { color: 'agent' | 'human' | 'skill' | 'mcp'; children: React.ReactNode }) {
   return (
     <span className={cn(
       'flex h-5 w-5 shrink-0 items-center justify-center rounded',
       color === 'agent' && 'bg-[var(--accent-agent-bg)] text-[var(--accent-agent)]',
+      color === 'human' && 'bg-emerald-500/15 text-emerald-400',
       color === 'skill' && 'bg-[var(--accent-skill-bg)] text-[var(--accent-skill)]',
       color === 'mcp'   && 'bg-[var(--accent-mcp-bg)] text-[var(--accent-mcp)]',
     )}>
