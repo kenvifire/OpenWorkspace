@@ -819,6 +819,19 @@ async def _request_human_input(args: dict, ctx: ToolContext) -> str:
     )
     await events.publish("task:created", {"projectId": ctx.project_id, "task": dict(new_task)})
 
+    # Create dependency: human task (blocking) → current task (blocked)
+    dep_id = _new_id()
+    await pool.execute(
+        """
+        INSERT INTO "TaskDependency" (id, "blockingTaskId", "blockedTaskId")
+        VALUES ($1, $2, $3)
+        ON CONFLICT ("blockingTaskId", "blockedTaskId") DO NOTHING
+        """,
+        dep_id,
+        new_task_id,   # human task is the blocker
+        ctx.task_id,   # current AI task is blocked
+    )
+
     # Post a comment on the current task explaining the block
     await _add_comment(
         ctx.task_id,

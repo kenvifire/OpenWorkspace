@@ -141,6 +141,11 @@ export class TasksService {
     // Auto-trigger agent when task becomes TODO and has an AI assignee
     await this.maybeEnqueueAgent(updated);
 
+    // When a task moves to DONE, unblock any dependents that are now clear
+    if (dto.status === TaskStatus.DONE && prevStatus !== TaskStatus.DONE) {
+      await this.maybeUnblockDependents(taskId, projectId);
+    }
+
     return updated;
   }
 
@@ -160,6 +165,43 @@ export class TasksService {
     if (running) return;
 
     await this.agentRunner.enqueue(task.id, projectAgent.id);
+  }
+
+  private async maybeUnblockDependents(completedTaskId: string, projectId: string) {
+    // Find every task that was blocked by the completed task
+    const deps = await this.prisma.taskDependency.findMany({
+      where: { blockingTaskId: completedTaskId },
+      select: { blockedTaskId: true },
+    });
+
+    for (const { blockedTaskId } of deps) {
+      // Check if all blockers for this task are now DONE
+      const remaining = await this.prisma.taskDependency.count({
+        where: {
+          blockedTaskId,
+          blockingTask: { status: { not: TaskStatus.DONE } },
+        },
+      });
+      if (remaining > 0) continue;
+
+      const task = await this.prisma.task.findUnique({
+        where: { id: blockedTaskId },
+        include: { assignee: { include: { agent: { select: { type: true } } } } },
+      });
+      if (!task || task.status !== 'BLOCKED') continue;
+
+      const newStatus = task.assigneeId ? TaskStatus.TODO : 'BACKLOG' as TaskStatus;
+      const unblocked = await this.prisma.task.update({
+        where: { id: blockedTaskId },
+        data: { status: newStatus },
+      });
+
+      this.gateway.emit('task:updated', { projectId, data: unblocked as any });
+
+      if (newStatus === TaskStatus.TODO && task.assignee?.agent.type === 'AI') {
+        await this.maybeEnqueueAgent(unblocked);
+      }
+    }
   }
 
   async addComment(projectId: string, taskId: string, dto: AddCommentDto, actor: Actor) {
