@@ -94,11 +94,13 @@ model Project {
 
   customNdaFileKey      String?  // S3 key; if set, all hires use this NDA instead of platform default
   plannerProjectAgentId String?  // ProjectAgent designated as planner
+  coordinatorProjectAgentId String?  // ProjectAgent designated as coordinator
   sandboxProvider       String?  @default("e2b")  // Sandbox provider for agent runs: "e2b" | null
 
   workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   leader         User            @relation(fields: [leaderId], references: [id])
   plannerAgent   ProjectAgent?   @relation("ProjectPlanner", fields: [plannerProjectAgentId], references: [id])
+  coordinatorAgent ProjectAgent? @relation("ProjectCoordinator", fields: [coordinatorProjectAgentId], references: [id])
   projectAgents  ProjectAgent[]
   tasks          Task[]
   resourceKeys   ResourceKey[]
@@ -358,6 +360,7 @@ model ProjectAgent {
   agreement         ProjectAgreement?
   runLogs           AgentRunLog[]
   plannerForProjects Project[]       @relation("ProjectPlanner")
+  coordinatorForProjects Project[]   @relation("ProjectCoordinator")
   skills            ProjectAgentSkill[]
   mcps              ProjectAgentMcp[]
 
