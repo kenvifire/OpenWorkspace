@@ -38,10 +38,19 @@ const KANBAN_CHANNEL = 'kanban:events';
  * Events emitted by apps/runner are received via Redis pub/sub and forwarded here.
  */
 @WebSocketGateway({
-  cors: { origin: process.env.WEB_URL ?? 'http://localhost:3000', credentials: true },
+  cors: {
+    origin: process.env.WEB_URL ?? 'http://localhost:3000',
+    credentials: true,
+  },
   namespace: '/kanban',
 })
-export class KanbanGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy {
+export class KanbanGateway
+  implements
+    OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleDestroy
+{
   @WebSocketServer()
   server: Server;
 
@@ -64,7 +73,10 @@ export class KanbanGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
     this.subscriber.on('message', (_channel, message) => {
       try {
-        const { event, payload } = JSON.parse(message) as { event: KanbanEvent; payload: KanbanPayload };
+        const { event, payload } = JSON.parse(message) as {
+          event: KanbanEvent;
+          payload: KanbanPayload;
+        };
         this.emit(event, payload);
       } catch (err) {
         this.logger.error('Failed to parse Kanban event from Redis', err);
@@ -85,13 +97,19 @@ export class KanbanGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   }
 
   @SubscribeMessage('join:project')
-  handleJoinProject(@MessageBody() projectId: string, @ConnectedSocket() client: Socket) {
+  handleJoinProject(
+    @MessageBody() projectId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
     client.join(`project:${projectId}`);
     return { event: 'joined', data: projectId };
   }
 
   @SubscribeMessage('leave:project')
-  handleLeaveProject(@MessageBody() projectId: string, @ConnectedSocket() client: Socket) {
+  handleLeaveProject(
+    @MessageBody() projectId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
     client.leave(`project:${projectId}`);
   }
 
@@ -101,9 +119,20 @@ export class KanbanGateway implements OnGatewayInit, OnGatewayConnection, OnGate
    * Server-side JWT verification of socket connections is a future hardening task.
    */
   @SubscribeMessage('join:user')
-  handleJoinUser(@MessageBody() userId: string, @ConnectedSocket() client: Socket) {
+  handleJoinUser(
+    @MessageBody() userId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
     client.join(`user:${userId}`);
     return { event: 'joined:user', data: userId };
+  }
+
+  @SubscribeMessage('leave:user')
+  handleLeaveUser(
+    @MessageBody() userId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.leave(`user:${userId}`);
   }
 
   /** Emit to all clients in the project room (used by TasksService and Redis subscriber) */
@@ -112,7 +141,11 @@ export class KanbanGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   }
 
   /** Emit to a specific user's personal room */
-  emitToUser(userId: string, event: KanbanEvent, data: Record<string, unknown>) {
+  emitToUser(
+    userId: string,
+    event: KanbanEvent,
+    data: Record<string, unknown>,
+  ) {
     this.server?.to(`user:${userId}`).emit(event, data);
   }
 }
