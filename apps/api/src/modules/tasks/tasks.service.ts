@@ -179,11 +179,17 @@ export class TasksService {
 
     this.gateway.emit('comment:created', { projectId, data: { ...comment, taskId } as any });
 
-    // If a human commented on a blocked/todo task with an assignee, re-trigger the agent
+    // If a human commented on a blocked/todo task with an AI assignee, re-trigger the agent
     if (actor.type === 'user' && task.assigneeId && ['BLOCKED', 'TODO', 'IN_PROGRESS'].includes(task.status)) {
       try {
-        await this.agentRunner.stop(taskId);
-        await this.agentRunner.enqueue(taskId, task.assigneeId);
+        const pa = await this.prisma.projectAgent.findUnique({
+          where: { id: task.assigneeId },
+          include: { agent: { select: { type: true } } },
+        });
+        if (pa?.agent.type === 'AI') {
+          await this.agentRunner.stop(taskId);
+          await this.agentRunner.enqueue(taskId, task.assigneeId);
+        }
       } catch (e) {
         // Non-fatal — comment was saved, agent re-trigger failed silently
       }
