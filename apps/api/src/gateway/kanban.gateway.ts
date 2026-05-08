@@ -17,10 +17,16 @@ export type KanbanEvent =
   | 'task:created'
   | 'task:updated'
   | 'task:deleted'
-  | 'comment:created';
+  | 'comment:created'
+  | 'notification:created';
 
 export interface KanbanPayload {
   projectId: string;
+  data: Record<string, unknown>;
+}
+
+export interface UserPayload {
+  userId: string;
   data: Record<string, unknown>;
 }
 
@@ -89,8 +95,24 @@ export class KanbanGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     client.leave(`project:${projectId}`);
   }
 
+  /**
+   * Join the personal notification room for a user.
+   * The client is trusted to pass its own userId (same posture as join:project).
+   * Server-side JWT verification of socket connections is a future hardening task.
+   */
+  @SubscribeMessage('join:user')
+  handleJoinUser(@MessageBody() userId: string, @ConnectedSocket() client: Socket) {
+    client.join(`user:${userId}`);
+    return { event: 'joined:user', data: userId };
+  }
+
   /** Emit to all clients in the project room (used by TasksService and Redis subscriber) */
   emit(event: KanbanEvent, payload: KanbanPayload) {
     this.server?.to(`project:${payload.projectId}`).emit(event, payload.data);
+  }
+
+  /** Emit to a specific user's personal room */
+  emitToUser(userId: string, event: KanbanEvent, data: Record<string, unknown>) {
+    this.server?.to(`user:${userId}`).emit(event, data);
   }
 }
