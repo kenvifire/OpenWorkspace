@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { KanbanGateway } from '../../gateway/kanban.gateway';
 import { AgentRunnerService } from '../agent-runner/agent-runner.service';
 import { PlannerService } from '../planner/planner.service';
+import { CoordinatorService } from '../coordinator/coordinator.service';
 import { TaskStatus, TaskPriority, User, ProjectAgent } from '@prisma/client';
 
 type Actor =
@@ -106,6 +107,10 @@ const mockPlannerService = {
   autoAssignNewTask: jest.fn(),
 };
 
+const mockCoordinatorService = {
+  publish: jest.fn(),
+};
+
 // ── Test suite ────────────────────────────────────────────────────────────────
 
 describe('TasksService', () => {
@@ -128,6 +133,7 @@ describe('TasksService', () => {
         { provide: KanbanGateway, useValue: mockGateway },
         { provide: AgentRunnerService, useValue: mockAgentRunner },
         { provide: PlannerService, useValue: mockPlannerService },
+        { provide: CoordinatorService, useValue: mockCoordinatorService },
       ],
     }).compile();
 
