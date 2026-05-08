@@ -181,7 +181,7 @@ export const coordinatorApi = {
   setCoordinator: (projectId: string, data: { projectAgentId: string }): Promise<{ id: string; coordinatorProjectAgentId: string | null }> =>
     api.post(`/api/projects/${projectId}/coordinator/set`, data).then((r) => r.data),
   unsetCoordinator: (projectId: string): Promise<{ id: string; coordinatorProjectAgentId: string | null }> =>
-    api.delete(`/api/projects/${projectId}/coordinator/set`).then((r) => r.data),
+    api.delete(`/api/projects/${projectId}/coordinator`).then((r) => r.data),
 };
 
 // ─── Two-Factor Auth ──────────────────────────────────────────────────────────

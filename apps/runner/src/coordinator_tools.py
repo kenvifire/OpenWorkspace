@@ -189,7 +189,7 @@ async def _get_board_state(ctx: CoordinatorContext) -> str:
 
     members = await pool.fetch(
         """
-        SELECT u.id AS user_id, u.name, u.email, wm.role
+        SELECT u.id AS user_id, u.name, wm.role
         FROM "WorkspaceMember" wm
         JOIN "User" u ON u.id = wm."userId"
         WHERE wm."workspaceId" = $1
@@ -198,15 +198,36 @@ async def _get_board_state(ctx: CoordinatorContext) -> str:
         project["workspaceId"],
     )
 
+    # Find BLOCKED tasks whose all blocking tasks are DONE (newly unblocked)
+    unblocked_blocked_task_ids = set(
+        r["id"] for r in await pool.fetch(
+            """
+            SELECT t.id
+            FROM "Task" t
+            WHERE t."projectId" = $1
+              AND t.status = 'BLOCKED'::"TaskStatus"
+              AND t."deletedAt" IS NULL
+              AND t."assigneeId" IS NOT NULL
+              AND NOT EXISTS (
+                SELECT 1 FROM "TaskDependency" td
+                JOIN "Task" bt ON bt.id = td."blockingTaskId"
+                WHERE td."blockedTaskId" = t.id
+                  AND bt.status != 'DONE'::"TaskStatus"
+              )
+            """,
+            ctx.project_id,
+        )
+    )
+
     task_list = []
     ready_tasks = []
     for t in tasks:
         blocked_by_list = blocked_by.get(t["id"], [])
+        is_effectively_unblocked = t["id"] in unblocked_blocked_task_ids
         is_ready = (
-            t["status"] in ("TODO", "BACKLOG")
+            (t["status"] in ("TODO", "BACKLOG") or is_effectively_unblocked)
             and t["assignee_type"] == "AI"
             and t["id"] not in running_task_ids
-            and not blocked_by_list
         )
         entry = {
             "id": t["id"],
@@ -217,6 +238,7 @@ async def _get_board_state(ctx: CoordinatorContext) -> str:
             "assignee_type": t["assignee_type"],
             "last_run_status": t["last_run_status"],
             "blocked_by": blocked_by_list,
+            "all_blockers_done": is_effectively_unblocked,
             "recent_comments": comments_by_task.get(t["id"], []),
         }
         task_list.append(entry)

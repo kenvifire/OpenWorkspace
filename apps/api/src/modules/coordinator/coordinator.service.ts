@@ -39,27 +39,62 @@ export class CoordinatorService implements OnModuleInit, OnModuleDestroy {
       throw new NotFoundException('ProjectAgent not found in this project');
     if (pa.agent.type !== 'AI')
       throw new BadRequestException('Only AI agents can be used as coordinators');
+    if (pa.revokedAt)
+      throw new BadRequestException('Revoked agents cannot be used as coordinators');
 
-    return this.prisma.project.update({
+    const project = await this.prisma.project.findUnique({
       where: { id: projectId },
-      data: { coordinatorProjectAgentId: dto.projectAgentId },
-      select: { id: true, coordinatorProjectAgentId: true },
+      select: { coordinatorProjectAgentId: true },
+    });
+
+    return this.prisma.$transaction(async (tx) => {
+      // Clear isCoordinator on any existing coordinator
+      if (project?.coordinatorProjectAgentId && project.coordinatorProjectAgentId !== dto.projectAgentId) {
+        await tx.projectAgent.update({
+          where: { id: project.coordinatorProjectAgentId },
+          data: { isCoordinator: false },
+        });
+      }
+      // Set isCoordinator on the new coordinator
+      await tx.projectAgent.update({
+        where: { id: dto.projectAgentId },
+        data: { isCoordinator: true },
+      });
+      return tx.project.update({
+        where: { id: projectId },
+        data: { coordinatorProjectAgentId: dto.projectAgentId },
+        select: { id: true, coordinatorProjectAgentId: true },
+      });
     });
   }
 
   async unsetCoordinator(projectId: string, user: User) {
     await this.assertProjectLeader(projectId, user.id);
-    return this.prisma.project.update({
+
+    const project = await this.prisma.project.findUnique({
       where: { id: projectId },
-      data: { coordinatorProjectAgentId: null },
-      select: { id: true, coordinatorProjectAgentId: true },
+      select: { coordinatorProjectAgentId: true },
+    });
+
+    return this.prisma.$transaction(async (tx) => {
+      if (project?.coordinatorProjectAgentId) {
+        await tx.projectAgent.update({
+          where: { id: project.coordinatorProjectAgentId },
+          data: { isCoordinator: false },
+        });
+      }
+      return tx.project.update({
+        where: { id: projectId },
+        data: { coordinatorProjectAgentId: null },
+        select: { id: true, coordinatorProjectAgentId: true },
+      });
     });
   }
 
   async publish(
     projectId: string,
     triggerTaskId: string,
-    triggerEvent: 'TASK_DONE' | 'TASK_BLOCKED' | 'TASK_FAILED' | 'HUMAN_DONE',
+    triggerEvent: 'TASK_DONE' | 'TASK_BLOCKED' | 'HUMAN_DONE',
     coordinatorProjectAgentId: string,
   ): Promise<void> {
     await this.redis.xadd(

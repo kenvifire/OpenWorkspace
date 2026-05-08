@@ -141,10 +141,9 @@ export class TasksService {
     this.gateway.emit('task:updated', { projectId, data: updated as any });
 
     if (dto.status && dto.status !== prevStatus) {
-      const relevantEvents: Record<string, 'TASK_DONE' | 'TASK_BLOCKED' | 'TASK_FAILED'> = {
+      const relevantEvents: Record<string, 'TASK_DONE' | 'TASK_BLOCKED'> = {
         DONE: 'TASK_DONE',
         BLOCKED: 'TASK_BLOCKED',
-        FAILED: 'TASK_FAILED',
       };
       const coordinatorEvent = relevantEvents[dto.status];
       const hasCoordinator = coordinatorEvent
@@ -222,7 +221,7 @@ export class TasksService {
   private async maybeNotifyCoordinator(
     projectId: string,
     taskId: string,
-    event: 'TASK_DONE' | 'TASK_BLOCKED' | 'TASK_FAILED' | 'HUMAN_DONE',
+    event: 'TASK_DONE' | 'TASK_BLOCKED' | 'HUMAN_DONE',
   ): Promise<boolean> {
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },

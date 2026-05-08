@@ -23,7 +23,7 @@ export class CoordinatorController {
     return this.service.setCoordinator(projectId, dto, user);
   }
 
-  @Delete('set')
+  @Delete()
   @ApiOperation({ summary: 'Remove the coordinator agent from this project' })
   unsetCoordinator(
     @Param('projectId') projectId: string,
