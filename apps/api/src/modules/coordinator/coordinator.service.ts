@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import { PrismaService } from '../prisma/prisma.service';
@@ -8,18 +8,24 @@ import type { User } from '@prisma/client';
 export const COORDINATOR_STREAM = 'coordinator-events';
 
 @Injectable()
-export class CoordinatorService {
+export class CoordinatorService implements OnModuleInit, OnModuleDestroy {
   private redis: Redis;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
-  ) {
+  ) {}
+
+  onModuleInit() {
     this.redis = new Redis({
       host: this.config.get('REDIS_HOST', 'localhost'),
       port: this.config.get<number>('REDIS_PORT', 6379),
       password: this.config.get('REDIS_PASSWORD') || undefined,
     });
+  }
+
+  async onModuleDestroy() {
+    await this.redis?.quit();
   }
 
   async setCoordinator(projectId: string, dto: SetCoordinatorDto, user: User) {
